@@ -49,6 +49,11 @@ Note: this configuration wil be easier in Capacitor 3 which [recently went into 
 
 API Routes can be used but some minimal configuration is required. See [this discussion](https://github.com/mlynch/nextjs-tailwind-ionic-capacitor-starter/issues/4#issuecomment-754030049) for more information.
 
+## SEO & Static Hosting
+
+- **Is the exported PWA crawlable?** By default this starter renders everything on the client (see `components/AppShell.tsx`), so the static build contains a minimal HTML shell that immediately hands off to JavaScript. Search engine bots that depend on server-rendered HTML will not see meaningful page content, so the project is not SEO-friendly out of the box. If you need full SEO support, SSR/SSG needs to be working on the routes you want indexed or using a parallel, SEO-optimized web surface, but take a look at the below caveat about this project.
+- **Can I host the export as static HTML?** Yes. `next.config.js` sets `output: 'export'`, so `npm run build` writes a fully static bundle to the `out/` directory. You can deploy those files to any static host (e.g. Vercel static, Netlify, S3, GitHub Pages) or let Capacitor copy them into the native shells.
+
 ## Caveats
 
 One caveat with this project: Because the app must be able to run purely client-side and use [Next.js's Export command](https://nextjs.org/docs/advanced-features/static-html-export), that means no Server Side Rendering in this code base. There is likely a way to SSR and a fully static Next.js app in tandem but it requires [a Babel plugin](https://github.com/erzr/next-babel-conditional-ssg-ssr) or would involve a more elaborate monorepo setup with code sharing that is out of scope for this project.

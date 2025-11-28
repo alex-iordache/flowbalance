@@ -18,7 +18,7 @@ import { notificationsOutline } from 'ionicons/icons';
 import { selectHomeItems } from '../../store/selectors';
 import Store from '../../store';
 
-type FeedCardProps = {
+type HomeCardProps = {
   title: string;
   type: string;
   text: string;
@@ -27,14 +27,14 @@ type FeedCardProps = {
   image: string;
 };
 
-const FeedCard = ({
+const HomeCard = ({
   title,
   type,
   text,
   author,
   authorAvatar,
   image,
-}: FeedCardProps) => (
+}: HomeCardProps) => (
   <Card className="my-4 mx-auto">
     <div className="h-32 w-full relative">
       <Image
@@ -71,7 +71,7 @@ const FeedCard = ({
   </Card>
 );
 
-const Feed = () => {
+const Home = () => {
   const homeItems = Store.useState(selectHomeItems);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -79,7 +79,7 @@ const Feed = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Feed</IonTitle>
+          <IonTitle>Home</IonTitle>
           <IonButtons slot="start">
             <IonMenuButton />
           </IonButtons>
@@ -93,7 +93,7 @@ const Feed = () => {
       <IonContent className="ion-padding" fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Feed</IonTitle>
+            <IonTitle size="large">Home</IonTitle>
           </IonToolbar>
         </IonHeader>
         <Notifications
@@ -101,11 +101,11 @@ const Feed = () => {
           onDidDismiss={() => setShowNotifications(false)}
         />
         {homeItems.map((i, index) => (
-          <FeedCard {...i} key={index} />
+          <HomeCard {...i} key={index} />
         ))}
       </IonContent>
     </IonPage>
   );
 };
 
-export default Feed;
+export default Home;

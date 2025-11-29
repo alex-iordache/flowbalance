@@ -10,8 +10,9 @@ import {
 import { home, pulse, trendingUp } from 'ionicons/icons';
 
 import Home from './Home';
-import Lists from './Lists';
-import ListDetail from './ListDetail';
+import Flows from './Flows';
+import FlowDetail from './FlowDetail';
+import Practice from './Practice';
 import Settings from './Settings';
 
 const Tabs = () => {
@@ -20,10 +21,15 @@ const Tabs = () => {
       <IonRouterOutlet>
         <Switch>
           <Route path="/home" render={() => <Home />} exact={true} />
-          <Route path="/lists" render={() => <Lists />} exact={true} />
+          <Route path="/flows" render={() => <Flows />} exact={true} />
           <Route
-            path="/lists/:listId"
-            render={() => <ListDetail />}
+            path="/flows/:flowId"
+            render={() => <FlowDetail />}
+            exact={true}
+          />
+          <Route
+            path="/flows/:flowId/:practiceId"
+            render={() => <Practice />}
             exact={true}
           />
           <Route path="/settings" render={() => <Settings />} exact={true} />
@@ -35,7 +41,7 @@ const Tabs = () => {
           <IonIcon icon={home} />
           <IonLabel>Home</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="tab2" href="/lists">
+        <IonTabButton tab="tab2" href="/flows">
           <IonIcon icon={pulse} />
           <IonLabel>Flows</IonLabel>
         </IonTabButton>

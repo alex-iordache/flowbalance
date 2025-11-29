@@ -1,3 +1,4 @@
+import { type Flow } from '../../data';
 import { TodoListItem } from '../../mock';
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -32,26 +33,43 @@ const AllLists = () => {
   );
 };
 
-const Lists = () => {
+const AllFlows = () => {
+  const flows = Store.useState(s => s.flows);
+  return (
+    <IonList>
+      {flows.map((flow, i) => (
+        <Flow flow={flow} key={i} />
+      ))}
+    </IonList>
+  );
+};
+
+const Flow = ({ flow }: { flow: Flow }) => {
+  return (
+    <IonItem routerLink={`/flows/${flow.id}`} className="flow-entry">
+      <IonLabel>{flow.name}</IonLabel>
+    </IonItem>
+  );
+};
+
+const Flows = () => {
   return (
     <IonPage>
       <IonHeader translucent={true}>
         <IonToolbar>
-          <IonTitle>Lists</IonTitle>
+          <IonTitle>Flows</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Lists</IonTitle>
+            <IonTitle size="large">Flows</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonList>
-          <AllLists />
-        </IonList>
-      </IonContent>
+        <AllFlows />
+        </IonContent>
     </IonPage>
   );
-};
-
-export default Lists;
+  }
+  
+  export default Flows;

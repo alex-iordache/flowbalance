@@ -1,5 +1,6 @@
 import Store from '.';
 import { ListItem, Settings, TodoListItem } from '../mock';
+import { Flow } from '../data';
 
 export const setMenuOpen = (open: boolean) => {
   Store.update(s => {
@@ -42,5 +43,36 @@ export const setDone = (
     if (list === o.selectedList) {
       s.selectedList = s.lists[listIndex];
     }
+  });
+};
+
+export const setPracticeFinished = (
+  flowId: string,
+  practiceId: string,
+  finished: boolean,
+) => {
+  Store.update((s, o) => {
+    const flowIndex = o.flows.findIndex(f => f.id === flowId);
+    if (flowIndex === -1) return;
+
+    const practiceIndex = o.flows[flowIndex].practices.findIndex(p => p.id === practiceId);
+    if (practiceIndex === -1) return;
+
+    const draftPractice = s.flows[flowIndex].practices[practiceIndex];
+    if (!draftPractice) return;
+
+    draftPractice.finished = finished;
+  });
+};
+
+export const setFlowStarted = (flowId: string, started: boolean) => {
+  Store.update((s, o) => {
+    const flowIndex = o.flows.findIndex(f => f.id === flowId);
+    if (flowIndex === -1) return;
+
+    const draftFlow = s.flows[flowIndex];
+    if (!draftFlow) return;
+
+    draftFlow.started = started;
   });
 };

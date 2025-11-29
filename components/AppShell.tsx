@@ -3,8 +3,10 @@ import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route } from 'react-router-dom';
+import { useEffect } from 'react';
 
 import Tabs from './pages/Tabs';
+import { loadAllPersistedState } from '../store/persistence';
 
 setupIonicReact({});
 
@@ -19,6 +21,11 @@ window
   });
 
 const AppShell = () => {
+  useEffect(() => {
+    // Load persisted state when app initializes
+    loadAllPersistedState();
+  }, []);
+
   return (
     <IonApp>
       <IonReactRouter>

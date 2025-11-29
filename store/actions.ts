@@ -1,6 +1,7 @@
 import Store from '.';
 import { ListItem, Settings, TodoListItem } from '../mock';
 import { Flow } from '../data';
+import { saveFlowsState, saveSettingsState, saveListsState } from './persistence';
 
 export const setMenuOpen = (open: boolean) => {
   Store.update(s => {
@@ -18,6 +19,7 @@ export const setSettings = (settings: Settings) => {
   Store.update(s => {
     s.settings = settings;
   });
+  saveSettingsState();
 };
 
 // App-specific actions
@@ -44,6 +46,7 @@ export const setDone = (
       s.selectedList = s.lists[listIndex];
     }
   });
+  saveListsState();
 };
 
 export const setPracticeFinished = (
@@ -63,6 +66,7 @@ export const setPracticeFinished = (
 
     draftPractice.finished = finished;
   });
+  saveFlowsState();
 };
 
 export const setFlowStarted = (flowId: string, started: boolean) => {
@@ -75,4 +79,5 @@ export const setFlowStarted = (flowId: string, started: boolean) => {
 
     draftFlow.started = started;
   });
+  saveFlowsState();
 };

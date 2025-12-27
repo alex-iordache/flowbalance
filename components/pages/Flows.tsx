@@ -11,53 +11,56 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonButton,
+  IonButtons,
+  IonIcon,
 } from '@ionic/react';
-
-const ListEntry = ({ list }: { list: TodoListItem }) => {
-  return (
-    <IonItem routerLink={`/lists/${list.id}`} className="list-entry">
-      <IonLabel>{list.name}</IonLabel>
-    </IonItem>
-  );
-};
-
-const AllLists = () => {
-  const lists = Store.useState(selectors.selectLists);
-
-  return (
-    <>
-      {lists.map((list, i) => (
-        <ListEntry list={list} key={i} />
-      ))}
-    </>
-  );
-};
+import { useHistory } from 'react-router-dom';
+import { settingsOutline } from 'ionicons/icons';
+import Logo from '../ui/Logo';
 
 const AllFlows = () => {
   const flows = Store.useState(s => s.flows);
   return (
-    <IonList>
+    <div className="flex flex-col gap-4 p-4">
       {flows.map((flow, i) => (
         <Flow flow={flow} key={i} />
       ))}
-    </IonList>
+    </div>
   );
 };
 
 const Flow = ({ flow }: { flow: Flow }) => {
+  const history = useHistory();
+  
   return (
-    <IonItem routerLink={`/flows/${flow.id}`} className="flow-entry">
-      <IonLabel>{flow.name}</IonLabel>
-    </IonItem>
+    <div 
+      onClick={() => history.push(`/flows/${flow.id}`)}
+      className="flow-entry cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl max-w-xl gap-4"
+    >
+
+      <img className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start" src={flow.image} alt={flow.name} />
+      <div className="flex flex-col justify-between flex-1 leading-normal min-w-0">
+        <h5 className="mt-0 mb-2 text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">{flow.name}</h5>
+        <p className="mb-1 text-sm md:text-base text-white">{flow.intro}</p>
+    </div>
+
+    </div>
   );
 };
 
 const Flows = () => {
+  const history = useHistory();
   return (
     <IonPage>
       <IonHeader translucent={true}>
         <IonToolbar>
-          <IonTitle>Flows</IonTitle>
+          <Logo />
+          <IonButtons slot="end">
+            <IonButton onClick={() => history.push('/settings')}>
+              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>

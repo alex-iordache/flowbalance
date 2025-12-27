@@ -17,13 +17,17 @@
     "presync": "npm run build",
     "sync": "npx cap sync",
     "android": "npx cap run android",
-    "ios": "npx cap run ios"
+    "ios": "npx cap run ios",
+    "make-android": "npm run build && npx cap sync android && cd android && ./gradlew assembleDebug"
   },
   "dependencies": {
     "@capacitor/android": "7.4.4",
+    "@capacitor/app": "7.1.0",
     "@capacitor/cli": "7.4.4",
     "@capacitor/core": "7.4.4",
+    "@capacitor/haptics": "7.0.2",
     "@capacitor/ios": "7.4.4",
+    "@capacitor/keyboard": "7.0.3",
     "@capacitor/preferences": "7.0.2",
     "@capacitor/status-bar": "7.0.3",
     "@ionic/react": "7.7.4",

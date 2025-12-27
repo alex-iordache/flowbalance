@@ -1,3 +1,16 @@
+/**
+ * STYLE GUIDE REMINDER:
+ * 
+ * All new CSS styling should use Tailwind CSS utility classes whenever possible.
+ * Only add raw CSS here for:
+ * - Ionic component CSS variables (--background, --ion-color-*, etc.)
+ * - Global styles that can't be achieved with Tailwind
+ * - Third-party component overrides
+ * - Complex animations/pseudo-elements
+ * 
+ * See README.md for full style guide details.
+ */
+
 :root {
   --safe-area-top: env(safe-area-inset-top);
   --safe-area-bottom: env(safe-area-inset-bottom, 0);
@@ -192,4 +205,35 @@ body {
   -webkit-box-shadow: 0px 0px 5px 5px #0099e0;
   -moz-box-shadow: 0px 0px 5px 5px #0099e0;
   box-shadow: 0px 0px 5px 5px #0099e0;
+}
+
+ion-content {
+  /* Use the CSS Custom Property for ionic background */
+  --background: linear-gradient(10deg,rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 50%, rgb(224, 135, 10) 100%) no-repeat center center / cover;
+}
+
+/* Make toolbar background transparent */
+ion-toolbar {
+  --background: linear-gradient(180deg, rgba(224, 135, 10) 60%, rgba(253, 29, 29, 1) 200%) no-repeat center center / cover;
+}
+
+/* Remove background from IonItem in FlowDetail */
+ion-item.no-bg-color {
+  --ion-item-background: transparent !important;
+  --background: transparent !important;
+  --background-hover: transparent !important;
+  --background-activated: transparent !important;
+  --background-focused: transparent !important;
+}
+
+.header-md {
+  box-shadow: 0 2px 4px -1px rgba(255, 255, 255, 0.2), 0 4px 5px 0 rgba(255, 255, 255, 0.14), 0 1px 10px 0 rgba(255, 255, 255, 0.12);
+}
+
+.hello-user-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }

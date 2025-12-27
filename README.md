@@ -67,3 +67,30 @@ You can think of [Capacitor](https://capacitorjs.com/) as a sort of "electron fo
 Capacitor provides access to Native APIs and a plugin system for building any native functionality your app needs.
 
 Capacitor apps can also run in the browser as a Progressive Web App with the same code.
+
+## Style Guide
+
+### CSS Styling Standards
+
+**All new CSS styling should use Tailwind CSS utility classes whenever possible.**
+
+- ✅ **Preferred**: Use Tailwind utility classes in JSX/TSX components (e.g., `className="flex items-center justify-center"`)
+- ⚠️ **Acceptable**: Use raw CSS only when:
+  - Styling Ionic component CSS variables (e.g., `--background`, `--ion-color-primary`)
+  - Creating global styles that can't be achieved with Tailwind
+  - Working with third-party component libraries that require CSS variable overrides
+  - Complex animations or pseudo-elements that require raw CSS
+
+- ❌ **Avoid**: Writing custom CSS classes in `global.css` or component-specific CSS files when Tailwind utilities can achieve the same result.
+
+**Examples:**
+```tsx
+// ✅ Good - Using Tailwind
+<div className="flex items-center justify-center p-4 bg-white rounded-lg shadow-md">
+
+// ❌ Avoid - Custom CSS when Tailwind can do it
+<div className="custom-centered-container">
+// .custom-centered-container { display: flex; align-items: center; ... }
+```
+
+**Note**: Existing CSS in `global.css` and `variables.css` is maintained for Ionic theming and legacy styles, but new styling should follow the Tailwind-first approach.

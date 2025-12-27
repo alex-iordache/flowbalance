@@ -1,6 +1,7 @@
 import { Preferences } from '@capacitor/preferences';
 import Store from '.';
 import { Flow } from '../data';
+import { flows as defaultFlows } from '../data';
 
 const STORAGE_KEYS = {
   FLOWS: 'flows_state',
@@ -88,24 +89,41 @@ export const loadListsState = async () => {
 
 // Load all persisted state and merge with defaults
 export const loadAllPersistedState = async () => {
-  const [flows, settings, lists] = await Promise.all([
+  const [persistedFlows, settings, lists] = await Promise.all([
     loadFlowsState(),
     loadSettingsState(),
     loadListsState(),
   ]);
 
-  if (flows || settings || lists) {
-    Store.update(s => {
-      if (flows) {
-        s.flows = flows;
-      }
-      if (settings) {
-        s.settings = settings;
-      }
-      if (lists) {
-        s.lists = lists;
-      }
-    });
-  }
+  Store.update(s => {
+    // Merge persisted flows with default flows to preserve user progress while using fresh content
+    if (persistedFlows) {
+      s.flows = defaultFlows.map(defaultFlow => {
+        const persistedFlow = persistedFlows.find(pf => pf.id === defaultFlow.id);
+        if (persistedFlow) {
+          // Merge: use default content but preserve user progress
+          return {
+            ...defaultFlow,
+            started: persistedFlow.started,
+            finished: persistedFlow.finished,
+            practices: defaultFlow.practices.map(defaultPractice => {
+              const persistedPractice = persistedFlow.practices.find(pp => pp.id === defaultPractice.id);
+              return persistedPractice
+                ? { ...defaultPractice, finished: persistedPractice.finished }
+                : defaultPractice;
+            }),
+          };
+        }
+        return defaultFlow;
+      });
+    }
+    
+    if (settings) {
+      s.settings = settings;
+    }
+    if (lists) {
+      s.lists = lists;
+    }
+  });
 };
 

@@ -14,95 +14,60 @@ import {
 } from '@ionic/react';
 import Notifications from './Notifications';
 import { useState } from 'react';
-import { notificationsOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
+import { notificationsOutline, settingsOutline } from 'ionicons/icons';
 import { selectHomeItems } from '../../store/selectors';
 import Store from '../../store';
+import Logo from '../ui/Logo';
 
-type HomeCardProps = {
-  title: string;
-  type: string;
-  text: string;
-  author: string;
-  authorAvatar: string;
-  image: string;
-};
+type HelloUserProps ={
+  firstName: string;
+}
 
-const HomeCard = ({
-  title,
-  type,
-  text,
-  author,
-  authorAvatar,
-  image,
-}: HomeCardProps) => (
-  <Card className="my-4 mx-auto">
-    <div className="h-32 w-full relative">
-      <Image
-        className="rounded-t-xl object-cover min-w-full min-h-full max-w-full max-h-full"
-        src={image}
-        alt=""
-        fill
-      />
-    </div>
-    <div className="px-4 py-4 bg-white rounded-b-xl dark:bg-gray-900">
-      <h4 className="font-bold py-0 text-s text-gray-400 dark:text-gray-500 uppercase">
-        {type}
-      </h4>
-      <h2 className="font-bold text-2xl text-gray-800 dark:text-gray-100">
-        {title}
-      </h2>
-      <p className="sm:text-sm text-s text-gray-500 mr-1 my-3 dark:text-gray-400">
-        {text}
-      </p>
-      <div className="flex items-center space-x-4">
-        <div className="w-10 h-10 relative">
-          <Image
-            src={authorAvatar}
-            className="rounded-full object-cover min-w-full min-h-full max-w-full max-h-full"
-            alt=""
-            fill
-          />
-        </div>
-        <h3 className="text-gray-500 dark:text-gray-200 m-l-8 text-sm font-medium">
-          {author}
-        </h3>
-      </div>
-    </div>
-  </Card>
-);
+const HelloUser = ({ firstName}: HelloUserProps) => (
+  <div className="hello-user-container">
+    <h2 className="font-bold text-2xl text-gray-800 dark:text-gray-100">Hello, {firstName}!</h2>
+    <p className="sm:text-sm text-s text-white mr-1 my-3">For you:</p>
+  </div>
+)
 
+type SimpleCardCTAProps = {
+  minutes: number;
+}
+
+const SimpleCardCTA = ({ minutes }: SimpleCardCTAProps) => (
+  <div className="bg-white text-black block max-w-sm p-6 border border-gray-200 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
+      <p className="text-gray-600">Stress Break Ziua 1 - 5 min</p>
+      <h5 className="mb-3 text-2xl font-semibold tracking-tight text-black leading-8">Stress Break</h5>
+      <button className="inline-flex items-center justify-center text-white bg-amber-500 hover:bg-amber-600 focus:ring-4 focus:ring-amber-300 shadow-sm font-medium leading-5 rounded-lg text-sm px-4 py-2.5 focus:outline-none transition-colors">
+          Continue
+          <svg className="w-4 h-4 ml-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m14 0-4 4m4-4-4-4"/></svg>
+      </button>
+  </div>
+)
 const Home = () => {
-  const homeItems = Store.useState(selectHomeItems);
   const [showNotifications, setShowNotifications] = useState(false);
+  const history = useHistory();
 
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Home</IonTitle>
-          <IonButtons slot="start">
-            <IonMenuButton />
-          </IonButtons>
+          <Logo />
           <IonButtons slot="end">
-            <IonButton onClick={() => setShowNotifications(true)}>
-              <IonIcon icon={notificationsOutline} />
+            <IonButton onClick={() => history.push('/settings')}>
+              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding" fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Home</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         <Notifications
           open={showNotifications}
           onDidDismiss={() => setShowNotifications(false)}
         />
-        {homeItems.map((i, index) => (
-          <HomeCard {...i} key={index} />
-        ))}
+        <HelloUser firstName="Alex"/>
+        <SimpleCardCTA minutes={5} />
       </IonContent>
     </IonPage>
   );

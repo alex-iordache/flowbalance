@@ -14,6 +14,7 @@ import Flows from './Flows';
 import FlowDetail from './FlowDetail';
 import Practice from './Practice';
 import Settings from './Settings';
+import MyProgress from './MyProgress';
 
 const Tabs = () => {
   return (
@@ -33,6 +34,7 @@ const Tabs = () => {
             exact={true}
           />
           <Route path="/settings" render={() => <Settings />} exact={true} />
+          <Route path="/progress" render={() => <MyProgress />} exact={true} />
           <Route render={() => <Redirect to="/home" />}/>
         </Switch>
       </IonRouterOutlet>
@@ -45,7 +47,7 @@ const Tabs = () => {
           <IonIcon icon={pulse} />
           <IonLabel>Flows</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="tab3" href="/settings">
+        <IonTabButton tab="tab3" href="/progress">
           <IonIcon icon={trendingUp} />
           <IonLabel>My Progress</IonLabel>
         </IonTabButton>

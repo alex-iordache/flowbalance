@@ -6,7 +6,15 @@
 	"webDir": "out",
 	"server": {
 		"url": "https://flowbalance-jdk.vercel.app",
-		"cleartext": true
+		"cleartext": false,
+		"androidScheme": "https",
+		"allowNavigation": [
+			"flowbalance-jdk.vercel.app",
+			"*.vercel.app",
+			"accounts.clerk.dev",
+			"*.clerk.accounts.dev",
+			"clerk.shared.lcl.dev"
+		]
 	},
 	"plugins": {
 		"SplashScreen": {

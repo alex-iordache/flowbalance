@@ -9,13 +9,14 @@ export async function generateStaticParams() {
   return [
     { all: ['home'] },
     { all: ['flows'] },
+    { all: ['settings'] },
+    { all: ['progress'] },
     ...flows.map(flow => ({ all: ['flows', flow.id] })),
     ...flows.flatMap(flow => 
       flow.practices.map(practice => ({ 
         all: ['flows', flow.id, practice.id] 
       }))
     ),
-    { all: ['settings'] },
   ];
 }
 

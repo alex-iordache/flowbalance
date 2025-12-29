@@ -2,8 +2,9 @@
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
-import { Route } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import { useEffect } from 'react';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
 
 import Tabs from './pages/Tabs';
 import { loadAllPersistedState } from '../store/persistence';
@@ -30,7 +31,54 @@ const AppShell = () => {
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet id="main">
-          <Route path="/" render={() => <Tabs />} />
+          {/* Main app routes - protected by Clerk middleware */}
+          <Route path="/home" render={() => (
+            <SignedIn>
+              <Tabs />
+            </SignedIn>
+          )} />
+          
+          <Route path="/flows" render={() => (
+            <SignedIn>
+              <Tabs />
+            </SignedIn>
+          )} />
+          
+          <Route path="/settings" render={() => (
+            <SignedIn>
+              <Tabs />
+            </SignedIn>
+          )} />
+          
+          <Route path="/progress" render={() => (
+            <SignedIn>
+              <Tabs />
+            </SignedIn>
+          )} />
+          
+          {/* Root route - redirects based on auth status */}
+          <Route path="/" exact={true} render={() => (
+            <>
+              <SignedIn>
+                <Redirect to="/home" />
+              </SignedIn>
+              <SignedOut>
+                <Redirect to="/sign-in" />
+              </SignedOut>
+            </>
+          )} />
+          
+          {/* Catch-all route */}
+          <Route render={() => (
+            <>
+              <SignedIn>
+                <Redirect to="/home" />
+              </SignedIn>
+              <SignedOut>
+                <Redirect to="/sign-in" />
+              </SignedOut>
+            </>
+          )} />
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

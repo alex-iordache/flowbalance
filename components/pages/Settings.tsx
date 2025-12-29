@@ -7,7 +7,9 @@ import {
   IonContent,
   IonList,
   IonToggle,
+  IonButton,
 } from '@ionic/react';
+import { SignOutButton } from '@clerk/nextjs';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -15,6 +17,7 @@ import { setSettings } from '../../store/actions';
 
 const Settings = () => {
   const settings = Store.useState(selectors.selectSettings);
+
   return (
     <IonPage>
       <IonHeader>
@@ -36,6 +39,18 @@ const Settings = () => {
             >
               Enable Notifications
             </IonToggle>
+          </IonItem>
+          
+          <IonItem>
+            <SignOutButton>
+              <IonButton
+                expand="block"
+                color="danger"
+                className="w-full mt-4"
+              >
+                Sign Out
+              </IonButton>
+            </SignOutButton>
           </IonItem>
         </IonList>
       </IonContent>

@@ -1,12 +1,19 @@
 {
-  "appId": "com.example.app",
-  "appName": "FlowBalance",
+  "appId": "com.flowapp.app",
+  "appName": "Flow",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "out",
+  "server": {
+    "url": "https://flowbalance-jdk.vercel.app",
+    "cleartext": true
+  },
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 0
+    },
+    "CapacitorCookies": {
+      "enabled": true
     }
   },
   "cordova": {}

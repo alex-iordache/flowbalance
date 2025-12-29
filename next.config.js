@@ -9,9 +9,7 @@ module.exports = {
         pathname: '**',
       },
     ],
-    unoptimized: true,
   },
-  ...(process.env.NODE_ENV === 'production' && { output: 'export' }),
   swcMinify: true,
   transpilePackages: [
     '@ionic/react',

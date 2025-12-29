@@ -8,10 +8,9 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware(async (auth, request) => {
-  // Protect all routes except public ones
-  if (!isPublicRoute(request)) {
-    await auth.protect();
-  }
+  // For mobile apps, we rely on client-side auth checks only
+  // Server-side protection causes browser redirects in Capacitor
+  // All routes are accessible, auth checks happen in components
 });
 
 export const config = {

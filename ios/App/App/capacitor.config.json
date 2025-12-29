@@ -11,9 +11,13 @@
 		"allowNavigation": [
 			"flowbalance-jdk.vercel.app",
 			"*.vercel.app",
+			"clerk.com",
+			"*.clerk.com",
 			"accounts.clerk.dev",
 			"*.clerk.accounts.dev",
-			"clerk.shared.lcl.dev"
+			"clerk.accounts.dev",
+			"clerk.shared.lcl.dev",
+			"*.lcl.dev"
 		]
 	},
 	"plugins": {

@@ -8,7 +8,7 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (isLoaded && userId) {
-      // User is already signed in, use full page navigation to trigger Ionic router
+      // User is signed in, redirect to home using full page navigation
       window.location.href = '/home';
     }
   }, [isLoaded, userId]);
@@ -25,7 +25,6 @@ export default function SignInPage() {
     >
       <div className="w-full max-w-md px-4">
         <SignIn 
-          forceRedirectUrl="/home"
           signUpUrl="/sign-up"
           appearance={{
             elements: {

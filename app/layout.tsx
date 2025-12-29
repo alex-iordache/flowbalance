@@ -40,7 +40,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider
+      allowedRedirectOrigins={[
+        'https://flowbalance-jdk.vercel.app',
+        'capacitor://localhost',
+        'http://localhost',
+        'ionic://localhost'
+      ]}
+    >
       <html lang="en" suppressHydrationWarning>
         <body>
           <CapacitorBrowserBlock />

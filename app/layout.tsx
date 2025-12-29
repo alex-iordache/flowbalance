@@ -42,6 +42,43 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
         <body>{children}</body>
+        
+        {/* Prevent external browser opens in Capacitor */}
+        <Script
+          id="prevent-external-browser"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                // Block window.open completely
+                window.open = function() {
+                  console.log('[BLOCKED] Prevented window.open call');
+                  return null;
+                };
+                
+                // Intercept link clicks that might open browser
+                document.addEventListener('click', function(e) {
+                  var target = e.target;
+                  while (target && target.tagName !== 'A') {
+                    target = target.parentElement;
+                  }
+                  if (target && target.tagName === 'A') {
+                    var href = target.getAttribute('href');
+                    // Allow internal navigation
+                    if (href && (href.startsWith('/') || href.startsWith('#'))) {
+                      return;
+                    }
+                    // Block everything else
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('[BLOCKED] Prevented external link:', href);
+                  }
+                }, true);
+              }
+            `
+          }}
+        />
+        
         <Script
           type="module"
           src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.esm.js"

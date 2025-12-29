@@ -4,7 +4,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
 import { useEffect } from 'react';
-import { SignedIn, SignedOut } from '@clerk/nextjs';
+import { SignedIn, SignedOut, useAuth } from '@clerk/nextjs';
 
 import Tabs from './pages/Tabs';
 import { loadAllPersistedState } from '../store/persistence';
@@ -20,6 +20,19 @@ window
       });
     } catch {}
   });
+
+const SignOutRedirect = () => {
+  const { isLoaded, userId } = useAuth();
+  
+  useEffect(() => {
+    if (isLoaded && !userId) {
+      // User is not signed in, redirect to sign-in page
+      window.location.href = '/sign-in';
+    }
+  }, [isLoaded, userId]);
+  
+  return <div>Loading...</div>;
+};
 
 const AppShell = () => {
   useEffect(() => {
@@ -63,7 +76,7 @@ const AppShell = () => {
                 <Redirect to="/home" />
               </SignedIn>
               <SignedOut>
-                <Redirect to="/sign-in" />
+                <SignOutRedirect />
               </SignedOut>
             </>
           )} />
@@ -75,7 +88,7 @@ const AppShell = () => {
                 <Redirect to="/home" />
               </SignedIn>
               <SignedOut>
-                <Redirect to="/sign-in" />
+                <SignOutRedirect />
               </SignedOut>
             </>
           )} />

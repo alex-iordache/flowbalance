@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { ClerkProvider } from '@clerk/nextjs';
+import CapacitorBrowserBlock from '../components/CapacitorBrowserBlock';
 
 import 'tailwindcss/tailwind.css';
 /* Core CSS required for Ionic components to work properly */
@@ -41,43 +42,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
-        <body>{children}</body>
-        
-        {/* Prevent external browser opens in Capacitor */}
-        <Script
-          id="prevent-external-browser"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              if (typeof window !== 'undefined') {
-                // Block window.open completely
-                window.open = function() {
-                  console.log('[BLOCKED] Prevented window.open call');
-                  return null;
-                };
-                
-                // Intercept link clicks that might open browser
-                document.addEventListener('click', function(e) {
-                  var target = e.target;
-                  while (target && target.tagName !== 'A') {
-                    target = target.parentElement;
-                  }
-                  if (target && target.tagName === 'A') {
-                    var href = target.getAttribute('href');
-                    // Allow internal navigation
-                    if (href && (href.startsWith('/') || href.startsWith('#'))) {
-                      return;
-                    }
-                    // Block everything else
-                    e.preventDefault();
-                    e.stopPropagation();
-                    console.log('[BLOCKED] Prevented external link:', href);
-                  }
-                }, true);
-              }
-            `
-          }}
-        />
+        <body>
+          <CapacitorBrowserBlock />
+          {children}
+        </body>
         
         <Script
           type="module"

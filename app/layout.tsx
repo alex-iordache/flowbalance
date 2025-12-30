@@ -47,9 +47,6 @@ export default function RootLayout({
         'http://localhost',
         'ionic://localhost'
       ]}
-      signUpForceRedirectUrl="/post-signup-redirect"
-      signUpFallbackRedirectUrl="/post-signup-redirect"
-      signInFallbackRedirectUrl="/home"
     >
       <html lang="en" suppressHydrationWarning>
         <body>

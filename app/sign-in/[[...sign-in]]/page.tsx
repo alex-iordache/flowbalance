@@ -2,19 +2,25 @@
 
 import { SignIn } from '@clerk/nextjs';
 import { IonPage, IonContent, IonButton } from '@ionic/react';
-import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * Sign In Page
  * 
- * Uses App.openUrl() to open sign-up in system browser.
+ * Opens sign-up in system browser (proper Next.js + Capacitor pattern).
  */
 export default function SignInPage() {
   const handleCreateAccount = async () => {
-    // Opens in SYSTEM browser (Chrome/Safari), not in-app
-    await App.openUrl({
-      url: 'https://flowbalance-jdk.vercel.app/sign-up-web'
-    });
+    const url = 'https://flowbalance-jdk.vercel.app/sign-up-web';
+
+    if (Capacitor.isNativePlatform()) {
+      // Native: Open in system browser using App.openUrl()
+      const { App } = await import('@capacitor/app');
+      await App.openUrl({ url });
+    } else {
+      // Web: Open in new tab
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (

@@ -2,19 +2,25 @@
 
 import { useEffect } from 'react';
 import { IonPage, IonContent, IonButton } from '@ionic/react';
-import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * Subscribe Page (Mobile)
  * 
- * Uses App.openUrl() to open subscription in system browser.
+ * Opens subscription in system browser (proper Next.js + Capacitor pattern).
  */
 export default function SubscribePage() {
   const handleSubscribe = async () => {
-    // Opens in SYSTEM browser (Chrome/Safari), not in-app
-    await App.openUrl({
-      url: 'https://flowbalance-jdk.vercel.app/subscribe-web'
-    });
+    const url = 'https://flowbalance-jdk.vercel.app/subscribe-web';
+
+    if (Capacitor.isNativePlatform()) {
+      // Native: Open in system browser using App.openUrl()
+      const { App } = await import('@capacitor/app');
+      await App.openUrl({ url });
+    } else {
+      // Web: Open in new tab
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
   };
 
   useEffect(() => {

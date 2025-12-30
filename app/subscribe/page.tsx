@@ -1,81 +1,32 @@
 'use client';
 
-import { PricingTable } from '@clerk/nextjs';
+import { IonButton, IonCard, IonCardContent, IonCardHeader, IonCardTitle, IonIcon, IonList, IonItem, IonLabel } from '@ionic/react';
+import { checkmarkCircle } from 'ionicons/icons';
 import { useEffect } from 'react';
 
 /**
  * Subscription/Pricing Page
  * 
- * This page displays Clerk's PricingTable component which shows
- * all available plans and allows users to subscribe.
- * 
- * Important: Plans must be created in Clerk Dashboard first:
- * https://dashboard.clerk.com/~/billing/plans
- * 
- * Required plans:
- * - free_user (key: 'free_user')
- * - pro_user (key: 'pro_user')
- * 
- * On mobile, Stripe checkout opens in external browser automatically
- * to avoid Google Play's 30% fee (detected by stripe.com domain)
+ * For mobile apps, we can't use Clerk's <PricingTable /> component
+ * because it opens payment in-app. Instead, we redirect users to
+ * the web version of the subscribe page in their external browser
+ * where they can complete payment without Google Play fees.
  */
 export default function SubscribePage() {
   useEffect(() => {
-    console.log('[Subscribe] Setting up Stripe external redirect...');
-
-    // Intercept ANY navigation to stripe.com and force external browser
-    const clickHandler = (e: MouseEvent) => {
-      let target = e.target as HTMLElement | null;
-      
-      // Walk up the DOM to find a clickable element
-      while (target && target !== document.body) {
-        // Check if this element or any parent will navigate to Stripe
-        const onclick = target.getAttribute('onclick');
-        const href = target.getAttribute('href');
-        
-        if ((onclick && onclick.includes('stripe')) || (href && href.includes('stripe'))) {
-          console.log('[Subscribe] 🚀 Stripe link detected, redirecting to external browser');
-          e.preventDefault();
-          e.stopPropagation();
-          
-          // Open in default browser by setting window.location to stripe URL
-          // The mobile OS will automatically open this in external browser
-          if (href) {
-            window.location.href = href;
-          }
-          return;
-        }
-        
-        target = target.parentElement;
-      }
-    };
-
-    document.addEventListener('click', clickHandler, true);
-
-    // Monitor for Stripe iframes and redirect them
-    const observer = new MutationObserver(() => {
-      const iframes = document.querySelectorAll('iframe');
-      iframes.forEach((iframe) => {
-        if (iframe.src && iframe.src.includes('stripe.com')) {
-          console.log('[Subscribe] 🚀 Stripe iframe detected, redirecting to:', iframe.src);
-          // Open Stripe in default external browser
-          window.location.href = iframe.src;
-          iframe.remove();
-        }
-      });
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-
-    return () => {
-      document.removeEventListener('click', clickHandler, true);
-      observer.disconnect();
-    };
+    // On mobile, redirect to web version in external browser
+    const isMobile = typeof window !== 'undefined' && 
+                    (navigator.userAgent.includes('Android') || 
+                     navigator.userAgent.includes('iPhone'));
+    
+    if (isMobile) {
+      console.log('[Subscribe] Mobile detected, opening external browser for payment');
+      // Open the subscribe page in external browser
+      window.location.href = 'https://flowbalance-jdk.vercel.app/subscribe-web';
+    }
   }, []);
 
+  // Fallback UI for non-mobile or if redirect doesn't work
   return (
     <div 
       className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
@@ -86,27 +37,67 @@ export default function SubscribePage() {
         paddingRight: 'env(safe-area-inset-right)',
       }}
     >
-      <div className="max-w-4xl w-full">
+      <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            Choose Your Plan
+          <h1 className="text-3xl font-bold text-white mb-4">
+            Unlock Full Access
           </h1>
-          <p className="text-xl text-white opacity-90">
-            Unlock all meditation practices and flows
+          <p className="text-lg text-white opacity-90">
+            To subscribe, we'll open payment in your browser
           </p>
         </div>
 
-        {/* Clerk Pricing Table */}
-        <div className="bg-white rounded-lg shadow-2xl p-6">
-          <PricingTable />
-        </div>
+        {/* Pro Plan Card */}
+        <IonCard>
+          <IonCardHeader>
+            <IonCardTitle className="text-2xl">Pro Plan</IonCardTitle>
+            <p className="text-3xl font-bold mt-2">$9.99<span className="text-base font-normal">/month</span></p>
+          </IonCardHeader>
+          <IonCardContent>
+            <IonList>
+              <IonItem lines="none">
+                <IonIcon icon={checkmarkCircle} color="success" slot="start" />
+                <IonLabel>Access to all flows and practices</IonLabel>
+              </IonItem>
+              <IonItem lines="none">
+                <IonIcon icon={checkmarkCircle} color="success" slot="start" />
+                <IonLabel>Offline access</IonLabel>
+              </IonItem>
+              <IonItem lines="none">
+                <IonIcon icon={checkmarkCircle} color="success" slot="start" />
+                <IonLabel>Progress tracking</IonLabel>
+              </IonItem>
+              <IonItem lines="none">
+                <IonIcon icon={checkmarkCircle} color="success" slot="start" />
+                <IonLabel>New content regularly</IonLabel>
+              </IonItem>
+            </IonList>
+
+            <IonButton 
+              expand="block" 
+              size="large" 
+              className="mt-4"
+              onClick={() => {
+                console.log('[Subscribe] Opening payment in external browser');
+                // This will open in external browser on mobile
+                window.location.href = 'https://flowbalance-jdk.vercel.app/subscribe-web';
+              }}
+            >
+              Subscribe Now
+            </IonButton>
+
+            <p className="text-center text-sm mt-4 opacity-70">
+              Payment opens in your browser to complete securely
+            </p>
+          </IonCardContent>
+        </IonCard>
 
         {/* Footer */}
-        <div className="text-center mt-8">
+        <div className="text-center mt-6">
           <button
-            onClick={() => window.history.back()}
-            className="text-white underline opacity-80 hover:opacity-100"
+            onClick={() => window.location.href = '/home'}
+            className="text-white underline opacity-80"
           >
             ← Back to App
           </button>

@@ -1,13 +1,18 @@
 'use client';
 
-import { IonPage, IonContent } from '@ionic/react';
+import { IonPage, IonContent, IonButton } from '@ionic/react';
+import { openExternalUrl } from '../../helpers/openExternal';
 
 /**
  * Subscribe Page (Mobile)
  * 
- * Simple page with link to open subscription in browser.
+ * Opens subscription in system browser (native) or new tab (web).
  */
 export default function SubscribePage() {
+  const handleSubscribe = async () => {
+    await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
+  };
+
   return (
     <IonPage>
       <IonContent className="ion-padding">
@@ -20,14 +25,15 @@ export default function SubscribePage() {
               Payment opens in your browser for security
             </p>
             
-            <a 
-              href="https://flowbalance-jdk.vercel.app/subscribe-web"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full bg-purple-600 text-white font-bold py-4 px-6 rounded-lg hover:bg-purple-700 transition-colors text-center text-lg mb-4"
+            <IonButton
+              expand="block"
+              size="large"
+              color="secondary"
+              onClick={handleSubscribe}
+              className="w-full mb-4"
             >
               View Plans & Subscribe
-            </a>
+            </IonButton>
             
             <button
               onClick={() => window.location.href = '/home'}

@@ -26,13 +26,19 @@
 		},
 		"CapacitorCookies": {
 			"enabled": true
+		},
+		"CapacitorHttp": {
+			"enabled": true
 		}
 	},
 	"cordova": {},
 	"packageClassList": [
-		"PreferencesPlugin",
-		"StatusBarPlugin",
 		"AppPlugin",
-		"BrowserPlugin"
+		"AppLauncherPlugin",
+		"CAPBrowserPlugin",
+		"HapticsPlugin",
+		"KeyboardPlugin",
+		"PreferencesPlugin",
+		"StatusBarPlugin"
 	]
 }

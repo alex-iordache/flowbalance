@@ -2,36 +2,45 @@
 
 import { SignIn, useAuth, useUser } from '@clerk/nextjs';
 import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
 
 export default function SignInPage() {
   const { isLoaded, userId } = useAuth();
   const { user } = useUser();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (isLoaded && userId && user) {
       console.log('[SignIn] User authenticated, checking redirect...');
       
+      // Read query parameters from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      
       // PRIORITY 1: Check for sign_up_force_redirect_url query parameter (from Clerk OAuth)
-      const signUpForceRedirect = searchParams.get('sign_up_force_redirect_url');
+      const signUpForceRedirect = urlParams.get('sign_up_force_redirect_url');
       if (signUpForceRedirect) {
         console.log('[SignIn] Found sign_up_force_redirect_url param:', signUpForceRedirect);
-        // Extract just the path from the full URL
-        const redirectPath = new URL(signUpForceRedirect).pathname;
-        console.log('[SignIn] Redirecting to:', redirectPath);
-        window.location.href = redirectPath;
-        return;
+        try {
+          // Extract just the path from the full URL
+          const redirectPath = new URL(signUpForceRedirect).pathname;
+          console.log('[SignIn] Redirecting to:', redirectPath);
+          window.location.href = redirectPath;
+          return;
+        } catch (e) {
+          console.error('[SignIn] Error parsing redirect URL:', e);
+        }
       }
       
       // PRIORITY 2: Check for after_sign_up_url query parameter
-      const afterSignUpUrl = searchParams.get('after_sign_up_url');
+      const afterSignUpUrl = urlParams.get('after_sign_up_url');
       if (afterSignUpUrl) {
         console.log('[SignIn] Found after_sign_up_url param:', afterSignUpUrl);
-        const redirectPath = new URL(afterSignUpUrl).pathname;
-        console.log('[SignIn] Redirecting to:', redirectPath);
-        window.location.href = redirectPath;
-        return;
+        try {
+          const redirectPath = new URL(afterSignUpUrl).pathname;
+          console.log('[SignIn] Redirecting to:', redirectPath);
+          window.location.href = redirectPath;
+          return;
+        } catch (e) {
+          console.error('[SignIn] Error parsing redirect URL:', e);
+        }
       }
       
       // PRIORITY 3: Check account age (for cases without query params)
@@ -46,8 +55,10 @@ export default function SignInPage() {
         console.log('[SignIn] Existing user (no query params), redirecting to home');
         window.location.href = '/home';
       }
+    } else {
+      console.log('[SignIn] Not ready:', { isLoaded, userId, hasUser: !!user });
     }
-  }, [isLoaded, userId, user, searchParams]);
+  }, [isLoaded, userId, user]);
 
   return (
     <div 

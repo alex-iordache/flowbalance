@@ -12,13 +12,16 @@ import { Capacitor } from '@capacitor/core';
  * keeps app on sign-in page for user to sign in after registration.
  */
 export default function SignInPage() {
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
     const isNative = Capacitor.isNativePlatform();
     
     if (isNative) {
-      // Open in SYSTEM browser (not in-app browser)
-      // Using window.open with '_system' opens in device's default browser
-      window.open('https://flowbalance-jdk.vercel.app/sign-up-web', '_system');
+      // Open in external browser (not in-app)
+      // presentationStyle 'fullscreen' opens in system browser
+      await Browser.open({ 
+        url: 'https://flowbalance-jdk.vercel.app/sign-up-web',
+        presentationStyle: 'fullscreen'
+      });
     } else {
       // Desktop: just navigate
       window.location.href = '/sign-up-web';

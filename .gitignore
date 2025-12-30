@@ -33,3 +33,6 @@ tsconfig.tsbuildinfo
 
 # vercel
 .vercel
+
+# clerk (auto-generated, contains secret keys)
+.clerk

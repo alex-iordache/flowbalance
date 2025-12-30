@@ -12,9 +12,8 @@ export default function SignupSuccessPage() {
 
   return (
     <div 
-      className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
+      className="flex flex-col items-center justify-center bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
       style={{
-        minHeight: '100vh',
         minHeight: '100dvh',
       }}
     >

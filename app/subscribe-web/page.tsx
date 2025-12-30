@@ -10,9 +10,8 @@ import { PricingTable, SignedIn, SignedOut } from '@clerk/nextjs';
 export default function SubscribeWebPage() {
   return (
     <div 
-      className="flex flex-col min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
+      className="flex flex-col bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
       style={{
-        minHeight: '100vh',
         minHeight: '100dvh',
       }}
     >

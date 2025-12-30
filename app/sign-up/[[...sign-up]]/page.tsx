@@ -1,17 +1,26 @@
 'use client';
 
-import { SignUp, useAuth } from '@clerk/nextjs';
+import { SignUp, useAuth, useOrganization } from '@clerk/nextjs';
 import { useEffect } from 'react';
 
 export default function SignUpPage() {
   const { isLoaded, userId } = useAuth();
+  const { organization, isLoaded: orgLoaded } = useOrganization();
 
   useEffect(() => {
-    if (isLoaded && userId) {
-      // User is signed in, redirect to home using full page navigation
-      window.location.href = '/home';
+    if (isLoaded && userId && orgLoaded) {
+      // Check if user is part of an organization
+      if (organization) {
+        // Organization user (Type B) - has automatic full access
+        // Redirect to home
+        window.location.href = '/home';
+      } else {
+        // Regular user (Type A) - needs to subscribe
+        // Redirect to subscription page to choose a plan
+        window.location.href = '/subscribe';
+      }
     }
-  }, [isLoaded, userId]);
+  }, [isLoaded, userId, orgLoaded, organization]);
 
   return (
     <div 

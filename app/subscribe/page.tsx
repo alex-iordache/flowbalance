@@ -11,13 +11,12 @@ import { Capacitor } from '@capacitor/core';
  * Redirects to web for subscription to comply with Google Play policies.
  */
 export default function SubscribePage() {
-  const handleSubscribeOnWeb = async () => {
+  const handleSubscribeOnWeb = () => {
     const isNative = Capacitor.isNativePlatform();
     
     if (isNative) {
-      await Browser.open({ 
-        url: 'https://flowbalance-jdk.vercel.app/subscribe-web' 
-      });
+      // Open in SYSTEM browser (not in-app browser)
+      window.open('https://flowbalance-jdk.vercel.app/subscribe-web', '_system');
     } else {
       window.location.href = '/subscribe-web';
     }

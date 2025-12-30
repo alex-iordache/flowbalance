@@ -1,69 +1,57 @@
 'use client';
 
-import { SignUp, useAuth } from '@clerk/nextjs';
-import { useEffect, useState } from 'react';
+import { SignUp } from '@clerk/nextjs';
 
 /**
  * Web-Only Sign Up Page
  * 
- * After successful registration, shows message to return to mobile app.
- * No payment during signup - user will subscribe separately on web.
+ * Mobile-optimized sign-up page that opens in browser.
+ * After registration, redirects to success page.
  */
 export default function SignUpWebPage() {
-  const { isLoaded, userId } = useAuth();
-  const [justSignedUp, setJustSignedUp] = useState(false);
-
-  useEffect(() => {
-    if (isLoaded && userId && !justSignedUp) {
-      // User just signed up successfully
-      setJustSignedUp(true);
-    }
-  }, [isLoaded, userId, justSignedUp]);
-
-  // Show success message after signup
-  if (justSignedUp) {
-    return (
-      <div 
-        className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-6"
-      >
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md text-center">
-          <div className="text-6xl mb-4">✅</div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-4">
-            Account Created!
-          </h1>
-          <p className="text-lg text-gray-700 mb-6">
-            You can now return to the Flow app and sign in with your email.
-          </p>
-          <div className="bg-purple-50 border-l-4 border-purple-600 p-4 mb-6">
-            <p className="text-sm text-gray-700">
-              💡 <strong>Next step:</strong> To unlock all practices, subscribe at flowbalance.com or from the app settings.
-            </p>
-          </div>
-          <button
-            onClick={() => window.location.href = '/home'}
-            className="bg-purple-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-purple-700"
-          >
-            Continue on Web
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Show sign-up form
   return (
     <div 
       className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
+      style={{
+        minHeight: '100vh',
+        minHeight: '100dvh', // Dynamic viewport height for mobile
+      }}
     >
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-lg px-2">
+        {/* Header */}
+        <div className="text-center mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+            Flow
+          </h1>
+          <p className="text-lg md:text-xl text-white opacity-90">
+            Create your account
+          </p>
+        </div>
+
+        {/* Clerk Sign Up Component */}
         <SignUp 
           signInUrl="/sign-in"
+          afterSignUpUrl="/signup-success"
+          forceRedirectUrl="/signup-success"
+          fallbackRedirectUrl="/signup-success"
           appearance={{
             elements: {
-              rootBox: "mx-auto",
-              card: "shadow-xl",
-              formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
-              footerActionLink: "text-purple-600 hover:text-purple-700"
+              rootBox: "mx-auto w-full",
+              card: "shadow-2xl w-full bg-white rounded-2xl p-6 md:p-8",
+              formButtonPrimary: "bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg text-base font-semibold w-full",
+              formFieldInput: "text-base py-3 px-4 rounded-lg border-2 border-gray-300 focus:border-purple-600 w-full",
+              formFieldLabel: "text-base font-semibold text-gray-700 mb-2",
+              footerActionLink: "text-purple-600 hover:text-purple-700 font-semibold text-base",
+              identityPreviewText: "text-base",
+              formHeaderTitle: "text-2xl md:text-3xl font-bold text-gray-900 mb-2",
+              formHeaderSubtitle: "text-base text-gray-600",
+              socialButtonsBlockButton: "text-base py-3 px-4 border-2 border-gray-300 rounded-lg hover:bg-gray-50 w-full",
+              dividerLine: "bg-gray-300",
+              dividerText: "text-gray-500 text-sm"
+            },
+            layout: {
+              socialButtonsPlacement: 'top',
+              socialButtonsVariant: 'blockButton',
             }
           }}
         />

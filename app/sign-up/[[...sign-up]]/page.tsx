@@ -32,7 +32,14 @@ export default function SignUpPage() {
                   rootBox: "mx-auto",
                   card: "shadow-xl",
                   formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
-                  footerActionLink: "text-purple-600 hover:text-purple-700"
+                  footerActionLink: "text-purple-600 hover:text-purple-700",
+                  // Hide password field - should be disabled in Dashboard, but this ensures it's hidden
+                  formFieldInput__password: {
+                    display: 'none',
+                  },
+                  formFieldLabel__password: {
+                    display: 'none',
+                  }
                 }
               }}
             />

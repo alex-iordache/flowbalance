@@ -1,6 +1,6 @@
 'use client';
 
-import { PricingTable, SignedIn, SignedOut, ClerkLoaded, ClerkLoading } from '@clerk/nextjs';
+import { PricingTable, SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } from '@clerk/nextjs';
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
 
@@ -9,10 +9,15 @@ import { Capacitor } from '@capacitor/core';
  * 
  * Mobile-optimized subscription page.
  * After successful subscription on mobile, instructs user to return to app.
+ * 
+ * Handles sign-in tokens passed from mobile app via __clerk_ticket parameter.
  */
 export default function SubscribeWebPage() {
   const [isMobile, setIsMobile] = useState(false);
   const [subscriptionSuccess, setSubscriptionSuccess] = useState(false);
+  const [isProcessingToken, setIsProcessingToken] = useState(false);
+  const { signIn, isLoaded: signInLoaded, setActive } = useSignIn();
+  const { userId } = useAuth();
 
   useEffect(() => {
     // Detect if opened from mobile device (not from Capacitor app, but from browser)
@@ -25,7 +30,29 @@ export default function SubscribeWebPage() {
     if (params.get('subscription') === 'success') {
       setSubscriptionSuccess(true);
     }
-  }, []);
+
+    // Process sign-in token from mobile app (if present and user is not already signed in)
+    const signInToken = params.get('__clerk_ticket');
+    if (signInToken && signInLoaded && !userId && !isProcessingToken) {
+      setIsProcessingToken(true);
+      
+      // Use Clerk's signIn.create with ticket strategy to authenticate
+      signIn.create({ strategy: 'ticket', ticket: signInToken })
+        .then((result) => {
+          if (result.status === 'complete' && result.createdSessionId) {
+            // Set the session as active
+            return setActive({ session: result.createdSessionId });
+          } else {
+            console.error('Sign-in not complete:', result);
+            setIsProcessingToken(false);
+          }
+        })
+        .catch((error) => {
+          console.error('Error processing sign-in token:', error);
+          setIsProcessingToken(false);
+        });
+    }
+  }, [signInLoaded, signIn, setActive, userId, isProcessingToken]);
 
   // Show success message after subscription
   if (subscriptionSuccess) {
@@ -97,7 +124,9 @@ export default function SubscribeWebPage() {
 
         <ClerkLoading>
           <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 text-center">
-            <p className="text-base md:text-lg text-gray-700">Loading subscription options...</p>
+            <p className="text-base md:text-lg text-gray-700">
+              {isProcessingToken ? 'Signing you in...' : 'Loading subscription options...'}
+            </p>
           </div>
         </ClerkLoading>
 

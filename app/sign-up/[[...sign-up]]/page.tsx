@@ -39,9 +39,26 @@ export default function SignUpPage() {
 
     // Clerk environment variables
     info.push(`\nClerk Environment Variables:`);
+    info.push(`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'not set'}`);
     info.push(`NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || 'not set'}`);
     info.push(`NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || 'not set'}`);
     info.push(`NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || 'not set'}`);
+
+    // Try to get Clerk instance info
+    if (typeof window !== 'undefined' && (window as any).Clerk) {
+      const clerk = (window as any).Clerk;
+      info.push(`\nClerk SDK Info:`);
+      try {
+        info.push(`Clerk loaded: Yes`);
+        if (clerk.publishableKey) {
+          info.push(`Clerk Publishable Key: ${clerk.publishableKey}`);
+        }
+      } catch (e) {
+        info.push(`Clerk SDK error: ${String(e)}`);
+      }
+    } else {
+      info.push(`\nClerk SDK: Not loaded yet`);
+    }
 
     // Check if in Capacitor
     if (typeof window !== 'undefined' && (window as any).Capacitor) {

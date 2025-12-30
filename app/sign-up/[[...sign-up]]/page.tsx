@@ -1,8 +1,21 @@
 'use client';
 
 import { SignUp } from '@clerk/nextjs';
+import { useEffect } from 'react';
 
 export default function SignUpPage() {
+  // Debug: Log what environment variables Clerk is seeing
+  useEffect(() => {
+    console.log('🔍 [DEBUG] Clerk Sign-Up Page Environment Variables:');
+    console.log('SIGN_UP_URL:', process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL);
+    console.log('SIGN_UP_FORCE_REDIRECT:', process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL);
+    console.log('SIGN_UP_FALLBACK_REDIRECT:', process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL);
+    console.log('SIGN_IN_URL:', process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL);
+    console.log('---');
+    console.log('If SIGN_UP_FORCE_REDIRECT is undefined, the environment variable is NOT set!');
+    console.log('It should be: /post-signup-redirect');
+  }, []);
+
   return (
     <div 
       className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600"

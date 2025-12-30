@@ -1,17 +1,53 @@
 'use client';
 
-import { SignIn, useAuth } from '@clerk/nextjs';
+import { SignIn, useAuth, useUser } from '@clerk/nextjs';
 import { useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export default function SignInPage() {
   const { isLoaded, userId } = useAuth();
+  const { user } = useUser();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (isLoaded && userId) {
-      // User is signed in, redirect to home using full page navigation
-      window.location.href = '/home';
+    if (isLoaded && userId && user) {
+      console.log('[SignIn] User authenticated, checking redirect...');
+      
+      // PRIORITY 1: Check for sign_up_force_redirect_url query parameter (from Clerk OAuth)
+      const signUpForceRedirect = searchParams.get('sign_up_force_redirect_url');
+      if (signUpForceRedirect) {
+        console.log('[SignIn] Found sign_up_force_redirect_url param:', signUpForceRedirect);
+        // Extract just the path from the full URL
+        const redirectPath = new URL(signUpForceRedirect).pathname;
+        console.log('[SignIn] Redirecting to:', redirectPath);
+        window.location.href = redirectPath;
+        return;
+      }
+      
+      // PRIORITY 2: Check for after_sign_up_url query parameter
+      const afterSignUpUrl = searchParams.get('after_sign_up_url');
+      if (afterSignUpUrl) {
+        console.log('[SignIn] Found after_sign_up_url param:', afterSignUpUrl);
+        const redirectPath = new URL(afterSignUpUrl).pathname;
+        console.log('[SignIn] Redirecting to:', redirectPath);
+        window.location.href = redirectPath;
+        return;
+      }
+      
+      // PRIORITY 3: Check account age (for cases without query params)
+      const accountAgeSeconds = user.createdAt 
+        ? (Date.now() - new Date(user.createdAt).getTime()) / 1000 
+        : Infinity;
+      
+      if (accountAgeSeconds < 30) {
+        console.log('[SignIn] New user (no query params), account age: ' + accountAgeSeconds + 's, redirecting to post-signup-redirect');
+        window.location.href = '/post-signup-redirect';
+      } else {
+        console.log('[SignIn] Existing user (no query params), redirecting to home');
+        window.location.href = '/home';
+      }
     }
-  }, [isLoaded, userId]);
+  }, [isLoaded, userId, user, searchParams]);
 
   return (
     <div 

@@ -17,6 +17,7 @@ export default function SignUpPage() {
   const [debugInfo, setDebugInfo] = useState<string>('');
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
+  const [clerkPublishableKey, setClerkPublishableKey] = useState<string>('Loading...');
 
   useEffect(() => {
     // Collect debug information
@@ -173,6 +174,10 @@ export default function SignUpPage() {
               <div className="space-y-2">
                 <div className="text-green-400">
                   <strong>URL:</strong> {typeof window !== 'undefined' ? window.location.href : 'N/A'}
+                </div>
+                
+                <div className="text-purple-400 break-all">
+                  <strong>Clerk Publishable Key:</strong> {clerkPublishableKey}
                 </div>
                 
                 <div className="text-blue-400">

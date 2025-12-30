@@ -19,8 +19,8 @@ import { setSettings } from '../../store/actions';
 const Settings = () => {
   const settings = Store.useState(selectors.selectSettings);
 
-  const handleSignOut = () => {
-    // Redirect to home page after sign out
+  const handleSignOutComplete = () => {
+    // This runs AFTER Clerk completes the sign-out
     window.location.href = '/home';
   };
 
@@ -55,12 +55,11 @@ const Settings = () => {
           {/* Show Sign Out button when user is signed in */}
           <SignedIn>
             <IonItem>
-              <SignOutButton>
+              <SignOutButton signOutCallback={handleSignOutComplete}>
                 <IonButton
                   expand="block"
                   color="danger"
                   className="w-full"
-                  onClick={handleSignOut}
                 >
                   Sign Out
                 </IonButton>

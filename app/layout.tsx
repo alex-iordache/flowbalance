@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import { ClerkProvider } from '@clerk/nextjs';
-import CapacitorBrowserBlock from '../components/CapacitorBrowserBlock';
 
 import 'tailwindcss/tailwind.css';
 /* Core CSS required for Ionic components to work properly */
@@ -50,7 +49,6 @@ export default function RootLayout({
     >
       <html lang="en" suppressHydrationWarning>
         <body>
-          <CapacitorBrowserBlock />
           {children}
         </body>
         

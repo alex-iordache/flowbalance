@@ -62,7 +62,27 @@ const Settings = () => {
                 expand="block"
                 color="secondary"
                 className="w-full mb-2"
-                onClick={() => window.location.href = '/subscribe'}
+                onClick={async () => {
+                  try {
+                    // Get sign-in token for external browser authentication
+                    const response = await fetch('/api/create-sign-in-token');
+                    const data = await response.json();
+                    
+                    const { openExternalUrl } = await import('../../helpers/openExternal');
+                    
+                    if (data.token) {
+                      // Pass token to external browser for auto sign-in
+                      await openExternalUrl(`https://flowbalance-jdk.vercel.app/subscribe-web?__clerk_ticket=${data.token}`);
+                    } else {
+                      // Fallback: open without token (user will need to sign in manually)
+                      await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
+                    }
+                  } catch (error) {
+                    console.error('Error opening subscription:', error);
+                    const { openExternalUrl } = await import('../../helpers/openExternal');
+                    await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
+                  }
+                }}
               >
                 Manage Subscription
               </IonButton>

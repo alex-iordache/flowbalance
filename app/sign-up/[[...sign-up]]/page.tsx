@@ -8,6 +8,9 @@ import { IonPage, IonContent } from '@ionic/react';
  * 
  * Shows Clerk SignUp component configured for email-code-only authentication.
  * After sign-up, users are redirected to home page.
+ * 
+ * Note: Password must be disabled in Clerk Dashboard > User & Authentication > Email, Phone, Username
+ * And Email verification code should be enabled.
  */
 export default function SignUpPage() {
   return (

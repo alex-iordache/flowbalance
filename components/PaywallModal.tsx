@@ -24,12 +24,29 @@ interface PaywallModalProps {
  * PaywallModal Component
  * 
  * Displays when user tries to access locked content.
- * Routes all users to subscription page (which opens in external browser).
+ * Opens subscription page directly in external browser with authentication token.
  */
 export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallModalProps) {
-  const handleSubscribe = () => {
-    // Redirect to subscribe page (opens /subscribe-web in external browser)
-    window.location.href = '/subscribe';
+  const handleSubscribe = async () => {
+    try {
+      // Get sign-in token for external browser authentication
+      const response = await fetch('/api/create-sign-in-token');
+      const data = await response.json();
+      
+      const { openExternalUrl } = await import('../helpers/openExternal');
+      
+      if (data.token) {
+        // Pass token to external browser for auto sign-in
+        await openExternalUrl(`https://flowbalance-jdk.vercel.app/subscribe-web?__clerk_ticket=${data.token}`);
+      } else {
+        // Fallback: open without token
+        await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
+      }
+    } catch (error) {
+      console.error('Error opening subscription:', error);
+      const { openExternalUrl } = await import('../helpers/openExternal');
+      await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
+    }
   };
 
   return (

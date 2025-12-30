@@ -10,7 +10,7 @@ import {
   IonToggle,
   IonButton,
 } from '@ionic/react';
-import { SignOutButton, SignedIn, SignedOut } from '@clerk/nextjs';
+import { SignedIn, SignedOut, useClerk } from '@clerk/nextjs';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -18,9 +18,12 @@ import { setSettings } from '../../store/actions';
 
 const Settings = () => {
   const settings = Store.useState(selectors.selectSettings);
+  const { signOut } = useClerk();
 
-  const handleSignOutComplete = () => {
-    // This runs AFTER Clerk completes the sign-out
+  const handleSignOut = async () => {
+    // Sign out with Clerk
+    await signOut();
+    // Redirect to home page after sign out completes
     window.location.href = '/home';
   };
 
@@ -55,15 +58,14 @@ const Settings = () => {
           {/* Show Sign Out button when user is signed in */}
           <SignedIn>
             <IonItem>
-              <SignOutButton signOutCallback={handleSignOutComplete}>
-                <IonButton
-                  expand="block"
-                  color="danger"
-                  className="w-full"
-                >
-                  Sign Out
-                </IonButton>
-              </SignOutButton>
+              <IonButton
+                expand="block"
+                color="danger"
+                className="w-full"
+                onClick={handleSignOut}
+              >
+                Sign Out
+              </IonButton>
             </IonItem>
           </SignedIn>
           

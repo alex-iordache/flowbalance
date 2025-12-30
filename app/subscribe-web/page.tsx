@@ -1,6 +1,6 @@
 'use client';
 
-import { PricingTable, SignedIn, SignedOut } from '@clerk/nextjs';
+import { PricingTable, SignedIn, SignedOut, ClerkLoaded, ClerkLoading } from '@clerk/nextjs';
 
 /**
  * Web-Only Subscription Page
@@ -26,51 +26,59 @@ export default function SubscribeWebPage() {
           </p>
         </div>
 
-        {/* Signed In: Show Pricing */}
-        <SignedIn>
-          <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6 mb-6">
-            <PricingTable 
-              appearance={{
-                elements: {
-                  rootBox: "mx-auto w-full",
-                  card: "shadow-lg rounded-xl p-4 md:p-6 w-full",
-                  formButtonPrimary: "bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg text-base font-semibold w-full",
-                  priceText: "text-2xl md:text-3xl font-bold",
-                  cardTitle: "text-xl md:text-2xl font-bold"
-                }
-              }}
-            />
-          </div>
-
-          <div className="text-center">
-            <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-4">
-              <p className="text-white text-base md:text-lg font-semibold mb-2">
-                ✅ After subscribing, return to Flow app
-              </p>
-              <p className="text-white text-sm md:text-base opacity-90">
-                Your subscription syncs automatically
-              </p>
-            </div>
-          </div>
-        </SignedIn>
-
-        {/* Signed Out: Show Sign In */}
-        <SignedOut>
+        <ClerkLoading>
           <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 text-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
-              Please Sign In First
-            </h2>
-            <p className="text-base md:text-lg text-gray-700 mb-6">
-              You need to sign in to subscribe
-            </p>
-            <button
-              onClick={() => window.location.href = '/sign-in'}
-              className="bg-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-700 w-full text-base md:text-lg"
-            >
-              Sign In
-            </button>
+            <p className="text-base md:text-lg text-gray-700">Loading subscription options...</p>
           </div>
-        </SignedOut>
+        </ClerkLoading>
+
+        <ClerkLoaded>
+          {/* Signed In: Show Pricing */}
+          <SignedIn>
+            <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6 mb-6">
+              <PricingTable 
+                appearance={{
+                  elements: {
+                    rootBox: "mx-auto w-full",
+                    card: "shadow-lg rounded-xl p-4 md:p-6 w-full",
+                    formButtonPrimary: "bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg text-base font-semibold w-full",
+                    priceText: "text-2xl md:text-3xl font-bold",
+                    cardTitle: "text-xl md:text-2xl font-bold"
+                  }
+                }}
+              />
+            </div>
+
+            <div className="text-center">
+              <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-4">
+                <p className="text-white text-base md:text-lg font-semibold mb-2">
+                  ✅ After subscribing, return to Flow app
+                </p>
+                <p className="text-white text-sm md:text-base opacity-90">
+                  Your subscription syncs automatically
+                </p>
+              </div>
+            </div>
+          </SignedIn>
+
+          {/* Signed Out: Show Sign In */}
+          <SignedOut>
+            <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 text-center">
+              <h2 className="text-2xl md:text-3xl font-bold text-gray-800 mb-4">
+                Please Sign In First
+              </h2>
+              <p className="text-base md:text-lg text-gray-700 mb-6">
+                You need to sign in to subscribe
+              </p>
+              <button
+                onClick={() => window.location.href = '/sign-in'}
+                className="bg-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-700 w-full text-base md:text-lg"
+              >
+                Sign In
+              </button>
+            </div>
+          </SignedOut>
+        </ClerkLoaded>
       </div>
     </div>
   );

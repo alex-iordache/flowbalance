@@ -4,7 +4,6 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
 import { useEffect } from 'react';
-import { SignedIn, SignedOut, useAuth } from '@clerk/nextjs';
 
 import Tabs from './pages/Tabs';
 import { loadAllPersistedState } from '../store/persistence';
@@ -21,19 +20,6 @@ window
     } catch {}
   });
 
-const SignOutRedirect = () => {
-  const { isLoaded, userId } = useAuth();
-  
-  useEffect(() => {
-    if (isLoaded && !userId) {
-      // User is not signed in, redirect to sign-in page
-      window.location.href = '/sign-in';
-    }
-  }, [isLoaded, userId]);
-  
-  return <div>Loading...</div>;
-};
-
 const AppShell = () => {
   useEffect(() => {
     // Load persisted state when app initializes
@@ -44,54 +30,22 @@ const AppShell = () => {
     <IonApp>
       <IonReactRouter>
         <IonRouterOutlet id="main">
-          {/* Main app routes - protected by Clerk middleware */}
-          <Route path="/home" render={() => (
-            <SignedIn>
-              <Tabs />
-            </SignedIn>
-          )} />
+          {/* Main app routes - accessible to everyone (guest or authenticated) */}
+          {/* Access control will be handled at the practice/content level */}
+          <Route path="/home" component={Tabs} />
+          <Route path="/flows" component={Tabs} />
+          <Route path="/settings" component={Tabs} />
+          <Route path="/progress" component={Tabs} />
           
-          <Route path="/flows" render={() => (
-            <SignedIn>
-              <Tabs />
-            </SignedIn>
-          )} />
+          {/* Root route - redirects to home */}
+          <Route path="/" exact={true}>
+            <Redirect to="/home" />
+          </Route>
           
-          <Route path="/settings" render={() => (
-            <SignedIn>
-              <Tabs />
-            </SignedIn>
-          )} />
-          
-          <Route path="/progress" render={() => (
-            <SignedIn>
-              <Tabs />
-            </SignedIn>
-          )} />
-          
-          {/* Root route - redirects based on auth status */}
-          <Route path="/" exact={true} render={() => (
-            <>
-              <SignedIn>
-                <Redirect to="/home" />
-              </SignedIn>
-              <SignedOut>
-                <SignOutRedirect />
-              </SignedOut>
-            </>
-          )} />
-          
-          {/* Catch-all route */}
-          <Route render={() => (
-            <>
-              <SignedIn>
-                <Redirect to="/home" />
-              </SignedIn>
-              <SignedOut>
-                <SignOutRedirect />
-              </SignedOut>
-            </>
-          )} />
+          {/* Catch-all route - redirects to home */}
+          <Route>
+            <Redirect to="/home" />
+          </Route>
         </IonRouterOutlet>
       </IonReactRouter>
     </IonApp>

@@ -16,7 +16,9 @@ export default function SignUpPage() {
       <div className="w-full max-w-md px-4">
         <SignUp 
           signInUrl="/sign-in"
+          afterSignUpUrl="/post-signup-redirect"
           forceRedirectUrl="/post-signup-redirect"
+          fallbackRedirectUrl="/post-signup-redirect"
           appearance={{
             elements: {
               rootBox: "mx-auto",

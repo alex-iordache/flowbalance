@@ -42,6 +42,7 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
   const handleSignUpFirst = () => {
     // Guest users need to sign up first, then they'll see the subscribe page
     // IMPORTANT: Direct to /sign-up, not /sign-in!
+    console.log('[PaywallModal] Redirecting to /sign-up');
     window.location.href = '/sign-up';
   };
 

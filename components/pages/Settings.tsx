@@ -6,10 +6,11 @@ import {
   IonTitle,
   IonContent,
   IonList,
+  IonListHeader,
   IonToggle,
   IonButton,
 } from '@ionic/react';
-import { SignOutButton } from '@clerk/nextjs';
+import { SignOutButton, SignedIn, SignedOut } from '@clerk/nextjs';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -17,6 +18,11 @@ import { setSettings } from '../../store/actions';
 
 const Settings = () => {
   const settings = Store.useState(selectors.selectSettings);
+
+  const handleSignOut = () => {
+    // Redirect to home page after sign out
+    window.location.href = '/home';
+  };
 
   return (
     <IonPage>
@@ -40,18 +46,41 @@ const Settings = () => {
               Enable Notifications
             </IonToggle>
           </IonItem>
+        </IonList>
+
+        {/* Account Section */}
+        <IonList>
+          <IonListHeader>Account</IonListHeader>
           
-          <IonItem>
-            <SignOutButton>
+          {/* Show Sign Out button when user is signed in */}
+          <SignedIn>
+            <IonItem>
+              <SignOutButton>
+                <IonButton
+                  expand="block"
+                  color="danger"
+                  className="w-full"
+                  onClick={handleSignOut}
+                >
+                  Sign Out
+                </IonButton>
+              </SignOutButton>
+            </IonItem>
+          </SignedIn>
+          
+          {/* Show Sign In button when user is NOT signed in */}
+          <SignedOut>
+            <IonItem>
               <IonButton
                 expand="block"
-                color="danger"
-                className="w-full mt-4"
+                color="primary"
+                className="w-full"
+                onClick={() => window.location.href = '/sign-in'}
               >
-                Sign Out
+                Sign In
               </IonButton>
-            </SignOutButton>
-          </IonItem>
+            </IonItem>
+          </SignedOut>
         </IonList>
       </IonContent>
     </IonPage>

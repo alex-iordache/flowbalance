@@ -1,20 +1,18 @@
 'use client';
 
-import { useAuth, useOrganization } from '@clerk/nextjs';
+import { useAuth } from '@clerk/nextjs';
 import { useEffect } from 'react';
 
 /**
  * Post-Signup Redirect
  * 
- * Organization users → /home
- * Regular users → /home (they already signed up on web)
+ * All users → /home
  */
 export default function PostSignupRedirect() {
   const { isLoaded, userId } = useAuth();
-  const { organization, isLoaded: orgLoaded } = useOrganization();
 
   useEffect(() => {
-    if (!isLoaded || !orgLoaded) return;
+    if (!isLoaded) return;
     
     if (!userId) {
       window.location.href = '/sign-in';
@@ -23,7 +21,7 @@ export default function PostSignupRedirect() {
 
     // All users go to home (no payment in app)
     window.location.href = '/home';
-  }, [isLoaded, userId, orgLoaded, organization]);
+  }, [isLoaded, userId]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600">

@@ -1,19 +1,16 @@
 'use client';
 
 import { SignIn } from '@clerk/nextjs';
-import { IonPage, IonContent, IonButton } from '@ionic/react';
-import { openExternalUrl } from '../../../helpers/openExternal';
+import { IonPage, IonContent } from '@ionic/react';
 
 /**
  * Sign In Page
  * 
- * Opens sign-up in the system browser on native (Clerk-recommended pattern).
+ * Only shows the Clerk SignIn component.
+ * signUpUrl points to the web sign-up page (/sign-up-web) so the Clerk
+ * "Sign up" link works on both web and native (opens in browser on native).
  */
 export default function SignInPage() {
-  const handleCreateAccount = async () => {
-    await openExternalUrl('https://flowbalance-jdk.vercel.app/sign-up-web');
-  };
-
   return (
     <IonPage>
       <IonContent scrollY={true}>
@@ -26,6 +23,7 @@ export default function SignInPage() {
         >
           <div className="w-full max-w-md">
             <SignIn 
+              signUpUrl="/sign-up-web"
               appearance={{
                 elements: {
                   rootBox: "mx-auto",
@@ -35,22 +33,6 @@ export default function SignInPage() {
                 }
               }}
             />
-            
-            {/* Create Account Button opens system browser */}
-            <div className="mt-6 text-center">
-              <p className="text-white mb-3">Don&apos;t have an account?</p>
-              <IonButton
-                expand="block"
-                color="light"
-                size="large"
-                onClick={handleCreateAccount}
-              >
-                Create Account on Web
-              </IonButton>
-              <p className="text-white text-sm mt-2 opacity-80">
-                Opens in your browser, then return here to sign in
-              </p>
-            </div>
           </div>
         </div>
       </IonContent>

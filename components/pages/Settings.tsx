@@ -23,8 +23,8 @@ const Settings = () => {
   const handleSignOut = async () => {
     // Sign out with Clerk
     await signOut();
-    // Redirect to home page after sign out completes
-    window.location.href = '/home';
+    // Redirect to sign-in page after sign out
+    window.location.href = '/sign-in';
   };
 
   return (

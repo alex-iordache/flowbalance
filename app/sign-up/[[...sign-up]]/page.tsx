@@ -1,16 +1,15 @@
 'use client';
 
-import { SignIn } from '@clerk/nextjs';
+import { SignUp } from '@clerk/nextjs';
 import { IonPage, IonContent } from '@ionic/react';
 
 /**
- * Sign In Page
+ * Sign Up Page (In-App)
  * 
- * Shows Clerk SignIn component configured for email-code-only authentication.
- * After sign-in, users are redirected to home page.
- * Sign-up URL points to in-app sign-up page.
+ * Shows Clerk SignUp component configured for email-code-only authentication.
+ * After sign-up, users are redirected to home page.
  */
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <IonPage>
       <IonContent scrollY={true}>
@@ -22,9 +21,9 @@ export default function SignInPage() {
           }}
         >
           <div className="w-full max-w-md">
-            <SignIn 
-              signUpUrl="/sign-up"
-              afterSignInUrl="/home"
+            <SignUp 
+              signInUrl="/sign-in"
+              afterSignUpUrl="/home"
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

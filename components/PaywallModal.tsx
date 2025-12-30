@@ -13,7 +13,6 @@ import {
   IonIcon,
 } from '@ionic/react';
 import { checkmarkCircle, closeOutline } from 'ionicons/icons';
-import { useAccessControl } from '../hooks/useAccessControl';
 
 interface PaywallModalProps {
   isOpen: boolean;
@@ -25,21 +24,12 @@ interface PaywallModalProps {
  * PaywallModal Component
  * 
  * Displays when user tries to access locked content.
- * - Organization users: Should never see this (handled in parent)
- * - Guest users: Prompted to sign up + payment (external browser)
- * - Free users: Prompted to upgrade to pro (external browser)
+ * Routes all users to subscription page (which opens in external browser).
  */
 export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallModalProps) {
-  const { userType, isAuthenticated } = useAccessControl();
-
-  const handleUpgrade = () => {
-    // Redirect to subscribe page (opens web in browser)
+  const handleSubscribe = () => {
+    // Redirect to subscribe page (opens /subscribe-web in external browser)
     window.location.href = '/subscribe';
-  };
-
-  const handleSignUpFirst = () => {
-    // Guest users go to sign-in page (which has "Create account on web" button)
-    window.location.href = '/sign-in';
   };
 
   return (
@@ -55,13 +45,11 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
       <IonContent className="ion-padding">
         <div className="flex flex-col items-center justify-center min-h-full">
           <h2 className="text-2xl font-bold mb-4 text-center">
-            {!isAuthenticated ? 'Create an Account' : 'Upgrade to Pro'}
+            Upgrade to Pro
           </h2>
 
           <p className="text-center mb-6">
-            {!isAuthenticated 
-              ? 'Sign up to unlock all meditation practices and flows.'
-              : 'Upgrade to Pro to access all premium content.'}
+            Subscribe to unlock all meditation practices and flows.
           </p>
 
           {/* Benefits List */}
@@ -86,34 +74,17 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
 
           {/* Action Buttons */}
           <div className="w-full space-y-4">
-            {!isAuthenticated ? (
-              <>
-                <IonButton 
-                  expand="block" 
-                  size="large"
-                  onClick={handleSignUpFirst}
-                >
-                  Sign Up & Subscribe
-                </IonButton>
-                <p className="text-center text-sm opacity-70">
-                  You&apos;ll be able to choose your plan after signing up
-                </p>
-              </>
-            ) : (
-              <>
-                <IonButton 
-                  expand="block" 
-                  size="large"
-                  color="primary"
-                  onClick={handleUpgrade}
-                >
-                  Upgrade to Pro
-                </IonButton>
-                <p className="text-center text-sm opacity-70">
-                  Opens in browser to complete payment
-                </p>
-              </>
-            )}
+            <IonButton 
+              expand="block" 
+              size="large"
+              color="primary"
+              onClick={handleSubscribe}
+            >
+              View Plans & Subscribe
+            </IonButton>
+            <p className="text-center text-sm opacity-70">
+              Opens in browser to complete payment
+            </p>
 
             <IonButton 
               expand="block" 

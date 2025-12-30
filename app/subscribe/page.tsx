@@ -44,7 +44,7 @@ export default function SubscribePage() {
             Unlock Full Access
           </h1>
           <p className="text-lg text-white opacity-90">
-            To subscribe, we'll open payment in your browser
+            To subscribe, we&apos;ll open payment in your browser
           </p>
         </div>
 

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { IonPage, IonContent, IonButton } from '@ionic/react';
-import { Capacitor } from '@capacitor/core';
+import { openExternalUrl } from '../../helpers/openExternal';
 
 /**
  * Subscribe Page (Mobile)
@@ -11,16 +11,7 @@ import { Capacitor } from '@capacitor/core';
  */
 export default function SubscribePage() {
   const handleSubscribe = async () => {
-    const url = 'https://flowbalance-jdk.vercel.app/subscribe-web';
-
-    if (Capacitor.isNativePlatform()) {
-      // Native: Open in system browser using App.openUrl()
-      const { App } = await import('@capacitor/app');
-      await App.openUrl({ url });
-    } else {
-      // Web: Open in new tab
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
+    await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
   };
 
   useEffect(() => {

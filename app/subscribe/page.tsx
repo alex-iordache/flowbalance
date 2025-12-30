@@ -1,13 +1,27 @@
 'use client';
 
-import { IonPage, IonContent } from '@ionic/react';
+import { useEffect } from 'react';
+import { IonPage, IonContent, IonButton } from '@ionic/react';
+import { App } from '@capacitor/app';
 
 /**
  * Subscribe Page (Mobile)
  * 
- * Simple page with link to open subscription in browser.
+ * Uses App.openUrl() to open subscription in system browser.
  */
 export default function SubscribePage() {
+  const handleSubscribe = async () => {
+    // Opens in SYSTEM browser (Chrome/Safari), not in-app
+    await App.openUrl({
+      url: 'https://flowbalance-jdk.vercel.app/subscribe-web'
+    });
+  };
+
+  useEffect(() => {
+    // Auto-open on mount
+    handleSubscribe();
+  }, []);
+
   return (
     <IonPage>
       <IonContent className="ion-padding">
@@ -20,18 +34,18 @@ export default function SubscribePage() {
               Payment opens in your browser for security
             </p>
             
-            <a 
-              href="https://flowbalance-jdk.vercel.app/subscribe-web"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full bg-purple-600 text-white font-bold py-4 px-6 rounded-lg hover:bg-purple-700 transition-colors text-center text-lg mb-4"
+            <IonButton
+              expand="block"
+              size="large"
+              color="secondary"
+              onClick={handleSubscribe}
             >
               View Plans & Subscribe
-            </a>
+            </IonButton>
             
             <button
               onClick={() => window.location.href = '/home'}
-              className="text-gray-600 underline"
+              className="text-gray-600 underline mt-4"
             >
               Back to Home
             </button>

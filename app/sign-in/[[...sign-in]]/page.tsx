@@ -7,13 +7,15 @@ export default function SignInPage() {
   const { isLoaded, userId } = useAuth();
   const { user } = useUser();
 
+  // Run effect MORE FREQUENTLY by also depending on URL changes
   useEffect(() => {
     // Always log the current state
     console.log('[SignIn] Effect running:', { 
       isLoaded, 
       userId, 
       hasUser: !!user,
-      url: window.location.href 
+      url: window.location.href,
+      timestamp: new Date().toISOString()
     });
     
     if (isLoaded && userId && user) {
@@ -68,8 +70,33 @@ export default function SignInPage() {
       }
     } else {
       console.log('[SignIn] ⏳ Waiting for authentication...', { isLoaded, hasUserId: !!userId, hasUser: !!user });
+      
+      // On mobile, sometimes auth takes a moment after landing on the page
+      // Set a timer to check again in 1 second if still not loaded
+      if (isLoaded && !userId) {
+        console.log('[SignIn] ⏰ Auth loaded but no userId yet. Will check again in 1s...');
+      }
     }
   }, [isLoaded, userId, user]);
+  
+  // Additional effect: Check periodically if authentication completes
+  useEffect(() => {
+    if (!isLoaded || userId) return; // Skip if already loaded with user
+    
+    console.log('[SignIn] 🔄 Setting up periodic auth check...');
+    let checkCount = 0;
+    const interval = setInterval(() => {
+      checkCount++;
+      console.log(`[SignIn] 🔄 Periodic check #${checkCount}:`, { isLoaded, hasUserId: !!userId });
+      
+      if (checkCount > 10) {
+        console.log('[SignIn] ⏹️ Stopping periodic check after 10 attempts');
+        clearInterval(interval);
+      }
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [isLoaded, userId]);
 
   return (
     <div 

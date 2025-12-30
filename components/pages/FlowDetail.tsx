@@ -12,27 +12,44 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
+  IonBadge,
 } from '@ionic/react';
 import { useParams, useHistory } from 'react-router-dom';
 
 import Store from '../../store';
 import { type Practices } from '../../data';
+import { usePracticeAccess } from '../../hooks/useAccessControl';
 
-import { playCircleOutline, checkmarkDoneCircleOutline, ellipseOutline, settingsOutline } from 'ionicons/icons';
+import { playCircleOutline, checkmarkDoneCircleOutline, ellipseOutline, settingsOutline, lockClosedOutline } from 'ionicons/icons';
 
-function Practice ({practice, flowId}: {practice: Practices; flowId: string}) {
+function Practice ({practice, flowId, flowIndex, practiceIndex}: {practice: Practices; flowId: string; flowIndex: number; practiceIndex: number}) {
+  const hasAccess = usePracticeAccess(flowId, practice.id, flowIndex, practiceIndex);
+  
   return practice && (
         <IonItem className="no-bg-color py-4 text-white" routerLink={`/flows/${flowId}/${practice.id}`}>
           <IonIcon className="text-white text-3xl" icon={practice.finished ? checkmarkDoneCircleOutline : ellipseOutline} />
-          <IonLabel className="pl-5 text-white text-lg">{practice.name}</IonLabel>
-          <IonIcon className="text-white text-3xl" icon={playCircleOutline} />          
+          <IonLabel className="pl-5 text-white text-lg">
+            {practice.name}
+            {!hasAccess && (
+              <IonBadge color="warning" className="ml-2">Premium</IonBadge>
+            )}
+          </IonLabel>
+          <IonIcon className="text-white text-3xl" icon={hasAccess ? playCircleOutline : lockClosedOutline} />          
         </IonItem>
   )
 }
 
-function Practices ({practices, flowId} : {practices: Practices[]; flowId: string}) {
+function Practices ({practices, flowId, flowIndex} : {practices: Practices[]; flowId: string; flowIndex: number}) {
   return practices && (<div className="no-bg-color">
-    {practices.map(practice => <Practice practice={practice} flowId={flowId} key={practice.id}/>)}
+    {practices.map((practice, index) => (
+      <Practice 
+        practice={practice} 
+        flowId={flowId} 
+        flowIndex={flowIndex}
+        practiceIndex={index}
+        key={practice.id}
+      />
+    ))}
   </div>)
 }
 const FlowDetail = () => {
@@ -40,6 +57,8 @@ const FlowDetail = () => {
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
   const flow = flows.find((flow) => flow.id === flowId);
+  const flowIndex = flows.findIndex((flow) => flow.id === flowId);
+  
   return (
     <IonPage>
       <IonHeader translucent={true}>
@@ -57,7 +76,7 @@ const FlowDetail = () => {
       </IonHeader>
       <IonContent className="ion-padding">
         <p className="text-white">{flow?.description}</p>
-        {flowId && <Practices practices={flow?.practices ?? []} flowId={flowId} />}
+        {flowId && <Practices practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} />}
       </IonContent>
     </IonPage>
   );

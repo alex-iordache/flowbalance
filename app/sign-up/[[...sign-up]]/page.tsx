@@ -94,6 +94,7 @@ export default function SignUpPage() {
     return () => {
       console.error = originalError;
       console.warn = originalWarn;
+      clearTimeout(timeoutId);
     };
   }, []);
 

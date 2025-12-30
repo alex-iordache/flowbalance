@@ -14,7 +14,6 @@ import {
 } from '@ionic/react';
 import { checkmarkCircle, closeOutline } from 'ionicons/icons';
 import { useAccessControl } from '../hooks/useAccessControl';
-import { Browser } from '@capacitor/browser';
 
 interface PaywallModalProps {
   isOpen: boolean;
@@ -33,27 +32,15 @@ interface PaywallModalProps {
 export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallModalProps) {
   const { userType, isAuthenticated } = useAccessControl();
 
-  const handleUpgrade = async () => {
-    // Open payment in external browser to avoid Google Play fees
-    // This follows Stripe's recommendation for mobile apps
-    const checkoutUrl = 'https://flowbalance-jdk.vercel.app/subscribe';
-    
-    await Browser.open({ 
-      url: checkoutUrl,
-      presentationStyle: 'popover'
-    });
-
-    // Listen for when browser closes
-    Browser.addListener('browserFinished', () => {
-      // User returned from payment, refresh to update subscription status
-      window.location.reload();
-    });
-
-    onClose();
+  const handleUpgrade = () => {
+    // Redirect to subscribe page where Clerk's PricingTable will handle everything
+    // Clerk will automatically open Stripe checkout in external browser
+    // to avoid Google Play fees
+    window.location.href = '/subscribe';
   };
 
   const handleSignUpFirst = () => {
-    // Guest users need to sign up first
+    // Guest users need to sign up first, then they'll see the subscribe page
     window.location.href = '/sign-in';
   };
 

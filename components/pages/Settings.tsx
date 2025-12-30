@@ -55,8 +55,18 @@ const Settings = () => {
         <IonList>
           <IonListHeader>Account</IonListHeader>
           
-          {/* Show Sign Out button when user is signed in */}
+          {/* Show Manage Subscription and Sign Out when user is signed in */}
           <SignedIn>
+            <IonItem>
+              <IonButton
+                expand="block"
+                color="secondary"
+                className="w-full mb-2"
+                onClick={() => window.location.href = '/subscribe'}
+              >
+                Manage Subscription
+              </IonButton>
+            </IonItem>
             <IonItem>
               <IonButton
                 expand="block"

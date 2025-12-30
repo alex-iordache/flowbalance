@@ -1,27 +1,8 @@
 'use client';
 
-import { SignUp, useAuth, useOrganization } from '@clerk/nextjs';
-import { useEffect } from 'react';
+import { SignUp } from '@clerk/nextjs';
 
 export default function SignUpPage() {
-  const { isLoaded, userId } = useAuth();
-  const { organization, isLoaded: orgLoaded } = useOrganization();
-
-  useEffect(() => {
-    if (isLoaded && userId && orgLoaded) {
-      // Check if user is part of an organization
-      if (organization) {
-        // Organization user (Type B) - has automatic full access
-        // Redirect to home
-        window.location.href = '/home';
-      } else {
-        // Regular user (Type A) - needs to subscribe
-        // Redirect to subscription page to choose a plan
-        window.location.href = '/subscribe';
-      }
-    }
-  }, [isLoaded, userId, orgLoaded, organization]);
-
   return (
     <div 
       className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600"
@@ -35,6 +16,7 @@ export default function SignUpPage() {
       <div className="w-full max-w-md px-4">
         <SignUp 
           signInUrl="/sign-in"
+          forceRedirectUrl="/post-signup-redirect"
           appearance={{
             elements: {
               rootBox: "mx-auto",

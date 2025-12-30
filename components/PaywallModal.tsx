@@ -33,17 +33,13 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
   const { userType, isAuthenticated } = useAccessControl();
 
   const handleUpgrade = () => {
-    // Redirect to subscribe page where Clerk's PricingTable will handle everything
-    // Clerk will automatically open Stripe checkout in external browser
-    // to avoid Google Play fees
+    // Redirect to subscribe page (opens web in browser)
     window.location.href = '/subscribe';
   };
 
   const handleSignUpFirst = () => {
-    // Guest users need to sign up first, then they'll see the subscribe page
-    // IMPORTANT: Direct to /sign-up, not /sign-in!
-    console.log('[PaywallModal] Redirecting to /sign-up');
-    window.location.href = '/sign-up';
+    // Guest users go to sign-in page (which has "Create account on web" button)
+    window.location.href = '/sign-in';
   };
 
   return (

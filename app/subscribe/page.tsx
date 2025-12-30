@@ -1,43 +1,56 @@
 'use client';
 
-import { PricingTable } from '@clerk/nextjs';
-import { IonPage, IonHeader, IonToolbar, IonTitle, IonContent, IonButtons, IonButton } from '@ionic/react';
+import { useEffect } from 'react';
+import { IonPage, IonContent, IonButton } from '@ionic/react';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 
 /**
- * Subscribe/Manage Subscription Page
+ * Subscribe Page (Mobile)
  * 
- * Shows Clerk's PricingTable for users to subscribe or manage their plan.
- * Uses Clerk's own billing system.
+ * Redirects to web for subscription to comply with Google Play policies.
  */
 export default function SubscribePage() {
+  const handleSubscribeOnWeb = async () => {
+    const isNative = Capacitor.isNativePlatform();
+    
+    if (isNative) {
+      await Browser.open({ 
+        url: 'https://flowbalance-jdk.vercel.app/subscribe-web' 
+      });
+    } else {
+      window.location.href = '/subscribe-web';
+    }
+  };
+
+  useEffect(() => {
+    // Auto-open on mount
+    handleSubscribeOnWeb();
+  }, []);
+
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle className="text-white">Subscription Plans</IonTitle>
-          <IonButtons slot="end">
-            <IonButton onClick={() => window.location.href = '/home'}>
-              Close
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding" scrollY={true}>
-        <div className="py-6">
-          <div className="text-center text-white mb-6">
-            <h1 className="text-3xl font-bold mb-2">Choose Your Plan</h1>
-            <p className="text-lg opacity-90">Unlock all meditation practices</p>
-          </div>
-          
-          <PricingTable 
-            appearance={{
-              elements: {
-                rootBox: "mx-auto max-w-4xl",
-                card: "shadow-xl rounded-xl bg-white",
-                formButtonPrimary: "bg-purple-600 hover:bg-purple-700"
-              }
-            }}
-          />
+      <IonContent className="ion-padding">
+        <div className="flex flex-col items-center justify-center min-h-full text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+          <h2 className="text-2xl font-bold text-white mb-4">
+            Opening subscription page...
+          </h2>
+          <p className="text-white mb-6">
+            Opens in your browser for secure payment
+          </p>
+          <IonButton
+            color="light"
+            onClick={handleSubscribeOnWeb}
+          >
+            Open Subscription Page
+          </IonButton>
+          <button
+            onClick={() => window.location.href = '/home'}
+            className="text-white underline mt-4"
+          >
+            Back to Home
+          </button>
         </div>
       </IonContent>
     </IonPage>

@@ -1,38 +1,71 @@
 'use client';
 
 import { SignIn } from '@clerk/nextjs';
+import { IonPage, IonContent, IonButton } from '@ionic/react';
+import { Browser } from '@capacitor/browser';
+import { Capacitor } from '@capacitor/core';
 
 /**
  * Sign In Page
  * 
- * Clerk handles all redirects via environment variables:
- * - Existing users → /home (SIGN_IN_FALLBACK_REDIRECT_URL)
- * - New signups → /post-signup-redirect (SIGN_UP_FORCE_REDIRECT_URL)
+ * "Create account" button opens browser to web sign-up page,
+ * keeps app on sign-in page for user to sign in after registration.
  */
 export default function SignInPage() {
+  const handleCreateAccount = async () => {
+    const isNative = Capacitor.isNativePlatform();
+    
+    if (isNative) {
+      // Open browser to sign-up page, keep app on sign-in
+      await Browser.open({ 
+        url: 'https://flowbalance-jdk.vercel.app/sign-up-web' 
+      });
+    } else {
+      // Desktop: just navigate
+      window.location.href = '/sign-up-web';
+    }
+  };
+
   return (
-    <div 
-      className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600"
-      style={{
-        paddingTop: 'env(safe-area-inset-top)',
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        paddingLeft: 'env(safe-area-inset-left)',
-        paddingRight: 'env(safe-area-inset-right)',
-      }}
-    >
-      <div className="w-full max-w-md px-4">
-        <SignIn 
-          signUpUrl="/sign-up"
-          appearance={{
-            elements: {
-              rootBox: "mx-auto",
-              card: "shadow-xl",
-              formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
-              footerActionLink: "text-purple-600 hover:text-purple-700"
-            }
+    <IonPage>
+      <IonContent scrollY={true}>
+        <div 
+          className="flex flex-col items-center justify-center min-h-full bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
+          style={{
+            paddingTop: 'env(safe-area-inset-top)',
+            paddingBottom: 'env(safe-area-inset-bottom)',
           }}
-        />
-      </div>
-    </div>
+        >
+          <div className="w-full max-w-md">
+            <SignIn 
+              appearance={{
+                elements: {
+                  rootBox: "mx-auto",
+                  card: "shadow-xl",
+                  formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
+                  footerActionLink: "text-purple-600 hover:text-purple-700"
+                }
+              }}
+            />
+            
+            {/* Custom Create Account Button */}
+            <div className="mt-6 text-center">
+              <p className="text-white mb-3">Don&apos;t have an account?</p>
+              <IonButton
+                expand="block"
+                color="light"
+                size="large"
+                onClick={handleCreateAccount}
+              >
+                Create Account on Web
+              </IonButton>
+              <p className="text-white text-sm mt-2 opacity-80">
+                Opens in your browser, then return here to sign in
+              </p>
+            </div>
+          </div>
+        </div>
+      </IonContent>
+    </IonPage>
   );
 }

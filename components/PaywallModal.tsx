@@ -111,7 +111,7 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
                   Sign Up & Subscribe
                 </IonButton>
                 <p className="text-center text-sm opacity-70">
-                  You'll be able to choose your plan after signing up
+                  You&apos;ll be able to choose your plan after signing up
                 </p>
               </>
             ) : (

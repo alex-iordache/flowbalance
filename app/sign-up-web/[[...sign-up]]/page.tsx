@@ -30,9 +30,9 @@ export default function SignUpWebPage() {
         {/* Clerk Sign Up Component */}
         <SignUp 
           signInUrl="/sign-in"
-          afterSignUpUrl="/signup-success"
-          forceRedirectUrl="/signup-success"
-          fallbackRedirectUrl="/signup-success"
+          afterSignUpUrl="/subscribe-web"
+          forceRedirectUrl="/subscribe-web"
+          fallbackRedirectUrl="/subscribe-web"
           appearance={{
             elements: {
               rootBox: "mx-auto w-full",

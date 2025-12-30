@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth, useUser, useOrganization } from '@clerk/nextjs';
+import { useOrganization, useAuth } from '@clerk/nextjs';
 
 export interface AccessControlResult {
   hasFullAccess: boolean;
@@ -21,37 +21,21 @@ export interface AccessControlResult {
  * - has(): https://clerk.com/docs/billing/overview
  */
 export function useAccessControl(): AccessControlResult {
-  const { has, userId } = useAuth();
-  const { user } = useUser();
   const { organization } = useOrganization();
+  const { has, userId } = useAuth();
 
   // Check if user is authenticated
   const isAuthenticated = !!userId;
 
-  // Type B: Organization users
-  // Preferred: Clerk organizations via useOrganization()
+  // Type B: Organization users get automatic full access
+  // Organizations are configured in Clerk Dashboard with verified domains
+  // (jordache.me, dynamichr.ro)
   if (organization) {
     return {
       hasFullAccess: true,
       userType: 'organization',
       isAuthenticated: true,
       organization: organization.name,
-      plan: null,
-    };
-  }
-
-  // Fallback: org-like users by email domain (for future orgs)
-  const email = user?.primaryEmailAddress?.emailAddress || '';
-  const emailDomain = email.split('@')[1]?.toLowerCase() || '';
-  const orgDomains = ['jordache.me', 'dynamichr.ro'];
-  const isOrgUser = orgDomains.includes(emailDomain);
-
-  if (isOrgUser) {
-    return {
-      hasFullAccess: true,
-      userType: 'organization',
-      isAuthenticated: true,
-      organization: emailDomain,
       plan: null,
     };
   }

@@ -21,6 +21,7 @@ export default function SignUpPage() {
   const [warnings, setWarnings] = useState<string[]>([]);
   const [clerkPublishableKey, setClerkPublishableKey] = useState<string>('Loading...');
   const [openedInBrowser, setOpenedInBrowser] = useState(false);
+  const [openFailed, setOpenFailed] = useState(false);
 
   useEffect(() => {
     const errorList: string[] = [];
@@ -152,10 +153,19 @@ export default function SignUpPage() {
     Browser.open({
       url: url.toString(),
       presentationStyle: 'popover',
-    }).catch(() => {
-      // If it fails, user can use the button below.
-      setOpenedInBrowser(false);
-    });
+    })
+      .then(() => {
+        // Immediately move the underlying WebView back to /sign-in so the user never sees
+        // an intermediate "opening..." screen at /sign-up.
+        window.setTimeout(() => {
+          window.location.replace('/sign-in');
+        }, 50);
+      })
+      .catch(() => {
+        // If it fails, show a minimal fallback button.
+        setOpenFailed(true);
+        setOpenedInBrowser(false);
+      });
   }, [openedInBrowser]);
 
   const copyToClipboard = async () => {
@@ -213,36 +223,38 @@ export default function SignUpPage() {
         >
           <div className="w-full max-w-md mx-auto space-y-4" data-debug-container="1">
             {Capacitor.isNativePlatform() ? (
-              <div className="bg-white rounded-2xl shadow-xl p-6 text-center">
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h1>
-                <p className="text-gray-700 mb-4">
-                  Opening sign up in an in-app browser tab (required for Clerk&apos;s passwordless flow).
-                </p>
-                <IonButton
-                  expand="block"
-                  onClick={() => {
-                    const url = new URL(window.location.href);
-                    url.searchParams.set('from', 'native');
-                    url.searchParams.set('__cache_bust', String(Date.now()));
-                    Browser.open({ url: url.toString(), presentationStyle: 'popover' });
-                  }}
-                >
-                  Open Sign Up
-                </IonButton>
-                <p className="text-sm text-gray-500 mt-3">
-                  After creating your account, you will be returned here automatically.
-                </p>
-              </div>
+              openFailed ? (
+                <div className="bg-white rounded-2xl shadow-xl p-6 text-center">
+                  <p className="text-gray-800 mb-4">
+                    Could not open the sign-up tab. Please try again.
+                  </p>
+                  <IonButton
+                    expand="block"
+                    onClick={() => {
+                      const url = new URL(window.location.href);
+                      url.searchParams.set('from', 'native');
+                      url.searchParams.set('__cache_bust', String(Date.now()));
+                      Browser.open({ url: url.toString(), presentationStyle: 'popover' });
+                    }}
+                  >
+                    Open Sign Up
+                  </IonButton>
+                </div>
+              ) : null
             ) : (
               <SignUp
                 signInUrl="/sign-in"
                 fallbackRedirectUrl={
-                  new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('from') === 'native'
+                  new URLSearchParams(
+                    typeof window !== 'undefined' ? window.location.search : '',
+                  ).get('from') === 'native'
                     ? '/native-signup-complete'
                     : '/home'
                 }
                 forceRedirectUrl={
-                  new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('from') === 'native'
+                  new URLSearchParams(
+                    typeof window !== 'undefined' ? window.location.search : '',
+                  ).get('from') === 'native'
                     ? '/native-signup-complete'
                     : '/home'
                 }

@@ -144,7 +144,19 @@ export default function SignUpPage() {
           }}
         >
           <div className="signin-page">
-            <SignUp />
+            <SignUp 
+              signInUrl="/sign-in"
+              fallbackRedirectUrl="/home"
+              forceRedirectUrl="/home"
+              appearance={{
+                elements: {
+                  rootBox: "mx-auto",
+                  card: "shadow-xl",
+                  formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
+                  footerActionLink: "text-purple-600 hover:text-purple-700"
+                }
+              }}
+            />
 
             {/* Debug Box */}
             <div className="bg-gray-900 text-white rounded-lg p-4 text-xs font-mono max-h-64 overflow-y-auto">

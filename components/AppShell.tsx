@@ -4,7 +4,6 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Capacitor } from '@capacitor/core';
 
 import Tabs from './pages/Tabs';
 import AuthGuard from './AuthGuard';
@@ -27,8 +26,6 @@ const AppShell = () => {
     // Load persisted state when app initializes
     loadAllPersistedState();
   }, []);
-
-  // Deep-link handling is now global (see components/DeepLinkHandler.tsx)
 
   return (
     <AuthGuard>

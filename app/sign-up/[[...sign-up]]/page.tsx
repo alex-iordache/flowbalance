@@ -3,8 +3,6 @@
 import { SignUp } from '@clerk/nextjs';
 import { IonPage, IonContent, IonButton } from '@ionic/react';
 import { useEffect, useState } from 'react';
-import { Capacitor } from '@capacitor/core';
-import { Browser } from '@capacitor/browser';
 
 /**
  * Sign Up Page (In-App)
@@ -20,155 +18,84 @@ export default function SignUpPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [clerkPublishableKey, setClerkPublishableKey] = useState<string>('Loading...');
-  const [openedInBrowser, setOpenedInBrowser] = useState(false);
-  const [openFailed, setOpenFailed] = useState(false);
 
   useEffect(() => {
+    // Collect debug information
+    const info: string[] = [];
     const errorList: string[] = [];
     const warningList: string[] = [];
 
+    // Current URL
+    info.push(`Current URL: ${window.location.href}`);
+    info.push(`Pathname: ${window.location.pathname}`);
+    info.push(`Search: ${window.location.search}`);
+    info.push(`Hash: ${window.location.hash}`);
+
+    // User Agent
+    info.push(`\nUser Agent: ${navigator.userAgent}`);
+
+    // Screen info
+    info.push(`\nScreen: ${window.screen.width}x${window.screen.height}`);
+    info.push(`Viewport: ${window.innerWidth}x${window.innerHeight}`);
+
+    // Clerk environment variables
+    info.push(`\nClerk Environment Variables:`);
+    info.push(`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'not set'}`);
+    info.push(`NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || 'not set'}`);
+    info.push(`NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || 'not set'}`);
+    info.push(`NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || 'not set'}`);
+
+    // Try to get Clerk instance info
+    if (typeof window !== 'undefined' && (window as any).Clerk) {
+      const clerk = (window as any).Clerk;
+      info.push(`\nClerk SDK Info:`);
+      try {
+        info.push(`Clerk loaded: Yes`);
+        if (clerk.publishableKey) {
+          info.push(`Clerk Publishable Key: ${clerk.publishableKey}`);
+        }
+      } catch (e) {
+        info.push(`Clerk SDK error: ${String(e)}`);
+      }
+    } else {
+      info.push(`\nClerk SDK: Not loaded yet`);
+    }
+
+    // Check if in Capacitor
+    if (typeof window !== 'undefined' && (window as any).Capacitor) {
+      info.push(`\nCapacitor: Detected`);
+      const Capacitor = (window as any).Capacitor;
+      info.push(`Platform: ${Capacitor.getPlatform()}`);
+      info.push(`Is Native: ${Capacitor.isNativePlatform()}`);
+    } else {
+      info.push(`\nCapacitor: Not detected (Web browser)`);
+    }
+
+    // Console errors and warnings
     const originalError = console.error;
     const originalWarn = console.warn;
 
-    // Keep state in sync as logs happen (otherwise we only see initial empty arrays)
     console.error = (...args: any[]) => {
-      const line = args.map(arg => String(arg)).join(' ');
-      errorList.push(line);
-      setErrors([...errorList]);
+      errorList.push(args.map(arg => String(arg)).join(' '));
       originalError.apply(console, args);
     };
 
     console.warn = (...args: any[]) => {
-      const line = args.map(arg => String(arg)).join(' ');
-      warningList.push(line);
-      setWarnings([...warningList]);
+      warningList.push(args.map(arg => String(arg)).join(' '));
       originalWarn.apply(console, args);
     };
 
-    const buildSnapshot = () => {
-      const info: string[] = [];
+    // Update state
+    setErrors(errorList);
+    setWarnings(warningList);
+    setDebugInfo(info.join('\n'));
 
-      // Current URL
-      info.push(`Current URL: ${window.location.href}`);
-      info.push(`Pathname: ${window.location.pathname}`);
-      info.push(`Search: ${window.location.search}`);
-      info.push(`Hash: ${window.location.hash}`);
-
-      // User Agent
-      info.push(`\nUser Agent: ${navigator.userAgent}`);
-
-      // Screen info
-      info.push(`\nScreen: ${window.screen.width}x${window.screen.height}`);
-      info.push(`Viewport: ${window.innerWidth}x${window.innerHeight}`);
-
-      // Clerk environment variables
-      info.push(`\nClerk Environment Variables:`);
-      info.push(`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'not set'}`);
-      info.push(`NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || 'not set'}`);
-      info.push(`NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || 'not set'}`);
-      info.push(`NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || 'not set'}`);
-
-      // Clerk SDK info (can load async)
-      const clerk = (window as any).Clerk;
-      if (clerk) {
-        info.push(`\nClerk SDK Info:`);
-        info.push(`Clerk loaded: Yes`);
-        if (clerk.publishableKey) info.push(`Clerk Publishable Key: ${clerk.publishableKey}`);
-        if (clerk.frontendApi) info.push(`Clerk Frontend API: ${clerk.frontendApi}`);
-      } else {
-        info.push(`\nClerk SDK: Not loaded yet`);
-      }
-
-      // Detect which fields Clerk actually rendered (helps debug “mobile vs desktop form”)
-      try {
-        const container =
-          (document.querySelector('[data-debug-container="1"]') as Element | null) || document.body;
-        const labels = Array.from(container.querySelectorAll('label'))
-          .map(el => (el.textContent || '').trim())
-          .filter(Boolean);
-        const uniq = Array.from(new Set(labels));
-        info.push(`\nRendered label texts (first 30):`);
-        info.push(uniq.slice(0, 30).join(' | ') || '(none detected)');
-
-        const hasFirst = uniq.some(t => /first\s*name/i.test(t));
-        const hasLast = uniq.some(t => /last\s*name/i.test(t));
-        const hasPass = uniq.some(t => /password/i.test(t));
-        info.push(`\nDetected fields: firstName=${hasFirst} lastName=${hasLast} password=${hasPass}`);
-      } catch (e) {
-        info.push(`\nRendered field detection error: ${String(e)}`);
-      }
-
-      // Check if in Capacitor
-      if ((window as any).Capacitor) {
-        info.push(`\nCapacitor: Detected`);
-        const Capacitor = (window as any).Capacitor;
-        info.push(`Platform: ${Capacitor.getPlatform()}`);
-        info.push(`Is Native: ${Capacitor.isNativePlatform()}`);
-      } else {
-        info.push(`\nCapacitor: Not detected (Web browser)`);
-      }
-
-      return info.join('\n');
-    };
-
-    // Build immediately + keep updating briefly so we capture “Clerk loaded” state reliably
-    const refresh = () => {
-      const snapshot = buildSnapshot();
-      setDebugInfo(snapshot);
-
-      // update the small visible key line too
-      const clerk = (window as any).Clerk;
-      const key =
-        (clerk && clerk.publishableKey) ||
-        process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
-        'Not found';
-      setClerkPublishableKey(key);
-    };
-
-    refresh();
-    const intervalId = window.setInterval(refresh, 500);
-    const stopId = window.setTimeout(() => window.clearInterval(intervalId), 8000);
-
+    // Cleanup
     return () => {
       console.error = originalError;
       console.warn = originalWarn;
-      window.clearInterval(intervalId);
-      window.clearTimeout(stopId);
     };
   }, []);
-
-  // On native (Capacitor WebView), Clerk prebuilt SignUp keeps rendering password even when disabled.
-  // We already confirmed the exact same URL shows the correct (passwordless) form in Chrome.
-  // Solution: open Sign Up in an *in-app browser tab* (Chrome Custom Tab / SFSafariViewController),
-  // then deep-link back to the app on success and close the tab.
-  useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
-    if (openedInBrowser) return;
-    setOpenedInBrowser(true);
-
-    const url = new URL(window.location.href);
-    url.searchParams.set('from', 'native');
-    url.searchParams.set('__cache_bust', String(Date.now()));
-
-    Browser.open({
-      url: url.toString(),
-      presentationStyle: 'popover',
-    })
-      .then(() => {
-        // Immediately move the underlying WebView back to /sign-in so the user never sees
-        // an intermediate "opening..." screen at /sign-up.
-        window.setTimeout(() => {
-          // Put the underlying WebView on sign-in while the tab is open.
-          // DeepLinkHandler will flip ?signup=success without forcing another reload.
-          window.location.replace('/sign-in?signup=pending');
-        }, 50);
-      })
-      .catch(() => {
-        // If it fails, show a minimal fallback button.
-        setOpenFailed(true);
-        setOpenedInBrowser(false);
-      });
-  }, [openedInBrowser]);
 
   const copyToClipboard = async () => {
     const fullDebug = [
@@ -206,13 +133,6 @@ export default function SignUpPage() {
     }
   };
 
-  const hardReload = () => {
-    // Force a full document reload (not just SPA navigation) and bust caches.
-    const url = new URL(window.location.href);
-    url.searchParams.set('__cache_bust', String(Date.now()));
-    window.location.href = url.toString();
-  };
-
   return (
     <IonPage>
       <IonContent scrollY={true}>
@@ -223,78 +143,32 @@ export default function SignUpPage() {
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          <div className="w-full max-w-md mx-auto space-y-4" data-debug-container="1">
-            {Capacitor.isNativePlatform() ? (
-              openFailed ? (
-                <div className="bg-white rounded-2xl shadow-xl p-6 text-center">
-                  <p className="text-gray-800 mb-4">
-                    Could not open the sign-up tab. Please try again.
-                  </p>
-                  <IonButton
-                    expand="block"
-                    onClick={() => {
-                      const url = new URL(window.location.href);
-                      url.searchParams.set('from', 'native');
-                      url.searchParams.set('__cache_bust', String(Date.now()));
-                      Browser.open({ url: url.toString(), presentationStyle: 'popover' });
-                    }}
-                  >
-                    Open Sign Up
-                  </IonButton>
-                </div>
-              ) : null
-            ) : (
-              <SignUp
-                signInUrl="/sign-in"
-                fallbackRedirectUrl={
-                  new URLSearchParams(
-                    typeof window !== 'undefined' ? window.location.search : '',
-                  ).get('from') === 'native'
-                    ? '/native-signup-complete'
-                    : '/home'
+          <div className="w-full max-w-md space-y-4">
+            <SignUp 
+              signInUrl="/sign-in"
+              afterSignUpUrl="/home"
+              appearance={{
+                elements: {
+                  rootBox: "mx-auto",
+                  card: "shadow-xl",
+                  formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
+                  footerActionLink: "text-purple-600 hover:text-purple-700"
                 }
-                forceRedirectUrl={
-                  new URLSearchParams(
-                    typeof window !== 'undefined' ? window.location.search : '',
-                  ).get('from') === 'native'
-                    ? '/native-signup-complete'
-                    : '/home'
-                }
-                appearance={{
-                  elements: {
-                    rootBox: 'mx-auto',
-                    card: 'shadow-xl',
-                    formButtonPrimary: 'bg-purple-600 hover:bg-purple-700',
-                    footerActionLink: 'text-purple-600 hover:text-purple-700',
-                  },
-                }}
-              />
-            )}
+              }}
+            />
 
             {/* Debug Box */}
-            <div className="bg-gray-900 text-white rounded-lg p-4 text-xs font-mono max-h-64 overflow-y-auto w-full max-w-md mx-auto">
-              <div className="flex flex-col gap-2 mb-3">
+            <div className="bg-gray-900 text-white rounded-lg p-4 text-xs font-mono max-h-64 overflow-y-auto">
+              <div className="flex justify-between items-center mb-2">
                 <h3 className="font-bold text-sm">Debug Info</h3>
-                <div className="flex flex-col sm:flex-row gap-2 w-full">
-                  <IonButton
-                    size="small"
-                    fill="outline"
-                    expand="block"
-                    onClick={hardReload}
-                    className="text-xs w-full"
-                  >
-                    Hard reload
-                  </IonButton>
-                  <IonButton 
-                    size="small" 
-                    fill="outline"
-                    expand="block"
-                    onClick={copyToClipboard}
-                    className="text-xs w-full"
-                  >
-                    Copy All
-                  </IonButton>
-                </div>
+                <IonButton 
+                  size="small" 
+                  fill="outline" 
+                  onClick={copyToClipboard}
+                  className="text-xs"
+                >
+                  Copy All
+                </IonButton>
               </div>
               
               <div className="space-y-2">

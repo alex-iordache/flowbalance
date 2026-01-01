@@ -201,23 +201,25 @@ export default function SignUpPage() {
             />
 
             {/* Debug Box */}
-            <div className="bg-gray-900 text-white rounded-lg p-4 text-xs font-mono max-h-64 overflow-y-auto">
-              <div className="flex justify-between items-center mb-2">
+            <div className="bg-gray-900 text-white rounded-lg p-4 text-xs font-mono max-h-64 overflow-y-auto w-full max-w-md mx-auto">
+              <div className="flex flex-col gap-2 mb-3">
                 <h3 className="font-bold text-sm">Debug Info</h3>
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2 w-full">
                   <IonButton
                     size="small"
                     fill="outline"
+                    expand="block"
                     onClick={hardReload}
-                    className="text-xs"
+                    className="text-xs w-full"
                   >
                     Hard reload
                   </IonButton>
                   <IonButton 
                     size="small" 
-                    fill="outline" 
+                    fill="outline"
+                    expand="block"
                     onClick={copyToClipboard}
-                    className="text-xs"
+                    className="text-xs w-full"
                   >
                     Copy All
                   </IonButton>

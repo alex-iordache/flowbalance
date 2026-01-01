@@ -24,7 +24,8 @@ export default function SignInPage() {
           <div className="signin-page">
             <SignIn 
               signUpUrl="/sign-up"
-              afterSignInUrl="/home"
+              fallbackRedirectUrl="/home"
+              forceRedirectUrl="/home"
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

@@ -20,80 +20,115 @@ export default function SignUpPage() {
   const [clerkPublishableKey, setClerkPublishableKey] = useState<string>('Loading...');
 
   useEffect(() => {
-    // Collect debug information
-    const info: string[] = [];
     const errorList: string[] = [];
     const warningList: string[] = [];
 
-    // Current URL
-    info.push(`Current URL: ${window.location.href}`);
-    info.push(`Pathname: ${window.location.pathname}`);
-    info.push(`Search: ${window.location.search}`);
-    info.push(`Hash: ${window.location.hash}`);
-
-    // User Agent
-    info.push(`\nUser Agent: ${navigator.userAgent}`);
-
-    // Screen info
-    info.push(`\nScreen: ${window.screen.width}x${window.screen.height}`);
-    info.push(`Viewport: ${window.innerWidth}x${window.innerHeight}`);
-
-    // Clerk environment variables
-    info.push(`\nClerk Environment Variables:`);
-    info.push(`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'not set'}`);
-    info.push(`NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || 'not set'}`);
-    info.push(`NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || 'not set'}`);
-    info.push(`NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || 'not set'}`);
-
-    // Try to get Clerk instance info
-    if (typeof window !== 'undefined' && (window as any).Clerk) {
-      const clerk = (window as any).Clerk;
-      info.push(`\nClerk SDK Info:`);
-      try {
-        info.push(`Clerk loaded: Yes`);
-        if (clerk.publishableKey) {
-          info.push(`Clerk Publishable Key: ${clerk.publishableKey}`);
-        }
-      } catch (e) {
-        info.push(`Clerk SDK error: ${String(e)}`);
-      }
-    } else {
-      info.push(`\nClerk SDK: Not loaded yet`);
-    }
-
-    // Check if in Capacitor
-    if (typeof window !== 'undefined' && (window as any).Capacitor) {
-      info.push(`\nCapacitor: Detected`);
-      const Capacitor = (window as any).Capacitor;
-      info.push(`Platform: ${Capacitor.getPlatform()}`);
-      info.push(`Is Native: ${Capacitor.isNativePlatform()}`);
-    } else {
-      info.push(`\nCapacitor: Not detected (Web browser)`);
-    }
-
-    // Console errors and warnings
     const originalError = console.error;
     const originalWarn = console.warn;
 
+    // Keep state in sync as logs happen (otherwise we only see initial empty arrays)
     console.error = (...args: any[]) => {
-      errorList.push(args.map(arg => String(arg)).join(' '));
+      const line = args.map(arg => String(arg)).join(' ');
+      errorList.push(line);
+      setErrors([...errorList]);
       originalError.apply(console, args);
     };
 
     console.warn = (...args: any[]) => {
-      warningList.push(args.map(arg => String(arg)).join(' '));
+      const line = args.map(arg => String(arg)).join(' ');
+      warningList.push(line);
+      setWarnings([...warningList]);
       originalWarn.apply(console, args);
     };
 
-    // Update state
-    setErrors(errorList);
-    setWarnings(warningList);
-    setDebugInfo(info.join('\n'));
+    const buildSnapshot = () => {
+      const info: string[] = [];
 
-    // Cleanup
+      // Current URL
+      info.push(`Current URL: ${window.location.href}`);
+      info.push(`Pathname: ${window.location.pathname}`);
+      info.push(`Search: ${window.location.search}`);
+      info.push(`Hash: ${window.location.hash}`);
+
+      // User Agent
+      info.push(`\nUser Agent: ${navigator.userAgent}`);
+
+      // Screen info
+      info.push(`\nScreen: ${window.screen.width}x${window.screen.height}`);
+      info.push(`Viewport: ${window.innerWidth}x${window.innerHeight}`);
+
+      // Clerk environment variables
+      info.push(`\nClerk Environment Variables:`);
+      info.push(`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'not set'}`);
+      info.push(`NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || 'not set'}`);
+      info.push(`NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || 'not set'}`);
+      info.push(`NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL || 'not set'}`);
+
+      // Clerk SDK info (can load async)
+      const clerk = (window as any).Clerk;
+      if (clerk) {
+        info.push(`\nClerk SDK Info:`);
+        info.push(`Clerk loaded: Yes`);
+        if (clerk.publishableKey) info.push(`Clerk Publishable Key: ${clerk.publishableKey}`);
+        if (clerk.frontendApi) info.push(`Clerk Frontend API: ${clerk.frontendApi}`);
+      } else {
+        info.push(`\nClerk SDK: Not loaded yet`);
+      }
+
+      // Detect which fields Clerk actually rendered (helps debug “mobile vs desktop form”)
+      try {
+        const container = document.querySelector('.signin-page') || document.body;
+        const labels = Array.from(container.querySelectorAll('label'))
+          .map(el => (el.textContent || '').trim())
+          .filter(Boolean);
+        const uniq = Array.from(new Set(labels));
+        info.push(`\nRendered label texts (first 30):`);
+        info.push(uniq.slice(0, 30).join(' | ') || '(none detected)');
+
+        const hasFirst = uniq.some(t => /first\s*name/i.test(t));
+        const hasLast = uniq.some(t => /last\s*name/i.test(t));
+        const hasPass = uniq.some(t => /password/i.test(t));
+        info.push(`\nDetected fields: firstName=${hasFirst} lastName=${hasLast} password=${hasPass}`);
+      } catch (e) {
+        info.push(`\nRendered field detection error: ${String(e)}`);
+      }
+
+      // Check if in Capacitor
+      if ((window as any).Capacitor) {
+        info.push(`\nCapacitor: Detected`);
+        const Capacitor = (window as any).Capacitor;
+        info.push(`Platform: ${Capacitor.getPlatform()}`);
+        info.push(`Is Native: ${Capacitor.isNativePlatform()}`);
+      } else {
+        info.push(`\nCapacitor: Not detected (Web browser)`);
+      }
+
+      return info.join('\n');
+    };
+
+    // Build immediately + keep updating briefly so we capture “Clerk loaded” state reliably
+    const refresh = () => {
+      const snapshot = buildSnapshot();
+      setDebugInfo(snapshot);
+
+      // update the small visible key line too
+      const clerk = (window as any).Clerk;
+      const key =
+        (clerk && clerk.publishableKey) ||
+        process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ||
+        'Not found';
+      setClerkPublishableKey(key);
+    };
+
+    refresh();
+    const intervalId = window.setInterval(refresh, 500);
+    const stopId = window.setTimeout(() => window.clearInterval(intervalId), 8000);
+
     return () => {
       console.error = originalError;
       console.warn = originalWarn;
+      window.clearInterval(intervalId);
+      window.clearTimeout(stopId);
     };
   }, []);
 

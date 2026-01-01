@@ -77,7 +77,8 @@ export default function SignUpPage() {
 
       // Detect which fields Clerk actually rendered (helps debug “mobile vs desktop form”)
       try {
-        const container = document.querySelector('.signin-page') || document.body;
+        const container =
+          (document.querySelector('[data-debug-container="1"]') as Element | null) || document.body;
         const labels = Array.from(container.querySelectorAll('label'))
           .map(el => (el.textContent || '').trim())
           .filter(Boolean);
@@ -185,7 +186,7 @@ export default function SignUpPage() {
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          <div>
+          <div className="w-full max-w-md mx-auto space-y-4" data-debug-container="1">
             <SignUp 
               signInUrl="/sign-in"
               fallbackRedirectUrl="/home"

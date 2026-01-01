@@ -21,7 +21,7 @@ export default function SignInPage() {
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          <div className="w-full max-w-md">
+          <div className="signin-page">
             <SignIn 
               signUpUrl="/sign-up"
               afterSignInUrl="/home"

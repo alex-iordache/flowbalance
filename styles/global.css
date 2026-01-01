@@ -237,3 +237,11 @@ ion-item.no-bg-color {
   justify-content: center;
   text-align: center;
 }
+
+.signin-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;     /* vertical */
+  justify-content: center; /* horizontal */
+  padding: 16px;           /* prevents edge clipping on small screens */
+}

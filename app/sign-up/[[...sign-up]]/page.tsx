@@ -143,20 +143,8 @@ export default function SignUpPage() {
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          <div className="w-full max-w-md space-y-4">
-            <SignUp 
-              signInUrl="/sign-in"
-              fallbackRedirectUrl="/home"
-              forceRedirectUrl="/home"
-              appearance={{
-                elements: {
-                  rootBox: "mx-auto",
-                  card: "shadow-xl",
-                  formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
-                  footerActionLink: "text-purple-600 hover:text-purple-700"
-                }
-              }}
-            />
+          <div className="signin-page">
+            <SignUp />
 
             {/* Debug Box */}
             <div className="bg-gray-900 text-white rounded-lg p-4 text-xs font-mono max-h-64 overflow-y-auto">

@@ -133,6 +133,13 @@ export default function SignUpPage() {
     }
   };
 
+  const hardReload = () => {
+    // Force a full document reload (not just SPA navigation) and bust caches.
+    const url = new URL(window.location.href);
+    url.searchParams.set('__cache_bust', String(Date.now()));
+    window.location.href = url.toString();
+  };
+
   return (
     <IonPage>
       <IonContent scrollY={true}>
@@ -162,14 +169,24 @@ export default function SignUpPage() {
             <div className="bg-gray-900 text-white rounded-lg p-4 text-xs font-mono max-h-64 overflow-y-auto">
               <div className="flex justify-between items-center mb-2">
                 <h3 className="font-bold text-sm">Debug Info</h3>
-                <IonButton 
-                  size="small" 
-                  fill="outline" 
-                  onClick={copyToClipboard}
-                  className="text-xs"
-                >
-                  Copy All
-                </IonButton>
+                <div className="flex gap-2">
+                  <IonButton
+                    size="small"
+                    fill="outline"
+                    onClick={hardReload}
+                    className="text-xs"
+                  >
+                    Hard reload
+                  </IonButton>
+                  <IonButton 
+                    size="small" 
+                    fill="outline" 
+                    onClick={copyToClipboard}
+                    className="text-xs"
+                  >
+                    Copy All
+                  </IonButton>
+                </div>
               </div>
               
               <div className="space-y-2">

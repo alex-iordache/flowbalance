@@ -3,6 +3,8 @@
 import { SignUp } from '@clerk/nextjs';
 import { IonPage, IonContent, IonButton } from '@ionic/react';
 import { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { openExternalUrl } from '../../../helpers/openExternal';
 
 /**
  * Sign Up Page (In-App)
@@ -18,6 +20,7 @@ export default function SignUpPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [clerkPublishableKey, setClerkPublishableKey] = useState<string>('Loading...');
+  const [openedInBrowser, setOpenedInBrowser] = useState(false);
 
   useEffect(() => {
     const errorList: string[] = [];
@@ -133,6 +136,25 @@ export default function SignUpPage() {
     };
   }, []);
 
+  // On native (Capacitor WebView), Clerk prebuilt SignUp keeps rendering password even when disabled.
+  // We already confirmed the exact same URL shows the correct (passwordless) form in a real browser.
+  // So: open this same page in the system browser when running native.
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+    if (openedInBrowser) return;
+    setOpenedInBrowser(true);
+
+    const url = new URL(window.location.href);
+    url.searchParams.set('from', 'native');
+    url.searchParams.set('__cache_bust', String(Date.now()));
+
+    // Opens Chrome / system browser (not the WebView)
+    openExternalUrl(url.toString()).catch(() => {
+      // If it fails, user can use the button below.
+      setOpenedInBrowser(false);
+    });
+  }, [openedInBrowser]);
+
   const copyToClipboard = async () => {
     const fullDebug = [
       '=== DEBUG INFO ===',
@@ -187,19 +209,42 @@ export default function SignUpPage() {
           }}
         >
           <div className="w-full max-w-md mx-auto space-y-4" data-debug-container="1">
-            <SignUp 
-              signInUrl="/sign-in"
-              fallbackRedirectUrl="/home"
-              forceRedirectUrl="/home"
-              appearance={{
-                elements: {
-                  rootBox: "mx-auto",
-                  card: "shadow-xl",
-                  formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
-                  footerActionLink: "text-purple-600 hover:text-purple-700"
-                }
-              }}
-            />
+            {Capacitor.isNativePlatform() ? (
+              <div className="bg-white rounded-2xl shadow-xl p-6 text-center">
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h1>
+                <p className="text-gray-700 mb-4">
+                  Opening sign up in your browser (required for Clerk&apos;s passwordless flow).
+                </p>
+                <IonButton
+                  expand="block"
+                  onClick={() => {
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('from', 'native');
+                    url.searchParams.set('__cache_bust', String(Date.now()));
+                    openExternalUrl(url.toString());
+                  }}
+                >
+                  Open in Browser
+                </IonButton>
+                <p className="text-sm text-gray-500 mt-3">
+                  After creating your account, return to the app and sign in.
+                </p>
+              </div>
+            ) : (
+              <SignUp
+                signInUrl="/sign-in"
+                fallbackRedirectUrl="/home"
+                forceRedirectUrl="/home"
+                appearance={{
+                  elements: {
+                    rootBox: 'mx-auto',
+                    card: 'shadow-xl',
+                    formButtonPrimary: 'bg-purple-600 hover:bg-purple-700',
+                    footerActionLink: 'text-purple-600 hover:text-purple-700',
+                  },
+                }}
+              />
+            )}
 
             {/* Debug Box */}
             <div className="bg-gray-900 text-white rounded-lg p-4 text-xs font-mono max-h-64 overflow-y-auto w-full max-w-md mx-auto">

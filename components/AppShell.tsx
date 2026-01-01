@@ -4,6 +4,9 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
 import { useEffect } from 'react';
+import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 
 import Tabs from './pages/Tabs';
 import AuthGuard from './AuthGuard';
@@ -25,6 +28,39 @@ const AppShell = () => {
   useEffect(() => {
     // Load persisted state when app initializes
     loadAllPersistedState();
+  }, []);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    let handle: { remove: () => void } | null = null;
+
+    CapApp.addListener('appUrlOpen', async ({ url }) => {
+      // Handle deep-link coming back from in-app browser after signup
+      if (typeof url !== 'string') return;
+      if (!url.startsWith('com.flowapp.app://sso-callback')) return;
+
+      try {
+        const parsed = new URL(url);
+        const flow = parsed.searchParams.get('flow');
+        if (flow === 'signup') {
+          try {
+            await Browser.close();
+          } catch {}
+          // After returning from sign-up, the WebView still won't share Clerk session cookies,
+          // so send user to sign-in inside the app.
+          window.location.href = '/sign-in';
+        }
+      } catch {
+        // If URL parsing fails, ignore.
+      }
+    }).then(h => {
+      handle = h;
+    });
+
+    return () => {
+      handle?.remove();
+    };
   }, []);
 
   return (

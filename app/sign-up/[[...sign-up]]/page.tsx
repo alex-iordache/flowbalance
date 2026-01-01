@@ -4,7 +4,7 @@ import { SignUp } from '@clerk/nextjs';
 import { IonPage, IonContent, IonButton } from '@ionic/react';
 import { useEffect, useState } from 'react';
 import { Capacitor } from '@capacitor/core';
-import { openExternalUrl } from '../../../helpers/openExternal';
+import { Browser } from '@capacitor/browser';
 
 /**
  * Sign Up Page (In-App)
@@ -137,8 +137,9 @@ export default function SignUpPage() {
   }, []);
 
   // On native (Capacitor WebView), Clerk prebuilt SignUp keeps rendering password even when disabled.
-  // We already confirmed the exact same URL shows the correct (passwordless) form in a real browser.
-  // So: open this same page in the system browser when running native.
+  // We already confirmed the exact same URL shows the correct (passwordless) form in Chrome.
+  // Solution: open Sign Up in an *in-app browser tab* (Chrome Custom Tab / SFSafariViewController),
+  // then deep-link back to the app on success and close the tab.
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
     if (openedInBrowser) return;
@@ -148,8 +149,10 @@ export default function SignUpPage() {
     url.searchParams.set('from', 'native');
     url.searchParams.set('__cache_bust', String(Date.now()));
 
-    // Opens Chrome / system browser (not the WebView)
-    openExternalUrl(url.toString()).catch(() => {
+    Browser.open({
+      url: url.toString(),
+      presentationStyle: 'popover',
+    }).catch(() => {
       // If it fails, user can use the button below.
       setOpenedInBrowser(false);
     });
@@ -213,7 +216,7 @@ export default function SignUpPage() {
               <div className="bg-white rounded-2xl shadow-xl p-6 text-center">
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Create your account</h1>
                 <p className="text-gray-700 mb-4">
-                  Opening sign up in your browser (required for Clerk&apos;s passwordless flow).
+                  Opening sign up in an in-app browser tab (required for Clerk&apos;s passwordless flow).
                 </p>
                 <IonButton
                   expand="block"
@@ -221,20 +224,28 @@ export default function SignUpPage() {
                     const url = new URL(window.location.href);
                     url.searchParams.set('from', 'native');
                     url.searchParams.set('__cache_bust', String(Date.now()));
-                    openExternalUrl(url.toString());
+                    Browser.open({ url: url.toString(), presentationStyle: 'popover' });
                   }}
                 >
-                  Open in Browser
+                  Open Sign Up
                 </IonButton>
                 <p className="text-sm text-gray-500 mt-3">
-                  After creating your account, return to the app and sign in.
+                  After creating your account, you will be returned here automatically.
                 </p>
               </div>
             ) : (
               <SignUp
                 signInUrl="/sign-in"
-                fallbackRedirectUrl="/home"
-                forceRedirectUrl="/home"
+                fallbackRedirectUrl={
+                  new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('from') === 'native'
+                    ? '/native-signup-complete'
+                    : '/home'
+                }
+                forceRedirectUrl={
+                  new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '').get('from') === 'native'
+                    ? '/native-signup-complete'
+                    : '/home'
+                }
                 appearance={{
                   elements: {
                     rootBox: 'mx-auto',

@@ -185,7 +185,7 @@ export default function SignUpPage() {
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          <div className="signin-page">
+          <div>
             <SignUp 
               signInUrl="/sign-in"
               fallbackRedirectUrl="/home"

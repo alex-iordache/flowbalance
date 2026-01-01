@@ -146,7 +146,8 @@ export default function SignUpPage() {
           <div className="w-full max-w-md space-y-4">
             <SignUp 
               signInUrl="/sign-in"
-              afterSignUpUrl="/home"
+              fallbackRedirectUrl="/home"
+              forceRedirectUrl="/home"
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

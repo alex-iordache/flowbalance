@@ -13,9 +13,32 @@ import { useEffect } from 'react';
  */
 export default function NativeSignupCompletePage() {
   useEffect(() => {
-    // Reuse the existing deep link host in AndroidManifest: com.flowapp.app://sso-callback
-    const deepLink = `com.flowapp.app://sso-callback?flow=signup&ts=${Date.now()}`;
-    window.location.href = deepLink;
+    const run = async () => {
+      let ticket = '';
+
+      // In this page we're signed in (in the in-app browser tab).
+      // Create a transferable sign-in token so the Capacitor WebView can establish a session.
+      try {
+        const res = await fetch('/api/create-sign-in-token', { method: 'GET' });
+        const data = await res.json();
+        if (res.ok && data?.token) {
+          ticket = String(data.token);
+        }
+      } catch {
+        // ignore; we'll fall back without ticket
+      }
+
+      const params = new URLSearchParams();
+      params.set('flow', 'signup');
+      params.set('ts', String(Date.now()));
+      if (ticket) params.set('ticket', ticket);
+
+      // Reuse the existing deep link host in AndroidManifest: com.flowapp.app://sso-callback
+      const deepLink = `com.flowapp.app://sso-callback?${params.toString()}`;
+      window.location.href = deepLink;
+    };
+
+    run();
   }, []);
 
   return (

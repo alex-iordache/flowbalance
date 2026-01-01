@@ -1,6 +1,6 @@
 'use client';
 
-import { SignIn } from '@clerk/nextjs';
+import { SignIn, useSignIn, useAuth } from '@clerk/nextjs';
 import { IonButton, IonContent, IonPage } from '@ionic/react';
 import { useEffect, useState } from 'react';
 
@@ -16,6 +16,46 @@ export default function SignInPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [clerkPublishableKey, setClerkPublishableKey] = useState<string>('Loading...');
+  const [isConsumingTicket, setIsConsumingTicket] = useState(false);
+
+  const { signIn, setActive, isLoaded: signInLoaded } = useSignIn();
+  const { userId, isLoaded: authLoaded } = useAuth();
+
+  useEffect(() => {
+    if (!signInLoaded || !authLoaded) return;
+
+    const params = new URLSearchParams(window.location.search);
+    const ticket = params.get('ticket');
+    const signup = params.get('signup');
+
+    // If already signed in, go straight to app
+    if (userId) {
+      if (signup === 'success' || ticket) {
+        window.location.replace('/home');
+      }
+      return;
+    }
+
+    // Auto-consume transferable sign-in token (ticket) from sign-up flow
+    if (ticket && !isConsumingTicket) {
+      setIsConsumingTicket(true);
+      signIn
+        .create({ strategy: 'ticket', ticket })
+        .then(result => {
+          if (result.status === 'complete' && result.createdSessionId) {
+            return setActive({ session: result.createdSessionId });
+          }
+          throw new Error(`Ticket sign-in not complete: ${result.status}`);
+        })
+        .then(() => {
+          window.location.replace('/home');
+        })
+        .catch(err => {
+          console.error('Failed to consume sign-in ticket:', err);
+          setIsConsumingTicket(false);
+        });
+    }
+  }, [signInLoaded, authLoaded, userId, isConsumingTicket, signIn, setActive]);
 
   useEffect(() => {
     const errorList: string[] = [];
@@ -55,6 +95,7 @@ export default function SignInPage() {
       info.push(`NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY || 'not set'}`);
       info.push(`NEXT_PUBLIC_CLERK_SIGN_IN_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL || 'not set'}`);
       info.push(`NEXT_PUBLIC_CLERK_SIGN_UP_URL: ${process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL || 'not set'}`);
+      info.push(`NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL: ${process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL || 'not set'}`);
 
       const clerk = (window as any).Clerk;
       if (clerk) {

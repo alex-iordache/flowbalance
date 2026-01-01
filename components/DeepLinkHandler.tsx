@@ -31,9 +31,15 @@ export default function DeepLinkHandler() {
             await Browser.close();
           } catch {}
 
-          // Return user to in-app sign-in after sign-up
-          // (sessions won't transfer from the browser tab to the WebView)
-          window.location.href = '/sign-in?signup=success';
+          // If we received a transferable sign-in token, send it to /sign-in so the WebView can
+          // establish a Clerk session and continue straight into the app.
+          const ticket = parsed.searchParams.get('ticket');
+          const target = new URL('/sign-in', window.location.origin);
+          target.searchParams.set('signup', 'success');
+          if (ticket) target.searchParams.set('ticket', ticket);
+
+          // Force a navigation so the SignIn page can consume the ticket.
+          window.location.replace(target.toString());
         }
       } catch {
         // ignore

@@ -158,7 +158,9 @@ export default function SignUpPage() {
         // Immediately move the underlying WebView back to /sign-in so the user never sees
         // an intermediate "opening..." screen at /sign-up.
         window.setTimeout(() => {
-          window.location.replace('/sign-in');
+          // Put the underlying WebView on sign-in while the tab is open.
+          // DeepLinkHandler will flip ?signup=success without forcing another reload.
+          window.location.replace('/sign-in?signup=pending');
         }, 50);
       })
       .catch(() => {

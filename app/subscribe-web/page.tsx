@@ -1,8 +1,8 @@
 'use client';
 
-import { PricingTable, SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } from '@clerk/nextjs';
+import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } from '@clerk/nextjs';
+import { CheckoutButton, usePlans } from '@clerk/nextjs/experimental';
 import { useEffect, useState } from 'react';
-import { Capacitor } from '@capacitor/core';
 
 /**
  * Web-Only Subscription Page
@@ -18,6 +18,7 @@ export default function SubscribeWebPage() {
   const [isProcessingToken, setIsProcessingToken] = useState(false);
   const { signIn, isLoaded: signInLoaded, setActive } = useSignIn();
   const { userId } = useAuth();
+  const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
 
   useEffect(() => {
     // Detect if opened from mobile device (not from Capacitor app, but from browser)
@@ -53,6 +54,21 @@ export default function SubscribeWebPage() {
         });
     }
   }, [signInLoaded, signIn, setActive, userId, isProcessingToken]);
+
+  const proPlan = (() => {
+    const list = Array.isArray(plans) ? plans : [];
+    if (list.length === 0) return null;
+
+    // Billing APIs are still evolving; fields vary by SDK version.
+    // Try a few stable identifiers first, then fall back to the only plan.
+    const byKey = list.find((p: any) => p?.key === 'pro_user' || p?.planKey === 'pro_user' || p?.slug === 'pro_user');
+    if (byKey) return byKey as any;
+
+    const byName = list.find((p: any) => String(p?.name || '').toLowerCase().includes('pro'));
+    if (byName) return byName as any;
+
+    return list[0] as any;
+  })();
 
   // Show success message after subscription
   if (subscriptionSuccess) {
@@ -115,7 +131,7 @@ export default function SubscribeWebPage() {
         {/* Header */}
         <div className="text-center mb-6 md:mb-8">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">
-            Choose Your Plan
+            Subscribe to Flow Premium
           </h1>
           <p className="text-lg md:text-xl text-white opacity-90">
             Unlock all meditation practices
@@ -133,18 +149,66 @@ export default function SubscribeWebPage() {
         <ClerkLoaded>
           {/* Signed In: Show Pricing */}
           <SignedIn>
-            <div className="bg-white rounded-2xl shadow-2xl p-4 md:p-6 mb-6">
-              <PricingTable 
-                appearance={{
-                  elements: {
-                    rootBox: "mx-auto w-full",
-                    card: "shadow-lg rounded-xl p-4 md:p-6 w-full",
-                    formButtonPrimary: "bg-purple-600 hover:bg-purple-700 text-white py-3 px-6 rounded-lg text-base font-semibold w-full",
-                    priceText: "text-2xl md:text-3xl font-bold",
-                    cardTitle: "text-xl md:text-2xl font-bold"
-                  }
-                }}
-              />
+            <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6">
+              {plansLoading ? (
+                <p className="text-base md:text-lg text-gray-700 text-center">Loading plan…</p>
+              ) : !proPlan ? (
+                <p className="text-base md:text-lg text-gray-700 text-center">
+                  No subscription plan found. Please check Clerk Billing plan availability.
+                </p>
+              ) : (
+                <div className="max-w-xl mx-auto">
+                  <div className="text-center mb-6">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                      {String(proPlan?.name ?? 'Pro')}
+                    </h2>
+                    <p className="text-gray-600">
+                      {String(proPlan?.description ?? 'Full access to all flows and practices')}
+                    </p>
+                    {proPlan?.amountFormatted ? (
+                      <p className="text-3xl md:text-4xl font-bold text-gray-900 mt-4">
+                        {String(proPlan.amountFormatted)}
+                        <span className="text-base font-medium text-gray-600">/month</span>
+                      </p>
+                    ) : null}
+                  </div>
+
+                  {Array.isArray(proPlan?.features) && proPlan.features.length > 0 ? (
+                    <div className="rounded-2xl border border-gray-200 overflow-hidden mb-6">
+                      <ul className="divide-y divide-gray-200">
+                        {proPlan.features.slice(0, 8).map((f: any) => (
+                          <li key={String(f?.id ?? f?.key ?? f?.name)} className="px-4 py-3 text-gray-800">
+                            {String(f?.name ?? f?.key ?? 'Feature')}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border border-gray-200 overflow-hidden mb-6">
+                      <ul className="divide-y divide-gray-200">
+                        <li className="px-4 py-3 text-gray-800">Access to all flows and practices</li>
+                        <li className="px-4 py-3 text-gray-800">Guided programs for stress, focus, and sleep</li>
+                        <li className="px-4 py-3 text-gray-800">Track your progress</li>
+                        <li className="px-4 py-3 text-gray-800">New content added regularly</li>
+                      </ul>
+                    </div>
+                  )}
+
+                  <CheckoutButton
+                    planId={String(proPlan.id)}
+                    planPeriod="month"
+                    newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+                  >
+                    <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors">
+                      Upgrade Flow to Pro
+                    </button>
+                  </CheckoutButton>
+
+                  <p className="text-center text-sm text-gray-600 mt-3">
+                    Opens in browser to complete payment
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="text-center">

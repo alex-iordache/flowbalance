@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import Tabs from './pages/Tabs';
 import AuthGuard from './AuthGuard';
 import { loadAllPersistedState } from '../store/persistence';
+import Subscribe from './pages/Subscribe';
 
 setupIonicReact({});
 
@@ -37,6 +38,7 @@ const AppShell = () => {
             <Route path="/flows" component={Tabs} />
             <Route path="/settings" component={Tabs} />
             <Route path="/progress" component={Tabs} />
+            <Route path="/subscribe" component={Subscribe} />
             
             {/* Root route - redirects to home */}
             <Route path="/" exact={true}>

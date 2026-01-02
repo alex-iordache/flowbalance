@@ -35,13 +35,27 @@ const Practice = () => {
   // If the user doesn't have access, route them to the in-app subscribe screen.
   useEffect(() => {
     if (!hasAccess) {
+      // If we just returned from a successful subscription, give Clerk a moment to sync entitlements
+      // before bouncing the user back to /subscribe.
+      try {
+        if (sessionStorage.getItem('flow_subscribe_pending') === '1') {
+          const t = window.setTimeout(() => {
+            if (!hasAccess) {
+              const returnTo = `${window.location.pathname}${window.location.search}`;
+              history.push(`/subscribe?return=${encodeURIComponent(returnTo)}`);
+            }
+          }, 1500);
+          return () => window.clearTimeout(t);
+        }
+      } catch {
+        // ignore
+      }
+
       const returnTo =
-        typeof window !== 'undefined'
-          ? `${window.location.pathname}${window.location.search}`
-          : '/home';
-      history.replace(`/subscribe?return=${encodeURIComponent(returnTo)}`);
+        typeof window !== 'undefined' ? `${window.location.pathname}${window.location.search}` : '/home';
+      history.push(`/subscribe?return=${encodeURIComponent(returnTo)}`);
     }
-  }, [hasAccess, history]);
+  }, [hasAccess, history, flowId, practiceId]);
 
   const handleAudioPlay = () => {
     if (flowId) {

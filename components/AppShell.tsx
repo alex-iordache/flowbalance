@@ -1,7 +1,6 @@
 'use client';
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
-import { App as CapacitorApp } from '@capacitor/app';
 import { IonReactRouter } from '@ionic/react-router';
 import { Route, Redirect } from 'react-router-dom';
 import { useEffect } from 'react';
@@ -10,6 +9,7 @@ import Tabs from './pages/Tabs';
 import AuthGuard from './AuthGuard';
 import { loadAllPersistedState } from '../store/persistence';
 import Subscribe from './pages/Subscribe';
+import DeepLinkReturnHandler from './DeepLinkReturnHandler';
 
 setupIonicReact({});
 
@@ -29,41 +29,11 @@ const AppShell = () => {
     loadAllPersistedState();
   }, []);
 
-  useEffect(() => {
-    // Handle deep links from the external browser checkout flow.
-    // Example: com.flowapp.app://sso-callback?subscribed=1&return=/flows/Connect/Connect-Ziua-002
-    let handle: { remove: () => Promise<void> } | null = null;
-
-    (async () => {
-      try {
-        handle = await CapacitorApp.addListener('appUrlOpen', ({ url }) => {
-          try {
-            const u = new URL(url);
-            if (u.protocol !== 'com.flowapp.app:' || u.hostname !== 'sso-callback') return;
-            const returnTo = u.searchParams.get('return') || '/home';
-            if (returnTo.startsWith('/') && !returnTo.startsWith('//')) {
-              window.location.href = returnTo;
-            } else {
-              window.location.href = '/home';
-            }
-          } catch {
-            // ignore
-          }
-        });
-      } catch {
-        // ignore
-      }
-    })();
-
-    return () => {
-      void handle?.remove();
-    };
-  }, []);
-
   return (
     <AuthGuard>
       <IonApp>
         <IonReactRouter>
+          <DeepLinkReturnHandler />
           <IonRouterOutlet id="main">
             {/* Main app routes - protected by AuthGuard */}
             <Route path="/home" component={Tabs} />

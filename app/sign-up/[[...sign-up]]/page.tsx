@@ -18,8 +18,29 @@ export default function SignUpPage() {
   const [errors, setErrors] = useState<string[]>([]);
   const [warnings, setWarnings] = useState<string[]>([]);
   const [clerkPublishableKey, setClerkPublishableKey] = useState<string>('Loading...');
+  const [runtimeUrl, setRuntimeUrl] = useState<string>(''); // avoid SSR/CSR mismatch
+  const [runtimeUserAgent, setRuntimeUserAgent] = useState<string>(''); // avoid SSR/CSR mismatch
 
   useEffect(() => {
+    // Capture runtime-only values in an effect so SSR HTML matches initial client render.
+    try {
+      setRuntimeUrl(window.location.href);
+      setRuntimeUserAgent(navigator.userAgent);
+    } catch {
+      // ignore
+    }
+
+    // Best-effort: populate publishable key from runtime Clerk instance or env var
+    try {
+      const pk =
+        (window as any)?.Clerk?.publishableKey ??
+        process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ??
+        'not set';
+      setClerkPublishableKey(String(pk));
+    } catch {
+      setClerkPublishableKey(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY ?? 'not set');
+    }
+
     // Collect debug information
     const info: string[] = [];
     const errorList: string[] = [];
@@ -146,7 +167,8 @@ export default function SignUpPage() {
           <div className="w-full max-w-md space-y-4">
             <SignUp 
               signInUrl="/sign-in"
-              afterSignUpUrl="/home"
+              fallbackRedirectUrl="/home"
+              forceRedirectUrl="/home"
               appearance={{
                 elements: {
                   rootBox: "mx-auto",
@@ -173,7 +195,7 @@ export default function SignUpPage() {
               
               <div className="space-y-2">
                 <div className="text-green-400">
-                  <strong>URL:</strong> {typeof window !== 'undefined' ? window.location.href : 'N/A'}
+                  <strong>URL:</strong> {runtimeUrl || 'Loading...'}
                 </div>
                 
                 <div className="text-purple-400 break-all">
@@ -181,7 +203,8 @@ export default function SignUpPage() {
                 </div>
                 
                 <div className="text-blue-400">
-                  <strong>User Agent:</strong> {typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 80) + '...' : 'N/A'}
+                  <strong>User Agent:</strong>{' '}
+                  {runtimeUserAgent ? `${runtimeUserAgent.substring(0, 80)}...` : 'Loading...'}
                 </div>
 
                 {errors.length > 0 && (

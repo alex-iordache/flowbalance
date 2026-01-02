@@ -16,6 +16,7 @@ import {
 } from '@ionic/react';
 import { checkmarkCircle, closeOutline } from 'ionicons/icons';
 import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 interface PaywallModalProps {
   isOpen: boolean;
@@ -31,29 +32,11 @@ interface PaywallModalProps {
  */
 export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallModalProps) {
   const [period, setPeriod] = useState<'month' | 'annual'>('month');
+  const history = useHistory();
 
-  const handleSubscribe = async () => {
-    try {
-      // Get sign-in token for external browser authentication
-      const response = await fetch('/api/create-sign-in-token');
-      const data = await response.json();
-      
-      const { openExternalUrl } = await import('../helpers/openExternal');
-      
-      if (data.token) {
-        // Pass token to external browser for auto sign-in
-        await openExternalUrl(
-          `https://flowbalance-jdk.vercel.app/subscribe-web?autocheckout=1&period=${period}&__clerk_ticket=${data.token}`,
-        );
-      } else {
-        // Fallback: open without token
-        await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
-      }
-    } catch (error) {
-      console.error('Error opening subscription:', error);
-      const { openExternalUrl } = await import('../helpers/openExternal');
-      await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
-    }
+  const handleSubscribe = () => {
+    onClose();
+    history.push(`/subscribe?period=${period}`);
   };
 
   return (

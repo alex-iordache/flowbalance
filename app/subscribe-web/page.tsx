@@ -21,6 +21,7 @@ export default function SubscribeWebPage() {
   const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
   const [period, setPeriod] = useState<'month' | 'annual'>('month');
   const [autoCheckout, setAutoCheckout] = useState(false);
+  const [minimal, setMinimal] = useState(false);
   const [didAutoOpen, setDidAutoOpen] = useState(false);
   const checkoutBtnRef = useRef<HTMLButtonElement | null>(null);
 
@@ -39,6 +40,8 @@ export default function SubscribeWebPage() {
     // Optional: auto-open checkout (used when coming from the app)
     const ac = (params.get('autocheckout') || '').toLowerCase();
     setAutoCheckout(ac === '1' || ac === 'true');
+    const min = (params.get('minimal') || '').toLowerCase();
+    setMinimal(min === '1' || min === 'true' || ac === '1' || ac === 'true');
     const p = (params.get('period') || '').toLowerCase();
     setPeriod(p === 'annual' || p === 'year' || p === 'yearly' ? 'annual' : 'month');
 
@@ -145,22 +148,24 @@ export default function SubscribeWebPage() {
   }
 
   return (
-    <div 
-      className="flex flex-col bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
-      style={{
-        minHeight: '100dvh',
-      }}
+    <div
+      className={minimal ? 'bg-white' : 'flex flex-col bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4'}
+      style={{ minHeight: '100dvh' }}
     >
-      <div className="max-w-5xl w-full mx-auto">
-        {/* Header */}
-        <div className="text-center mb-6 md:mb-8">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">
-            Subscribe to Flow Premium
-          </h1>
-          <p className="text-lg md:text-xl text-white opacity-90">
-            Unlock all meditation practices
-          </p>
-        </div>
+      <div className={minimal ? 'w-full' : 'max-w-5xl w-full mx-auto'}>
+        {!minimal && (
+          <>
+            {/* Header */}
+            <div className="text-center mb-6 md:mb-8">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4">
+                Subscribe to Flow Premium
+              </h1>
+              <p className="text-lg md:text-xl text-white opacity-90">
+                Unlock all meditation practices
+              </p>
+            </div>
+          </>
+        )}
 
         <ClerkLoading>
           <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 text-center">
@@ -173,23 +178,17 @@ export default function SubscribeWebPage() {
         <ClerkLoaded>
           {/* Signed In: Show Pricing */}
           <SignedIn>
-            <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6">
+            <div className={minimal ? 'p-0' : 'bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6'}>
               {plansLoading ? (
-                <p className="text-base md:text-lg text-gray-700 text-center">Loading plan…</p>
+                <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : ''}>
+                  <p className="text-base md:text-lg text-gray-700 text-center">Loading…</p>
+                </div>
               ) : !proPlan ? (
                 <p className="text-base md:text-lg text-gray-700 text-center">
                   No subscription plan found. Please check Clerk Billing plan availability.
                 </p>
               ) : autoCheckout ? (
-                <div className="max-w-xl mx-auto text-center">
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                    Opening checkout…
-                  </h2>
-                  <p className="text-gray-600 mb-6">
-                    You&apos;ll complete payment in your browser.
-                  </p>
-
-                  {/* Hidden-ish button we can click programmatically */}
+                <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : 'max-w-xl mx-auto text-center'}>
                   <CheckoutButton
                     planId={String(proPlan.id)}
                     planPeriod={period}
@@ -197,15 +196,16 @@ export default function SubscribeWebPage() {
                   >
                     <button
                       ref={checkoutBtnRef}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors"
+                      className={minimal ? 'sr-only' : 'w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors'}
                     >
                       Continue to Checkout
                     </button>
                   </CheckoutButton>
-
-                  <p className="text-center text-sm text-gray-600 mt-3">
-                    If nothing happens, tap &quot;Continue to Checkout&quot;.
-                  </p>
+                  {!minimal && (
+                    <p className="text-center text-sm text-gray-600 mt-3">
+                      If nothing happens, tap &quot;Continue to Checkout&quot;.
+                    </p>
+                  )}
                 </div>
               ) : (
                 <div className="max-w-xl mx-auto">
@@ -265,7 +265,8 @@ export default function SubscribeWebPage() {
               )}
             </div>
 
-            <div className="text-center">
+            {!minimal && (
+              <div className="text-center">
               <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-4">
                 {isMobile ? (
                   <>
@@ -287,7 +288,8 @@ export default function SubscribeWebPage() {
                   </>
                 )}
               </div>
-            </div>
+              </div>
+            )}
           </SignedIn>
 
           {/* Signed Out: Show Sign In */}

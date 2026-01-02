@@ -13,12 +13,34 @@ import {
   IonLabel,
 } from '@ionic/react';
 import { chevronBackOutline } from 'ionicons/icons';
-import { useState } from 'react';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
+import { usePlans } from '@clerk/nextjs/experimental';
+import { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 export default function Subscribe() {
   const history = useHistory();
   const [period, setPeriod] = useState<'month' | 'annual'>('month');
+  const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
+
+  useEffect(() => {
+    // Allow deep-linking into annual/monthly from other screens
+    const params = new URLSearchParams(window.location.search);
+    const p = (params.get('period') || '').toLowerCase();
+    if (p === 'annual' || p === 'year' || p === 'yearly') setPeriod('annual');
+  }, []);
+
+  const proPlan = useMemo(() => {
+    const list = Array.isArray(plans) ? plans : [];
+    if (list.length === 0) return null;
+    const byKey = list.find(
+      (p: any) => p?.key === 'pro_user' || p?.planKey === 'pro_user' || p?.slug === 'pro_user',
+    );
+    if (byKey) return byKey as any;
+    const byName = list.find((p: any) => String(p?.name || '').toLowerCase().includes('pro'));
+    if (byName) return byName as any;
+    return list[0] as any;
+  }, [plans]);
 
   const openCheckout = async () => {
     try {
@@ -28,7 +50,7 @@ export default function Subscribe() {
 
       const base = 'https://flowbalance-jdk.vercel.app/subscribe-web';
       if (data?.token) {
-        await openExternalUrl(`${base}?autocheckout=1&period=${period}&__clerk_ticket=${data.token}`);
+        await openExternalUrl(`${base}?autocheckout=1&minimal=1&period=${period}&__clerk_ticket=${data.token}`);
       } else {
         await openExternalUrl(base);
       }
@@ -59,6 +81,7 @@ export default function Subscribe() {
           }}
         >
           <div className="w-full max-w-md space-y-4">
+            {/* Your features box */}
             <div className="bg-white rounded-2xl shadow-2xl p-6">
               <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Flow Pro</h2>
               <p className="text-gray-700 text-center mb-4">
@@ -87,13 +110,47 @@ export default function Subscribe() {
               </div>
             </div>
 
-            <IonButton expand="block" size="large" color="primary" onClick={openCheckout}>
-              Upgrade Flow to Pro
-            </IonButton>
+            {/* Clerk plan box (pulled from Clerk plan data) */}
+            <SignedIn>
+              <div className="bg-white rounded-2xl shadow-2xl p-6">
+                {plansLoading ? (
+                  <p className="text-gray-700 text-center">Loading plan…</p>
+                ) : !proPlan ? (
+                  <p className="text-gray-700 text-center">No plan found in Clerk.</p>
+                ) : (
+                  <>
+                    <div className="text-center">
+                      <p className="text-gray-600 text-sm mb-1">Plan</p>
+                      <h3 className="text-xl font-bold text-gray-900">{String(proPlan?.name ?? 'Pro')}</h3>
+                      <p className="text-gray-600 mt-2">
+                        {period === 'annual'
+                          ? String((proPlan as any)?.annualAmountFormatted ?? (proPlan as any)?.annualPriceFormatted ?? '')
+                          : String((proPlan as any)?.amountFormatted ?? '')}
+                        {period === 'annual' ? <span className="text-gray-500">/year</span> : <span className="text-gray-500">/month</span>}
+                      </p>
+                    </div>
 
-            <p className="text-center text-sm text-white opacity-90">
-              Opens in browser to complete payment
-            </p>
+                    <IonButton
+                      expand="block"
+                      color="primary"
+                      className="mt-4"
+                      onClick={openCheckout}
+                    >
+                      Subscribe
+                    </IonButton>
+                    <p className="text-center text-sm text-gray-600 mt-3">
+                      Opens in browser to complete payment
+                    </p>
+                  </>
+                )}
+              </div>
+            </SignedIn>
+
+            <SignedOut>
+              <IonButton expand="block" color="primary" onClick={() => (window.location.href = '/sign-in')}>
+                Sign in to Subscribe
+              </IonButton>
+            </SignedOut>
           </div>
         </div>
       </IonContent>

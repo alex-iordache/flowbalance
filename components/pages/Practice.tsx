@@ -16,7 +16,6 @@ import Store from '../../store';
 import * as actions from '../../store/actions';
 import { settingsOutline, lockClosedOutline } from 'ionicons/icons';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
-import PaywallModal from '../PaywallModal';
 
 const Practice = () => {
   const { flowId, practiceId } = useParams<{ flowId: string; practiceId: string }>();
@@ -32,16 +31,13 @@ const Practice = () => {
   
   // Check if user has access to this practice
   const hasAccess = usePracticeAccess(flowId, practiceId, flowIndex, practiceIndex);
-  
-  // Paywall modal state
-  const [showPaywall, setShowPaywall] = useState(false);
-  
-  // Show paywall if user doesn't have access
+
+  // If the user doesn't have access, route them to the in-app subscribe screen.
   useEffect(() => {
     if (!hasAccess) {
-      setShowPaywall(true);
+      history.replace('/subscribe');
     }
-  }, [hasAccess]);
+  }, [hasAccess, history]);
 
   const handleAudioPlay = () => {
     if (flowId) {
@@ -100,26 +96,7 @@ const Practice = () => {
               </audio>
             )}
           </>
-        ) : (
-          <div className="flex flex-col items-center justify-center min-h-full text-center">
-            <IonIcon 
-              icon={lockClosedOutline} 
-              style={{ fontSize: '64px' }} 
-              className="mb-4 opacity-50"
-            />
-            <h2 className="text-xl font-bold mb-2">This Practice is Locked</h2>
-            <p className="mb-4 opacity-70">
-              Upgrade to access all practices and flows
-            </p>
-          </div>
-        )}
-
-        {/* Paywall Modal */}
-        <PaywallModal 
-          isOpen={showPaywall}
-          onClose={() => setShowPaywall(false)}
-          practiceName={practice?.name}
-        />
+        ) : null}
       </IonContent>
     </IonPage>
   );

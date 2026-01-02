@@ -53,39 +53,39 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
     <IonModal isOpen={isOpen} onDidDismiss={onClose}>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Unlock {practiceName || 'This Practice'}</IonTitle>
+          <IonTitle className="text-white">Subscribe to Flow Premium</IonTitle>
           <IonButton slot="end" fill="clear" onClick={onClose}>
-            <IonIcon icon={closeOutline} />
+            <IonIcon icon={closeOutline} className="text-white" />
           </IonButton>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
         <div className="flex flex-col items-center justify-center min-h-full">
-          <h2 className="text-2xl font-bold mb-4 text-center">
+          <h2 className="text-2xl font-bold mb-4 text-center text-white">
             Upgrade to Pro
           </h2>
 
-          <p className="text-center mb-6">
+          <p className="text-center mb-6 text-white">
             Subscribe to unlock all meditation practices and flows.
           </p>
 
           {/* Benefits List */}
-          <IonList className="w-full mb-6">
+          <IonList className="w-full mb-6 rounded-2xl overflow-hidden">
             <IonItem>
               <IonIcon icon={checkmarkCircle} color="success" slot="start" />
-              <IonLabel>Access to all flows and practices</IonLabel>
+              <IonLabel className="text-white">Access to all flows and practices</IonLabel>
             </IonItem>
             <IonItem>
               <IonIcon icon={checkmarkCircle} color="success" slot="start" />
-              <IonLabel>Offline access to content</IonLabel>
+              <IonLabel className="text-white">Guided programs for stress, focus, and sleep</IonLabel>
             </IonItem>
             <IonItem>
               <IonIcon icon={checkmarkCircle} color="success" slot="start" />
-              <IonLabel>Track your progress</IonLabel>
+              <IonLabel className="text-white">Track your progress</IonLabel>
             </IonItem>
             <IonItem>
               <IonIcon icon={checkmarkCircle} color="success" slot="start" />
-              <IonLabel>New content added regularly</IonLabel>
+              <IonLabel className="text-white">New content added regularly</IonLabel>
             </IonItem>
           </IonList>
 
@@ -97,9 +97,9 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
               color="primary"
               onClick={handleSubscribe}
             >
-              View Plans & Subscribe
+              Upgrade Flow to Pro
             </IonButton>
-            <p className="text-center text-sm opacity-70">
+            <p className="text-center text-sm opacity-70 text-white">
               Opens in browser to complete payment
             </p>
 

@@ -36,7 +36,7 @@ type SimpleCardCTAProps = {
 }
 
 const SimpleCardCTA = ({ minutes }: SimpleCardCTAProps) => (
-  <div className="bg-white text-black block max-w-sm p-6 border border-gray-200 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
+  <div className="bg-white text-black block w-full max-w-sm mx-auto p-6 border border-gray-200 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
       <p className="text-gray-600">Stress Break Ziua 1 - 5 min</p>
       <h5 className="mb-3 text-2xl font-semibold tracking-tight text-black leading-8">Stress Break</h5>
       <button className="inline-flex items-center justify-center text-white bg-amber-500 hover:bg-amber-600 focus:ring-4 focus:ring-amber-300 shadow-sm font-medium leading-5 rounded-lg text-sm px-4 py-2.5 focus:outline-none transition-colors">

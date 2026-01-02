@@ -40,6 +40,9 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
+      // Pin Clerk JS to a specific version to avoid transient load failures in dev
+      // (e.g. attempts to load an unversioned @5 script that can be CORS-blocked).
+      clerkJSVersion="5.117.0"
       allowedRedirectOrigins={[
         'https://flowbalance-jdk.vercel.app',
         'capacitor://localhost',

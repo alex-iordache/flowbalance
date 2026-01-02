@@ -4,6 +4,149 @@ import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } fr
 import { CheckoutButton, usePlans } from '@clerk/nextjs/experimental';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+function SignedInSubscribeContent({
+  period,
+  minimal,
+  autoCheckout,
+}: {
+  period: 'month' | 'annual';
+  minimal: boolean;
+  autoCheckout: boolean;
+}) {
+  const { userId } = useAuth();
+  const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
+  const [didAutoOpen, setDidAutoOpen] = useState(false);
+  const checkoutBtnRef = useRef<HTMLButtonElement | null>(null);
+
+  const proPlan = useMemo(() => {
+    const list = Array.isArray(plans) ? plans : [];
+    if (list.length === 0) return null;
+
+    // Billing APIs are still evolving; fields vary by SDK version.
+    // Try a few stable identifiers first, then fall back to the only plan.
+    const byKey = list.find((p: any) => p?.key === 'pro_user' || p?.planKey === 'pro_user');
+    if (byKey) return byKey as any;
+
+    const byName = list.find((p: any) => String(p?.name || '').toLowerCase().includes('pro'));
+    if (byName) return byName as any;
+
+    const nonFree = list.find((p: any) => p?.key !== 'free_user' && p?.planKey !== 'free_user');
+    return (nonFree ?? list[0]) as any;
+  }, [plans]);
+
+  // If opened with autocheckout=1, auto-open the checkout drawer as soon as we're signed in.
+  useEffect(() => {
+    if (!autoCheckout) return;
+    if (didAutoOpen) return;
+    if (!userId) return;
+    if (plansLoading) return;
+    if (!proPlan?.id) return;
+
+    window.setTimeout(() => {
+      checkoutBtnRef.current?.click();
+      setDidAutoOpen(true);
+    }, 50);
+  }, [autoCheckout, didAutoOpen, userId, plansLoading, proPlan?.id]);
+
+  return (
+    <div className={minimal ? 'p-0' : 'bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6'}>
+      {plansLoading ? (
+        <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : ''}>
+          <p className="text-base md:text-lg text-gray-700 text-center">Loading…</p>
+        </div>
+      ) : !proPlan ? (
+        <p className="text-base md:text-lg text-gray-700 text-center">
+          No subscription plan found. Please check Clerk Billing plan availability.
+        </p>
+      ) : minimal ? (
+        // Minimal mode: open the Clerk Checkout drawer automatically and render nothing else.
+        <div className="min-h-[50vh] flex items-center justify-center">
+          <CheckoutButton
+            planId={String(proPlan.id)}
+            planPeriod={period}
+            newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+          >
+            <button ref={checkoutBtnRef} className="sr-only">
+              Continue to Checkout
+            </button>
+          </CheckoutButton>
+        </div>
+      ) : autoCheckout ? (
+        <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : 'max-w-xl mx-auto text-center'}>
+          <CheckoutButton
+            planId={String(proPlan.id)}
+            planPeriod={period}
+            newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+          >
+            <button
+              ref={checkoutBtnRef}
+              className={
+                minimal
+                  ? 'sr-only'
+                  : 'w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors'
+              }
+            >
+              Continue to Checkout
+            </button>
+          </CheckoutButton>
+          {!minimal && (
+            <p className="text-center text-sm text-gray-600 mt-3">If nothing happens, tap &quot;Continue to Checkout&quot;.</p>
+          )}
+        </div>
+      ) : (
+        <div className="max-w-xl mx-auto">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{String(proPlan?.name ?? 'Pro')}</h2>
+            <p className="text-gray-600">{String(proPlan?.description ?? 'Full access to all flows and practices')}</p>
+            {proPlan?.amountFormatted ? (
+              <p className="text-3xl md:text-4xl font-bold text-gray-900 mt-4">
+                {String(proPlan.amountFormatted)}
+                <span className="text-base font-medium text-gray-600">/month</span>
+              </p>
+            ) : null}
+          </div>
+
+          {Array.isArray(proPlan?.features) && proPlan.features.length > 0 ? (
+            <div className="rounded-2xl border border-gray-200 overflow-hidden mb-6">
+              <ul className="divide-y divide-gray-200">
+                {proPlan.features.slice(0, 8).map((f: any) => (
+                  <li key={String(f?.id ?? f?.key ?? f?.name)} className="px-4 py-3 text-gray-800">
+                    {String(f?.name ?? f?.key ?? 'Feature')}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-gray-200 overflow-hidden mb-6">
+              <ul className="divide-y divide-gray-200">
+                <li className="px-4 py-3 text-gray-800">Access to all flows and practices</li>
+                <li className="px-4 py-3 text-gray-800">Guided programs for stress, focus, and sleep</li>
+                <li className="px-4 py-3 text-gray-800">Track your progress</li>
+                <li className="px-4 py-3 text-gray-800">New content added regularly</li>
+              </ul>
+            </div>
+          )}
+
+          <CheckoutButton
+            planId={String(proPlan.id)}
+            planPeriod={period}
+            newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+          >
+            <button
+              ref={checkoutBtnRef}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors"
+            >
+              Upgrade Flow to Pro
+            </button>
+          </CheckoutButton>
+
+          <p className="text-center text-sm text-gray-600 mt-3">Opens in browser to complete payment</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /**
  * Web-Only Subscription Page
  * 
@@ -18,12 +161,9 @@ export default function SubscribeWebPage() {
   const [isProcessingToken, setIsProcessingToken] = useState(false);
   const { signIn, isLoaded: signInLoaded, setActive } = useSignIn();
   const { userId } = useAuth();
-  const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
   const [period, setPeriod] = useState<'month' | 'annual'>('month');
   const [autoCheckout, setAutoCheckout] = useState(false);
   const [minimal, setMinimal] = useState(false);
-  const [didAutoOpen, setDidAutoOpen] = useState(false);
-  const checkoutBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     // Detect if opened from mobile device (not from Capacitor app, but from browser)
@@ -67,36 +207,6 @@ export default function SubscribeWebPage() {
         });
     }
   }, [signInLoaded, signIn, setActive, userId, isProcessingToken]);
-
-  const proPlan = useMemo(() => {
-    const list = Array.isArray(plans) ? plans : [];
-    if (list.length === 0) return null;
-
-    // Billing APIs are still evolving; fields vary by SDK version.
-    // Try a few stable identifiers first, then fall back to the only plan.
-    const byKey = list.find((p: any) => p?.key === 'pro_user' || p?.planKey === 'pro_user');
-    if (byKey) return byKey as any;
-
-    const byName = list.find((p: any) => String(p?.name || '').toLowerCase().includes('pro'));
-    if (byName) return byName as any;
-
-    const nonFree = list.find((p: any) => p?.key !== 'free_user' && p?.planKey !== 'free_user');
-    return (nonFree ?? list[0]) as any;
-  }, [plans]);
-
-  // If opened with autocheckout=1, auto-open the checkout drawer as soon as we're signed in.
-  useEffect(() => {
-    if (!autoCheckout) return;
-    if (didAutoOpen) return;
-    if (!userId) return;
-    if (plansLoading) return;
-    if (!proPlan?.id) return;
-
-    window.setTimeout(() => {
-      checkoutBtnRef.current?.click();
-      setDidAutoOpen(true);
-    }, 50);
-  }, [autoCheckout, didAutoOpen, userId, plansLoading, proPlan?.id]);
 
   // Show success message after subscription
   if (subscriptionSuccess) {
@@ -179,105 +289,7 @@ export default function SubscribeWebPage() {
         <ClerkLoaded>
           {/* Signed In: Show Pricing */}
           <SignedIn>
-            <div className={minimal ? 'p-0' : 'bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6'}>
-              {plansLoading ? (
-                <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : ''}>
-                  <p className="text-base md:text-lg text-gray-700 text-center">Loading…</p>
-                </div>
-              ) : !proPlan ? (
-                <p className="text-base md:text-lg text-gray-700 text-center">
-                  No subscription plan found. Please check Clerk Billing plan availability.
-                </p>
-              ) : minimal ? (
-                // Minimal mode: open the Clerk Checkout drawer automatically and render nothing else.
-                <div className="min-h-[50vh] flex items-center justify-center">
-                  <CheckoutButton
-                    planId={String(proPlan.id)}
-                    planPeriod={period}
-                    newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                  >
-                    <button ref={checkoutBtnRef} className="sr-only">
-                      Continue to Checkout
-                    </button>
-                  </CheckoutButton>
-                </div>
-              ) : autoCheckout ? (
-                <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : 'max-w-xl mx-auto text-center'}>
-                  <CheckoutButton
-                    planId={String(proPlan.id)}
-                    planPeriod={period}
-                    newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                  >
-                    <button
-                      ref={checkoutBtnRef}
-                      className={minimal ? 'sr-only' : 'w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors'}
-                    >
-                      Continue to Checkout
-                    </button>
-                  </CheckoutButton>
-                  {!minimal && (
-                    <p className="text-center text-sm text-gray-600 mt-3">
-                      If nothing happens, tap &quot;Continue to Checkout&quot;.
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="max-w-xl mx-auto">
-                  <div className="text-center mb-6">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-                      {String(proPlan?.name ?? 'Pro')}
-                    </h2>
-                    <p className="text-gray-600">
-                      {String(proPlan?.description ?? 'Full access to all flows and practices')}
-                    </p>
-                    {proPlan?.amountFormatted ? (
-                      <p className="text-3xl md:text-4xl font-bold text-gray-900 mt-4">
-                        {String(proPlan.amountFormatted)}
-                        <span className="text-base font-medium text-gray-600">/month</span>
-                      </p>
-                    ) : null}
-                  </div>
-
-                  {Array.isArray(proPlan?.features) && proPlan.features.length > 0 ? (
-                    <div className="rounded-2xl border border-gray-200 overflow-hidden mb-6">
-                      <ul className="divide-y divide-gray-200">
-                        {proPlan.features.slice(0, 8).map((f: any) => (
-                          <li key={String(f?.id ?? f?.key ?? f?.name)} className="px-4 py-3 text-gray-800">
-                            {String(f?.name ?? f?.key ?? 'Feature')}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ) : (
-                    <div className="rounded-2xl border border-gray-200 overflow-hidden mb-6">
-                      <ul className="divide-y divide-gray-200">
-                        <li className="px-4 py-3 text-gray-800">Access to all flows and practices</li>
-                        <li className="px-4 py-3 text-gray-800">Guided programs for stress, focus, and sleep</li>
-                        <li className="px-4 py-3 text-gray-800">Track your progress</li>
-                        <li className="px-4 py-3 text-gray-800">New content added regularly</li>
-                      </ul>
-                    </div>
-                  )}
-
-                  <CheckoutButton
-                    planId={String(proPlan.id)}
-                    planPeriod={period}
-                    newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                  >
-                    <button
-                      ref={checkoutBtnRef}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors"
-                    >
-                      Upgrade Flow to Pro
-                    </button>
-                  </CheckoutButton>
-
-                  <p className="text-center text-sm text-gray-600 mt-3">
-                    Opens in browser to complete payment
-                  </p>
-                </div>
-              )}
-            </div>
+            <SignedInSubscribeContent period={period} minimal={minimal} autoCheckout={autoCheckout} />
 
             {!minimal && (
               <div className="text-center">

@@ -2,7 +2,7 @@
 
 import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } from '@clerk/nextjs';
 import { CheckoutButton, usePlans } from '@clerk/nextjs/experimental';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * Web-Only Subscription Page
@@ -19,6 +19,10 @@ export default function SubscribeWebPage() {
   const { signIn, isLoaded: signInLoaded, setActive } = useSignIn();
   const { userId } = useAuth();
   const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
+  const [period, setPeriod] = useState<'month' | 'annual'>('month');
+  const [autoCheckout, setAutoCheckout] = useState(false);
+  const [didAutoOpen, setDidAutoOpen] = useState(false);
+  const checkoutBtnRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     // Detect if opened from mobile device (not from Capacitor app, but from browser)
@@ -31,6 +35,12 @@ export default function SubscribeWebPage() {
     if (params.get('subscription') === 'success') {
       setSubscriptionSuccess(true);
     }
+
+    // Optional: auto-open checkout (used when coming from the app)
+    const ac = (params.get('autocheckout') || '').toLowerCase();
+    setAutoCheckout(ac === '1' || ac === 'true');
+    const p = (params.get('period') || '').toLowerCase();
+    setPeriod(p === 'annual' || p === 'year' || p === 'yearly' ? 'annual' : 'month');
 
     // Process sign-in token from mobile app (if present and user is not already signed in)
     const signInToken = params.get('__clerk_ticket');
@@ -55,7 +65,7 @@ export default function SubscribeWebPage() {
     }
   }, [signInLoaded, signIn, setActive, userId, isProcessingToken]);
 
-  const proPlan = (() => {
+  const proPlan = useMemo(() => {
     const list = Array.isArray(plans) ? plans : [];
     if (list.length === 0) return null;
 
@@ -68,7 +78,21 @@ export default function SubscribeWebPage() {
     if (byName) return byName as any;
 
     return list[0] as any;
-  })();
+  }, [plans]);
+
+  // If opened with autocheckout=1, auto-open the checkout drawer as soon as we're signed in.
+  useEffect(() => {
+    if (!autoCheckout) return;
+    if (didAutoOpen) return;
+    if (!userId) return;
+    if (plansLoading) return;
+    if (!proPlan?.id) return;
+
+    window.setTimeout(() => {
+      checkoutBtnRef.current?.click();
+      setDidAutoOpen(true);
+    }, 50);
+  }, [autoCheckout, didAutoOpen, userId, plansLoading, proPlan?.id]);
 
   // Show success message after subscription
   if (subscriptionSuccess) {
@@ -156,6 +180,33 @@ export default function SubscribeWebPage() {
                 <p className="text-base md:text-lg text-gray-700 text-center">
                   No subscription plan found. Please check Clerk Billing plan availability.
                 </p>
+              ) : autoCheckout ? (
+                <div className="max-w-xl mx-auto text-center">
+                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                    Opening checkout…
+                  </h2>
+                  <p className="text-gray-600 mb-6">
+                    You&apos;ll complete payment in your browser.
+                  </p>
+
+                  {/* Hidden-ish button we can click programmatically */}
+                  <CheckoutButton
+                    planId={String(proPlan.id)}
+                    planPeriod={period}
+                    newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+                  >
+                    <button
+                      ref={checkoutBtnRef}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors"
+                    >
+                      Continue to Checkout
+                    </button>
+                  </CheckoutButton>
+
+                  <p className="text-center text-sm text-gray-600 mt-3">
+                    If nothing happens, tap &quot;Continue to Checkout&quot;.
+                  </p>
+                </div>
               ) : (
                 <div className="max-w-xl mx-auto">
                   <div className="text-center mb-6">
@@ -196,10 +247,13 @@ export default function SubscribeWebPage() {
 
                   <CheckoutButton
                     planId={String(proPlan.id)}
-                    planPeriod="month"
+                    planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
                   >
-                    <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors">
+                    <button
+                      ref={checkoutBtnRef}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors"
+                    >
                       Upgrade Flow to Pro
                     </button>
                   </CheckoutButton>

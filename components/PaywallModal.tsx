@@ -11,8 +11,11 @@ import {
   IonItem,
   IonLabel,
   IonIcon,
+  IonSegment,
+  IonSegmentButton,
 } from '@ionic/react';
 import { checkmarkCircle, closeOutline } from 'ionicons/icons';
+import { useState } from 'react';
 
 interface PaywallModalProps {
   isOpen: boolean;
@@ -27,6 +30,8 @@ interface PaywallModalProps {
  * Opens subscription page directly in external browser with authentication token.
  */
 export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallModalProps) {
+  const [period, setPeriod] = useState<'month' | 'annual'>('month');
+
   const handleSubscribe = async () => {
     try {
       // Get sign-in token for external browser authentication
@@ -37,7 +42,9 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
       
       if (data.token) {
         // Pass token to external browser for auto sign-in
-        await openExternalUrl(`https://flowbalance-jdk.vercel.app/subscribe-web?__clerk_ticket=${data.token}`);
+        await openExternalUrl(
+          `https://flowbalance-jdk.vercel.app/subscribe-web?autocheckout=1&period=${period}&__clerk_ticket=${data.token}`,
+        );
       } else {
         // Fallback: open without token
         await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
@@ -68,6 +75,20 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
           <p className="text-center mb-6 text-white">
             Subscribe to unlock all meditation practices and flows.
           </p>
+
+          <div className="w-full mb-4">
+            <IonSegment
+              value={period}
+              onIonChange={e => setPeriod((e.detail.value as 'month' | 'annual') || 'month')}
+            >
+              <IonSegmentButton value="month">
+                <IonLabel>Monthly</IonLabel>
+              </IonSegmentButton>
+              <IonSegmentButton value="annual">
+                <IonLabel>Yearly</IonLabel>
+              </IonSegmentButton>
+            </IonSegment>
+          </div>
 
           {/* Benefits List */}
           <IonList className="w-full mb-6 rounded-2xl overflow-hidden">

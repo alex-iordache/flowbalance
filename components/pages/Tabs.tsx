@@ -15,6 +15,7 @@ import FlowDetail from './FlowDetail';
 import Practice from './Practice';
 import Settings from './Settings';
 import MyProgress from './MyProgress';
+import Subscribe from './Subscribe';
 
 const Tabs = () => {
   return (
@@ -34,6 +35,7 @@ const Tabs = () => {
             exact={true}
           />
           <Route path="/settings" render={() => <Settings />} exact={true} />
+          <Route path="/subscribe" render={() => <Subscribe />} exact={true} />
           <Route path="/progress" render={() => <MyProgress />} exact={true} />
           <Route render={() => <Redirect to="/home" />}/>
         </Switch>

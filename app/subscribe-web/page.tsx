@@ -24,9 +24,13 @@ export default function SubscribeWebPage() {
   const [minimal, setMinimal] = useState(false);
   const [didAutoOpen, setDidAutoOpen] = useState(false);
   const checkoutBtnRef = useRef<HTMLButtonElement | null>(null);
+  const portalRootRef = useRef<HTMLDivElement | null>(null);
   const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
+    // Capture portal root once mounted so we can mount Clerk checkout there
+    setPortalRoot(portalRootRef.current);
+
     // Detect if opened from mobile device (not from Capacitor app, but from browser)
     const userAgent = navigator.userAgent.toLowerCase();
     const mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
@@ -92,13 +96,12 @@ export default function SubscribeWebPage() {
     if (!userId) return;
     if (plansLoading) return;
     if (!proPlan?.id) return;
-    if (!portalRoot) return;
 
     window.setTimeout(() => {
       checkoutBtnRef.current?.click();
       setDidAutoOpen(true);
     }, 50);
-  }, [autoCheckout, didAutoOpen, userId, plansLoading, proPlan?.id, portalRoot]);
+  }, [autoCheckout, didAutoOpen, userId, plansLoading, proPlan?.id]);
 
   // Show success message after subscription
   if (subscriptionSuccess) {
@@ -155,13 +158,7 @@ export default function SubscribeWebPage() {
       className={minimal ? 'bg-white' : 'flex flex-col bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4'}
       style={{ minHeight: '100dvh' }}
     >
-      <div
-        id="flow-checkout-portal"
-        ref={el => {
-          // Ensure portalRoot is set before we try to open the checkout.
-          if (el && portalRoot !== el) setPortalRoot(el);
-        }}
-      />
+      <div id="flow-checkout-portal" ref={portalRootRef} />
       <div className={minimal ? 'w-full' : 'max-w-5xl w-full mx-auto'}>
         {!minimal && (
           <>
@@ -197,30 +194,19 @@ export default function SubscribeWebPage() {
                 <p className="text-base md:text-lg text-gray-700 text-center">
                   No subscription plan found. Please check Clerk Billing plan availability.
                 </p>
-              ) : !portalRoot ? (
-                <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : ''}>
-                  <p className="text-base md:text-lg text-gray-700 text-center">Loading checkout…</p>
-                </div>
               ) : minimal ? (
                 // Minimal mode: open the Clerk Checkout drawer automatically and render nothing else.
-                <div className="min-h-[50vh] flex flex-col items-center justify-center gap-4 p-6">
-                  <p className="text-base text-gray-700 text-center">Opening checkout…</p>
+                <div className="min-h-[50vh] flex items-center justify-center">
                   <CheckoutButton
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                    checkoutProps={{ portalRoot }}
+                    checkoutProps={portalRoot ? { portalRoot } : undefined}
                   >
-                    <button
-                      ref={checkoutBtnRef}
-                      className="w-full max-w-sm bg-purple-600 hover:bg-purple-700 text-white py-3 px-5 rounded-xl text-base font-semibold transition-colors"
-                    >
+                    <button ref={checkoutBtnRef} className="sr-only">
                       Continue to Checkout
                     </button>
                   </CheckoutButton>
-                  <p className="text-xs text-gray-500 text-center">
-                    If the checkout doesn’t open automatically, tap the button.
-                  </p>
                 </div>
               ) : autoCheckout ? (
                 <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : 'max-w-xl mx-auto text-center'}>
@@ -228,7 +214,7 @@ export default function SubscribeWebPage() {
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                    checkoutProps={{ portalRoot }}
+                    checkoutProps={portalRoot ? { portalRoot } : undefined}
                   >
                     <button
                       ref={checkoutBtnRef}
@@ -285,7 +271,7 @@ export default function SubscribeWebPage() {
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                    checkoutProps={{ portalRoot }}
+                    checkoutProps={portalRoot ? { portalRoot } : undefined}
                   >
                     <button
                       ref={checkoutBtnRef}

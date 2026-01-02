@@ -1,32 +1,32 @@
-import Image from 'next/image';
-import Card from '../ui/Card';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+'use client';
 
 import {
   IonPage,
   IonHeader,
   IonToolbar,
-  IonTitle,
   IonButtons,
   IonButton,
   IonIcon,
   IonContent,
-  IonMenuButton,
 } from '@ionic/react';
 import Notifications from './Notifications';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { notificationsOutline, settingsOutline } from 'ionicons/icons';
-import { selectHomeItems } from '../../store/selectors';
-import Store from '../../store';
+import { settingsOutline } from 'ionicons/icons';
 import Logo from '../ui/Logo';
+import { useUser } from '@clerk/nextjs';
+import { Preferences } from '@capacitor/preferences';
 
 type HelloUserProps ={
-  firstName: string;
+  firstName?: string;
 }
 
-const HelloUser = ({ firstName}: HelloUserProps) => (
+const HelloUser = ({ firstName }: HelloUserProps) => (
   <div className="hello-user-container">
-    <h2 className="font-bold text-2xl text-gray-800 dark:text-gray-100">Hello, {firstName}!</h2>
+    <h2 className="font-bold text-2xl text-gray-800 dark:text-gray-100">
+      {firstName ? `Hello, ${firstName}!` : 'Hello!'}
+    </h2>
     <p className="sm:text-sm text-s text-white mr-1 my-3">For you:</p>
   </div>
 )
@@ -48,6 +48,47 @@ const SimpleCardCTA = ({ minutes }: SimpleCardCTAProps) => (
 const Home = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const history = useHistory();
+  const { user, isLoaded } = useUser();
+
+  const displayFirstNameFromClerk = useMemo(() => {
+    if (!isLoaded || !user) return '';
+    const first = (user.firstName ?? '').trim();
+    if (first) return first;
+    const full = (user.fullName ?? '').trim();
+    if (full) return full.split(/\s+/)[0] ?? '';
+    const primaryEmail = user.primaryEmailAddress?.emailAddress ?? '';
+    if (primaryEmail.includes('@')) return primaryEmail.split('@')[0] ?? '';
+    return '';
+  }, [isLoaded, user]);
+
+  const [firstName, setFirstName] = useState<string>('');
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const { value } = await Preferences.get({ key: 'flow_user_first_name' });
+        if (!cancelled && value) setFirstName(value);
+      } catch {
+        // ignore
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!displayFirstNameFromClerk) return;
+    setFirstName(displayFirstNameFromClerk);
+    (async () => {
+      try {
+        await Preferences.set({ key: 'flow_user_first_name', value: displayFirstNameFromClerk });
+      } catch {
+        // ignore
+      }
+    })();
+  }, [displayFirstNameFromClerk]);
 
   return (
     <IonPage>
@@ -66,7 +107,7 @@ const Home = () => {
           open={showNotifications}
           onDidDismiss={() => setShowNotifications(false)}
         />
-        <HelloUser firstName="Alex"/>
+        <HelloUser firstName={firstName} />
         <SimpleCardCTA minutes={5} />
       </IonContent>
     </IonPage>

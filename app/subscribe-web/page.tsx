@@ -24,13 +24,8 @@ export default function SubscribeWebPage() {
   const [minimal, setMinimal] = useState(false);
   const [didAutoOpen, setDidAutoOpen] = useState(false);
   const checkoutBtnRef = useRef<HTMLButtonElement | null>(null);
-  const portalRootRef = useRef<HTMLDivElement | null>(null);
-  const [portalRoot, setPortalRoot] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
-    // Capture portal root once mounted so we can mount Clerk checkout there
-    setPortalRoot(portalRootRef.current);
-
     // Detect if opened from mobile device (not from Capacitor app, but from browser)
     const userAgent = navigator.userAgent.toLowerCase();
     const mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
@@ -158,7 +153,6 @@ export default function SubscribeWebPage() {
       className={minimal ? 'bg-white' : 'flex flex-col bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4'}
       style={{ minHeight: '100dvh' }}
     >
-      <div id="flow-checkout-portal" ref={portalRootRef} />
       <div className={minimal ? 'w-full' : 'max-w-5xl w-full mx-auto'}>
         {!minimal && (
           <>
@@ -201,7 +195,6 @@ export default function SubscribeWebPage() {
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                    checkoutProps={portalRoot ? { portalRoot } : undefined}
                   >
                     <button ref={checkoutBtnRef} className="sr-only">
                       Continue to Checkout
@@ -214,7 +207,6 @@ export default function SubscribeWebPage() {
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                    checkoutProps={portalRoot ? { portalRoot } : undefined}
                   >
                     <button
                       ref={checkoutBtnRef}
@@ -271,7 +263,6 @@ export default function SubscribeWebPage() {
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
-                    checkoutProps={portalRoot ? { portalRoot } : undefined}
                   >
                     <button
                       ref={checkoutBtnRef}

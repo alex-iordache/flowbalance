@@ -33,14 +33,45 @@ export default function Subscribe() {
   const proPlan = useMemo(() => {
     const list = Array.isArray(plans) ? plans : [];
     if (list.length === 0) return null;
-    const byKey = list.find(
-      (p: any) => p?.key === 'pro_user' || p?.planKey === 'pro_user' || p?.slug === 'pro_user',
-    );
+    // Prefer the real paid plan (you have free_user + pro_user in Clerk)
+    const byKey = list.find((p: any) => p?.key === 'pro_user' || p?.planKey === 'pro_user');
     if (byKey) return byKey as any;
     const byName = list.find((p: any) => String(p?.name || '').toLowerCase().includes('pro'));
     if (byName) return byName as any;
-    return list[0] as any;
+
+    // Fallback: pick the first non-free plan if keys/names differ
+    const nonFree = list.find((p: any) => p?.key !== 'free_user' && p?.planKey !== 'free_user');
+    return (nonFree ?? list[0]) as any;
   }, [plans]);
+
+  const priceLabel = useMemo(() => {
+    if (!proPlan) return '';
+
+    const p: any = proPlan;
+
+    // Clerk BillingPlanResource: monthly = fee.formatted, yearly = annualFee.formatted
+    const formatMoney = (m: any) => {
+      if (!m) return '';
+      const formatted = String(m.formatted ?? m.amountFormatted ?? '').trim();
+      // If Clerk already provides a formatted string with currency symbols/letters, use it.
+      if (formatted && /[A-Za-z$€£¥]/.test(formatted)) return formatted;
+      const currency = String(m.currency ?? '').trim();
+      const amount = typeof m.amount === 'number' ? m.amount : null;
+      if (currency && amount != null) {
+        // amount is in smallest unit (e.g., cents)
+        return `${currency} ${(amount / 100).toFixed(2)}`;
+      }
+      return formatted;
+    };
+
+    const monthly = formatMoney(p?.fee) || String(p?.amountFormatted ?? '');
+    const annual = formatMoney(p?.annualFee);
+
+    if (period === 'annual') {
+      return annual ? `${String(annual)}/year` : '';
+    }
+    return monthly ? `${String(monthly)}/month` : '';
+  }, [proPlan, period]);
 
   const openCheckout = async () => {
     try {
@@ -72,7 +103,7 @@ export default function Subscribe() {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent className="ion-padding" fullscreen>
+      <IonContent fullscreen>
         <div
           className="flex flex-col items-center justify-center min-h-full bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
           style={{
@@ -120,14 +151,12 @@ export default function Subscribe() {
                 ) : (
                   <>
                     <div className="text-center">
-                      <p className="text-gray-600 text-sm mb-1">Plan</p>
-                      <h3 className="text-xl font-bold text-gray-900">{String(proPlan?.name ?? 'Pro')}</h3>
-                      <p className="text-gray-600 mt-2">
-                        {period === 'annual'
-                          ? String((proPlan as any)?.annualAmountFormatted ?? (proPlan as any)?.annualPriceFormatted ?? '')
-                          : String((proPlan as any)?.amountFormatted ?? '')}
-                        {period === 'annual' ? <span className="text-gray-500">/year</span> : <span className="text-gray-500">/month</span>}
-                      </p>
+                      <h3 className="text-xl font-bold text-gray-900">Flow Pro</h3>
+                      {priceLabel ? (
+                        <p className="text-2xl font-bold text-gray-900 mt-3">{priceLabel}</p>
+                      ) : (
+                        <p className="text-gray-600 mt-3">Price not available</p>
+                      )}
                     </div>
 
                     <IonButton

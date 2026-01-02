@@ -74,13 +74,14 @@ export default function SubscribeWebPage() {
 
     // Billing APIs are still evolving; fields vary by SDK version.
     // Try a few stable identifiers first, then fall back to the only plan.
-    const byKey = list.find((p: any) => p?.key === 'pro_user' || p?.planKey === 'pro_user' || p?.slug === 'pro_user');
+    const byKey = list.find((p: any) => p?.key === 'pro_user' || p?.planKey === 'pro_user');
     if (byKey) return byKey as any;
 
     const byName = list.find((p: any) => String(p?.name || '').toLowerCase().includes('pro'));
     if (byName) return byName as any;
 
-    return list[0] as any;
+    const nonFree = list.find((p: any) => p?.key !== 'free_user' && p?.planKey !== 'free_user');
+    return (nonFree ?? list[0]) as any;
   }, [plans]);
 
   // If opened with autocheckout=1, auto-open the checkout drawer as soon as we're signed in.

@@ -25,6 +25,27 @@ export default function SubscribeWebPage() {
   const [didAutoOpen, setDidAutoOpen] = useState(false);
   const checkoutBtnRef = useRef<HTMLButtonElement | null>(null);
 
+  // Clerk-documented styling hook for the checkout drawer.
+  // Keys correspond to stable Clerk classnames WITHOUT the `cl-` prefix (e.g. `cl-drawerContent` -> `drawerContent`).
+  // This is safer than targeting `cl-internal-*` classes, and avoids custom portals/mount hacks.
+  const checkoutProps = useMemo(
+    () => ({
+      appearance: {
+        elements: {
+          // Make the drawer full width on small screens (100vw < 25rem),
+          // keep it 25rem on larger screens. Also cap height to avoid “endless” feel.
+          drawerContent: {
+            width: 'min(25rem, 100vw)',
+            maxWidth: '100vw',
+            maxHeight: '100dvh',
+            overflow: 'auto',
+          },
+        },
+      },
+    }),
+    [],
+  );
+
   useEffect(() => {
     // Detect if opened from mobile device (not from Capacitor app, but from browser)
     const userAgent = navigator.userAgent.toLowerCase();
@@ -195,6 +216,7 @@ export default function SubscribeWebPage() {
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+                    checkoutProps={checkoutProps}
                   >
                     <button ref={checkoutBtnRef} className="sr-only">
                       Continue to Checkout
@@ -207,6 +229,7 @@ export default function SubscribeWebPage() {
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+                    checkoutProps={checkoutProps}
                   >
                     <button
                       ref={checkoutBtnRef}
@@ -263,6 +286,7 @@ export default function SubscribeWebPage() {
                     planId={String(proPlan.id)}
                     planPeriod={period}
                     newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+                    checkoutProps={checkoutProps}
                   >
                     <button
                       ref={checkoutBtnRef}

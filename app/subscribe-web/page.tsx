@@ -3,15 +3,25 @@
 import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } from '@clerk/nextjs';
 import { CheckoutButton, usePlans } from '@clerk/nextjs/experimental';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+
+function sanitizeReturnTo(raw: string | null): string {
+  if (!raw) return '/home';
+  if (!raw.startsWith('/')) return '/home';
+  if (raw.startsWith('//')) return '/home';
+  return raw;
+}
 
 function SignedInSubscribeContent({
   period,
   minimal,
   autoCheckout,
+  returnTo,
 }: {
   period: 'month' | 'annual';
   minimal: boolean;
   autoCheckout: boolean;
+  returnTo: string;
 }) {
   const { userId } = useAuth();
   const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
@@ -33,6 +43,10 @@ function SignedInSubscribeContent({
     const nonFree = list.find((p: any) => p?.key !== 'free_user' && p?.planKey !== 'free_user');
     return (nonFree ?? list[0]) as any;
   }, [plans]);
+
+  const checkoutRedirectUrl = useMemo(() => {
+    return `/subscribe-web/return?return=${encodeURIComponent(returnTo)}`;
+  }, [returnTo]);
 
   // If opened with autocheckout=1, auto-open the checkout drawer as soon as we're signed in.
   useEffect(() => {
@@ -64,7 +78,7 @@ function SignedInSubscribeContent({
           <CheckoutButton
             planId={String(proPlan.id)}
             planPeriod={period}
-            newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+            newSubscriptionRedirectUrl={checkoutRedirectUrl}
           >
             <button ref={checkoutBtnRef} className="sr-only">
               Continue to Checkout
@@ -76,7 +90,7 @@ function SignedInSubscribeContent({
           <CheckoutButton
             planId={String(proPlan.id)}
             planPeriod={period}
-            newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+            newSubscriptionRedirectUrl={checkoutRedirectUrl}
           >
             <button
               ref={checkoutBtnRef}
@@ -130,7 +144,7 @@ function SignedInSubscribeContent({
           <CheckoutButton
             planId={String(proPlan.id)}
             planPeriod={period}
-            newSubscriptionRedirectUrl="/subscribe-web?subscription=success"
+            newSubscriptionRedirectUrl={checkoutRedirectUrl}
           >
             <button
               ref={checkoutBtnRef}
@@ -157,105 +171,69 @@ function SignedInSubscribeContent({
  */
 export default function SubscribeWebPage() {
   const [isMobile, setIsMobile] = useState(false);
-  const [subscriptionSuccess, setSubscriptionSuccess] = useState(false);
   const [isProcessingToken, setIsProcessingToken] = useState(false);
   const { signIn, isLoaded: signInLoaded, setActive } = useSignIn();
   const { userId } = useAuth();
-  const [period, setPeriod] = useState<'month' | 'annual'>('month');
-  const [autoCheckout, setAutoCheckout] = useState(false);
-  const [minimal, setMinimal] = useState(false);
+  const searchParams = useSearchParams();
+
+  // Derive UI state from URL params so it stays correct even if Clerk navigates
+  // to newSubscriptionRedirectUrl via client-side routing (no full reload).
+  const subscriptionSuccess = searchParams.get('subscription') === 'success';
+  const returnTo = sanitizeReturnTo(searchParams.get('return'));
+  const period = ((): 'month' | 'annual' => {
+    const p = (searchParams.get('period') || '').toLowerCase();
+    return p === 'annual' || p === 'year' || p === 'yearly' ? 'annual' : 'month';
+  })();
+  const autoCheckout = ((): boolean => {
+    const ac = (searchParams.get('autocheckout') || '').toLowerCase();
+    return ac === '1' || ac === 'true';
+  })();
+  const minimal = ((): boolean => {
+    const min = (searchParams.get('minimal') || '').toLowerCase();
+    // minimal also implied when autocheckout is requested
+    return min === '1' || min === 'true' || autoCheckout;
+  })();
+  const signInToken = searchParams.get('__clerk_ticket');
 
   useEffect(() => {
     // Detect if opened from mobile device (not from Capacitor app, but from browser)
     const userAgent = navigator.userAgent.toLowerCase();
     const mobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
     setIsMobile(mobile);
+  }, []);
 
-    // Check URL params for subscription success
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('subscription') === 'success') {
-      setSubscriptionSuccess(true);
-    }
+  useEffect(() => {
+    // Process sign-in token from mobile app (if present and user is not already signed in).
+    if (!signInToken) return;
+    if (!signInLoaded) return;
+    if (userId) return;
+    if (isProcessingToken) return;
 
-    // Optional: auto-open checkout (used when coming from the app)
-    const ac = (params.get('autocheckout') || '').toLowerCase();
-    setAutoCheckout(ac === '1' || ac === 'true');
-    const min = (params.get('minimal') || '').toLowerCase();
-    setMinimal(min === '1' || min === 'true' || ac === '1' || ac === 'true');
-    const p = (params.get('period') || '').toLowerCase();
-    setPeriod(p === 'annual' || p === 'year' || p === 'yearly' ? 'annual' : 'month');
+    setIsProcessingToken(true);
 
-    // Process sign-in token from mobile app (if present and user is not already signed in)
-    const signInToken = params.get('__clerk_ticket');
-    if (signInToken && signInLoaded && !userId && !isProcessingToken) {
-      setIsProcessingToken(true);
-      
-      // Use Clerk's signIn.create with ticket strategy to authenticate
-      signIn.create({ strategy: 'ticket', ticket: signInToken })
-        .then((result) => {
-          if (result.status === 'complete' && result.createdSessionId) {
-            // Set the session as active
-            return setActive({ session: result.createdSessionId });
-          } else {
-            console.error('Sign-in not complete:', result);
-            setIsProcessingToken(false);
-          }
-        })
-        .catch((error) => {
-          console.error('Error processing sign-in token:', error);
-          setIsProcessingToken(false);
-        });
-    }
-  }, [signInLoaded, signIn, setActive, userId, isProcessingToken]);
+    signIn
+      .create({ strategy: 'ticket', ticket: signInToken })
+      .then(result => {
+        if (result.status === 'complete' && result.createdSessionId) {
+          return setActive({ session: result.createdSessionId });
+        }
+        console.error('Sign-in not complete:', result);
+        setIsProcessingToken(false);
+      })
+      .catch(error => {
+        console.error('Error processing sign-in token:', error);
+        setIsProcessingToken(false);
+      });
+  }, [signInToken, signInLoaded, signIn, setActive, userId, isProcessingToken]);
 
   // Show success message after subscription
   if (subscriptionSuccess) {
-    return (
-      <div 
-        className="flex flex-col items-center justify-center bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
-        style={{
-          minHeight: '100dvh',
-        }}
-      >
-        <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 max-w-lg w-full text-center">
-          <div className="text-6xl md:text-7xl mb-6">✅</div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
-            Subscription Successful!
-          </h1>
-          
-          {isMobile ? (
-            <>
-              <div className="bg-green-50 border-2 border-green-500 rounded-xl p-6 mb-6">
-                <p className="text-xl md:text-2xl font-bold text-gray-800 mb-3">
-                  📱 Return to the Flow app
-                </p>
-                <p className="text-base md:text-lg text-gray-700">
-                  Your subscription is now active. Open the Flow app to access all premium content.
-                </p>
-              </div>
-              <button
-                onClick={() => window.close()}
-                className="bg-purple-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-purple-700 w-full text-base md:text-lg"
-              >
-                Close this page
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="text-lg md:text-xl text-gray-700 mb-6">
-                You now have access to all premium features!
-              </p>
-              <button
-                onClick={() => window.location.href = '/home'}
-                className="bg-purple-600 text-white px-6 py-4 rounded-xl font-bold hover:bg-purple-700 w-full text-base md:text-lg"
-              >
-                Go to Home
-              </button>
-            </>
-          )}
-        </div>
-      </div>
-    );
+    // Backward compatibility: if an older checkout redirect hits ?subscription=success,
+    // immediately route to the deep-link return page.
+    if (typeof window !== 'undefined') {
+      window.location.replace(`/subscribe-web/return?return=${encodeURIComponent(returnTo)}`);
+    }
+    return null;
   }
 
   return (
@@ -289,7 +267,7 @@ export default function SubscribeWebPage() {
         <ClerkLoaded>
           {/* Signed In: Show Pricing */}
           <SignedIn>
-            <SignedInSubscribeContent period={period} minimal={minimal} autoCheckout={autoCheckout} />
+            <SignedInSubscribeContent period={period} minimal={minimal} autoCheckout={autoCheckout} returnTo={returnTo} />
 
             {!minimal && (
               <div className="text-center">

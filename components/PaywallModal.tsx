@@ -36,7 +36,11 @@ export default function PaywallModal({ isOpen, onClose, practiceName }: PaywallM
 
   const handleSubscribe = () => {
     onClose();
-    history.push(`/subscribe?period=${period}`);
+    const returnTo =
+      typeof window !== 'undefined'
+        ? `${window.location.pathname}${window.location.search}`
+        : '/home';
+    history.push(`/subscribe?period=${period}&return=${encodeURIComponent(returnTo)}`);
   };
 
   return (

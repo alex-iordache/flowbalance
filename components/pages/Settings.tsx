@@ -64,7 +64,7 @@ const Settings = () => {
                 expand="block"
                 color="secondary"
                 className="w-full mb-2"
-                onClick={() => history.push('/subscribe')}
+                onClick={() => history.push(`/subscribe?return=${encodeURIComponent('/settings')}`)}
               >
                 Manage Subscription
               </IonButton>

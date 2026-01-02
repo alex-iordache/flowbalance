@@ -35,7 +35,11 @@ const Practice = () => {
   // If the user doesn't have access, route them to the in-app subscribe screen.
   useEffect(() => {
     if (!hasAccess) {
-      history.replace('/subscribe');
+      const returnTo =
+        typeof window !== 'undefined'
+          ? `${window.location.pathname}${window.location.search}`
+          : '/home';
+      history.replace(`/subscribe?return=${encodeURIComponent(returnTo)}`);
     }
   }, [hasAccess, history]);
 

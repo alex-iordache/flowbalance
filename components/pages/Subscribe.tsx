@@ -21,6 +21,7 @@ export default function Subscribe() {
   // Match Clerk pricing-table UX: default is "Billed annually"
   const [billing, setBilling] = useState<'month' | 'annual'>('annual');
   const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
+  const [returnTo, setReturnTo] = useState<string>('/home');
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
@@ -28,6 +29,9 @@ export default function Subscribe() {
     const p = (params.get('period') || '').toLowerCase();
     if (p === 'month' || p === 'monthly') setBilling('month');
     if (p === 'annual' || p === 'year' || p === 'yearly') setBilling('annual');
+
+    const r = params.get('return');
+    if (r && r.startsWith('/')) setReturnTo(r);
   }, []);
 
   const proPlan = useMemo(() => {
@@ -91,14 +95,16 @@ export default function Subscribe() {
 
       const base = 'https://flowbalance-jdk.vercel.app/subscribe-web';
       if (data?.token) {
-        await openExternalUrl(`${base}?autocheckout=1&minimal=1&period=${billing}&__clerk_ticket=${data.token}`);
+        await openExternalUrl(
+          `${base}?autocheckout=1&minimal=1&period=${billing}&return=${encodeURIComponent(returnTo)}&__clerk_ticket=${data.token}`,
+        );
       } else {
-        await openExternalUrl(base);
+        await openExternalUrl(`${base}?return=${encodeURIComponent(returnTo)}`);
       }
     } catch (e) {
       console.error('Error opening checkout:', e);
       const { openExternalUrl } = await import('../../helpers/openExternal');
-      await openExternalUrl('https://flowbalance-jdk.vercel.app/subscribe-web');
+      await openExternalUrl(`https://flowbalance-jdk.vercel.app/subscribe-web?return=${encodeURIComponent(returnTo)}`);
     }
   };
 
@@ -123,8 +129,8 @@ export default function Subscribe() {
         >
           <div className="w-full max-w-md">
             <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-              <div className="p-6">
-                <h2 className="text-2xl font-bold text-gray-900">Flow Pro</h2>
+              <div className="p-4">
+                <h2 className="font-bold text-gray-900">Flow Pro</h2>
                 <p className="text-gray-600 mt-1">
                   Full access to all meditation practices and flows.
                 </p>

@@ -1,0 +1,29 @@
+/* Route-scoped styles for /subscribe-web only */
+
+/* Portal overlay that Clerk checkout will mount into */
+#flow-checkout-portal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+#flow-checkout-portal * {
+  pointer-events: auto;
+}
+
+/* Clerk drawer uses role="dialog" for the checkout container */
+#flow-checkout-portal [role='dialog'] {
+  position: fixed !important;
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+
+  width: min(420px, calc(100vw - 24px)) !important;
+  max-height: min(80vh, 720px) !important;
+  height: auto !important;
+  overflow: auto !important;
+}
+

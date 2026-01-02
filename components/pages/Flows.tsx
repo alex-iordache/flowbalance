@@ -22,7 +22,7 @@ import Logo from '../ui/Logo';
 const AllFlows = () => {
   const flows = Store.useState(s => s.flows);
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 w-full max-w-2xl mx-auto">
       {flows.map((flow, i) => (
         <Flow flow={flow} key={i} />
       ))}
@@ -36,7 +36,7 @@ const Flow = ({ flow }: { flow: Flow }) => {
   return (
     <div 
       onClick={() => history.push(`/flows/${flow.id}`)}
-      className="flow-entry cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl max-w-xl gap-4"
+      className="flow-entry cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl w-full gap-4"
     >
 
       <img className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start" src={flow.image} alt={flow.name} />

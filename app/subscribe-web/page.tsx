@@ -1,8 +1,61 @@
 'use client';
 
 import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } from '@clerk/nextjs';
-import { CheckoutButton, usePlans } from '@clerk/nextjs/experimental';
+import {
+  CheckoutButton,
+  CheckoutProvider,
+  PaymentElement,
+  PaymentElementProvider,
+  useCheckout,
+  usePaymentElement,
+  usePlans,
+} from '@clerk/nextjs/experimental';
 import { useEffect, useMemo, useRef, useState } from 'react';
+
+function EmbeddedCheckoutForm({ checkout }: { checkout: any }) {
+  const { submit, isFormReady } = usePaymentElement();
+
+  const onSubmit = async () => {
+    const { data, error } = await submit();
+    if (error) return;
+    const result = await checkout.confirm(data);
+    // If Clerk doesn't auto-redirect, do it ourselves.
+    if (result?.status === 'complete') {
+      window.location.replace('/subscribe-web?subscription=success');
+    }
+  };
+
+  return (
+    <div className="w-full max-w-md mx-auto px-4 py-6">
+      <PaymentElement fallback={<div className="text-center text-gray-600">Loading checkout…</div>} />
+      <button
+        onClick={onSubmit}
+        disabled={!isFormReady || checkout?.isConfirming}
+        className="w-full mt-4 bg-black text-white py-3 rounded-lg font-semibold disabled:opacity-50"
+      >
+        {checkout?.isConfirming ? 'Processing…' : 'Pay'}
+      </button>
+    </div>
+  );
+}
+
+function EmbeddedCheckout() {
+  const { checkout } = useCheckout();
+
+  // Start checkout immediately to render the payment element.
+  useEffect(() => {
+    if (!checkout) return;
+    if (checkout.status === 'needs_initialization') {
+      checkout.start();
+    }
+  }, [checkout]);
+
+  return (
+    <PaymentElementProvider checkout={checkout}>
+      <EmbeddedCheckoutForm checkout={checkout} />
+    </PaymentElementProvider>
+  );
+}
 
 /**
  * Web-Only Subscription Page
@@ -188,6 +241,11 @@ export default function SubscribeWebPage() {
                 <p className="text-base md:text-lg text-gray-700 text-center">
                   No subscription plan found. Please check Clerk Billing plan availability.
                 </p>
+              ) : minimal ? (
+                // Minimal mode: render ONLY the embedded checkout UI (no headers, no plan marketing).
+                <CheckoutProvider for="user" planId={String(proPlan.id)} planPeriod={period}>
+                  <EmbeddedCheckout />
+                </CheckoutProvider>
               ) : autoCheckout ? (
                 <div className={minimal ? 'min-h-[50vh] flex items-center justify-center' : 'max-w-xl mx-auto text-center'}>
                   <CheckoutButton

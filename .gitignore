@@ -36,3 +36,6 @@ tsconfig.tsbuildinfo
 
 # clerk (auto-generated, contains secret keys)
 .clerk
+
+# local tooling (do not commit)
+.tools

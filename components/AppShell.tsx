@@ -2,7 +2,7 @@
 import { IonApp, IonRouterOutlet, setupIonicReact } from '@ionic/react';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { IonReactRouter } from '@ionic/react-router';
-import { Route, Redirect, Switch } from 'react-router-dom';
+import { Route, Redirect } from 'react-router-dom';
 import { useEffect } from 'react';
 
 import Tabs from './pages/Tabs';
@@ -33,25 +33,17 @@ const AppShell = () => {
       <IonApp>
         <IonReactRouter>
           <IonRouterOutlet id="main">
-            {/* React Router v5: use Switch so the catch-all doesn't match everything */}
-            <Switch>
-              {/* Main app routes - now protected by AuthGuard */}
-              <Route path="/home" component={Tabs} />
-              <Route path="/flows" component={Tabs} />
-              <Route path="/settings" component={Tabs} />
-              <Route path="/progress" component={Tabs} />
-              <Route path="/subscribe" component={Subscribe} />
+            {/* Main app routes - protected by AuthGuard */}
+            <Route path="/home" component={Tabs} />
+            <Route path="/flows" component={Tabs} />
+            <Route path="/settings" component={Tabs} />
+            <Route path="/progress" component={Tabs} />
+            <Route path="/subscribe" component={Subscribe} />
 
-              {/* Root route - redirects to home */}
-              <Route path="/" exact={true}>
-                <Redirect to="/home" />
-              </Route>
-
-              {/* Catch-all route - redirects to home */}
-              <Route>
-                <Redirect to="/home" />
-              </Route>
-            </Switch>
+            {/* Root route - redirects to home */}
+            <Route path="/" exact={true}>
+              <Redirect to="/home" />
+            </Route>
           </IonRouterOutlet>
         </IonReactRouter>
       </IonApp>

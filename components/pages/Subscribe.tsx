@@ -6,11 +6,9 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
-  IonSegment,
-  IonSegmentButton,
   IonTitle,
   IonToolbar,
-  IonLabel,
+  IonToggle,
 } from '@ionic/react';
 import { chevronBackOutline } from 'ionicons/icons';
 import { SignedIn, SignedOut } from '@clerk/nextjs';
@@ -20,14 +18,16 @@ import { useHistory } from 'react-router-dom';
 
 export default function Subscribe() {
   const history = useHistory();
-  const [period, setPeriod] = useState<'month' | 'annual'>('month');
+  // Match Clerk pricing-table UX: default is "Billed annually"
+  const [billing, setBilling] = useState<'month' | 'annual'>('annual');
   const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
     const params = new URLSearchParams(window.location.search);
     const p = (params.get('period') || '').toLowerCase();
-    if (p === 'annual' || p === 'year' || p === 'yearly') setPeriod('annual');
+    if (p === 'month' || p === 'monthly') setBilling('month');
+    if (p === 'annual' || p === 'year' || p === 'yearly') setBilling('annual');
   }, []);
 
   const proPlan = useMemo(() => {
@@ -44,34 +44,44 @@ export default function Subscribe() {
     return (nonFree ?? list[0]) as any;
   }, [plans]);
 
-  const priceLabel = useMemo(() => {
-    if (!proPlan) return '';
-
+  const pricing = useMemo(() => {
+    if (!proPlan) return { perMonth: '', billedLabel: 'Billed annually', billedDetail: '' };
     const p: any = proPlan;
 
-    // Clerk BillingPlanResource: monthly = fee.formatted, yearly = annualFee.formatted
+    const normalizeUsd = (s: string) => s.replace(/^USD\s*/i, '$').replace(/\bUSD\b/i, '$').trim();
     const formatMoney = (m: any) => {
       if (!m) return '';
       const formatted = String(m.formatted ?? m.amountFormatted ?? '').trim();
-      // If Clerk already provides a formatted string with currency symbols/letters, use it.
-      if (formatted && /[A-Za-z$€£¥]/.test(formatted)) return formatted;
+      if (formatted) return normalizeUsd(formatted);
       const currency = String(m.currency ?? '').trim();
       const amount = typeof m.amount === 'number' ? m.amount : null;
-      if (currency && amount != null) {
-        // amount is in smallest unit (e.g., cents)
-        return `${currency} ${(amount / 100).toFixed(2)}`;
+      if (amount != null) {
+        const dollars = (amount / 100).toFixed(2);
+        if (!currency) return dollars;
+        return normalizeUsd(`${currency} ${dollars}`);
       }
-      return formatted;
+      return '';
     };
 
-    const monthly = formatMoney(p?.fee) || String(p?.amountFormatted ?? '');
-    const annual = formatMoney(p?.annualFee);
+    const monthlyStr = formatMoney(p?.fee);
+    const annualStr = formatMoney(p?.annualFee);
+    const annualAmount = typeof p?.annualFee?.amount === 'number' ? p.annualFee.amount : null; // cents
+    const annualPerMonth = annualAmount != null ? `$${(annualAmount / 12 / 100).toFixed(2)}` : '';
 
-    if (period === 'annual') {
-      return annual ? `${String(annual)}/year` : '';
+    if (billing === 'annual') {
+      return {
+        perMonth: annualPerMonth ? `${normalizeUsd(annualPerMonth)}` : '',
+        billedLabel: 'Billed annually',
+        billedDetail: annualStr ? `${annualStr}` : '',
+      };
     }
-    return monthly ? `${String(monthly)}/month` : '';
-  }, [proPlan, period]);
+
+    return {
+      perMonth: monthlyStr ? `${monthlyStr}` : '',
+      billedLabel: 'Billed monthly',
+      billedDetail: '',
+    };
+  }, [proPlan, billing]);
 
   const openCheckout = async () => {
     try {
@@ -81,7 +91,7 @@ export default function Subscribe() {
 
       const base = 'https://flowbalance-jdk.vercel.app/subscribe-web';
       if (data?.token) {
-        await openExternalUrl(`${base}?autocheckout=1&minimal=1&period=${period}&__clerk_ticket=${data.token}`);
+        await openExternalUrl(`${base}?autocheckout=1&minimal=1&period=${billing}&__clerk_ticket=${data.token}`);
       } else {
         await openExternalUrl(base);
       }
@@ -99,7 +109,7 @@ export default function Subscribe() {
           <IonButton slot="start" fill="clear" onClick={() => history.goBack()}>
             <IonIcon icon={chevronBackOutline} className="text-white" />
           </IonButton>
-          <IonTitle className="text-white">Subscribe to Flow Premium</IonTitle>
+          <IonTitle className="text-white">Subscribe to Flow Pro</IonTitle>
         </IonToolbar>
       </IonHeader>
 
@@ -111,75 +121,80 @@ export default function Subscribe() {
             paddingBottom: 'env(safe-area-inset-bottom)',
           }}
         >
-          <div className="w-full max-w-md space-y-4">
-            {/* Your features box */}
-            <div className="bg-white rounded-2xl shadow-2xl p-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">Flow Pro</h2>
-              <p className="text-gray-700 text-center mb-4">
-                Full access to all meditation practices and flows.
-              </p>
+          <div className="w-full max-w-md">
+            <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+              <div className="p-6">
+                <h2 className="text-2xl font-bold text-gray-900">Flow Pro</h2>
+                <p className="text-gray-600 mt-1">
+                  Full access to all meditation practices and flows.
+                </p>
 
-              <IonSegment
-                value={period}
-                onIonChange={e => setPeriod((e.detail.value as 'month' | 'annual') || 'month')}
-              >
-                <IonSegmentButton value="month">
-                  <IonLabel>Monthly</IonLabel>
-                </IonSegmentButton>
-                <IonSegmentButton value="annual">
-                  <IonLabel>Yearly</IonLabel>
-                </IonSegmentButton>
-              </IonSegment>
+                {/* Price + billing toggle (Clerk-like) */}
+                <div className="mt-5">
+                  <div className="flex items-baseline gap-2">
+                    {plansLoading ? (
+                      <div className="text-3xl font-bold text-gray-900">Loading…</div>
+                    ) : !proPlan ? (
+                      <div className="text-3xl font-bold text-gray-900">—</div>
+                    ) : (
+                      <>
+                        <div className="text-4xl font-bold text-gray-900">
+                          {pricing.perMonth ? pricing.perMonth.replace(/\/(month|year)$/i, '') : ''}
+                        </div>
+                        <div className="text-sm text-gray-600">/ month</div>
+                      </>
+                    )}
+                  </div>
 
-              <div className="rounded-2xl border border-gray-200 overflow-hidden mt-4">
-                <ul className="divide-y divide-gray-200">
-                  <li className="px-4 py-3 text-gray-800">Access to all flows and practices</li>
-                  <li className="px-4 py-3 text-gray-800">Guided programs for stress, focus, and sleep</li>
-                  <li className="px-4 py-3 text-gray-800">Track your progress</li>
-                  <li className="px-4 py-3 text-gray-800">New content added regularly</li>
-                </ul>
+                  <div className="flex items-center gap-3 mt-3">
+                    <IonToggle
+                      checked={billing === 'annual'}
+                      onIonChange={e => setBilling(e.detail.checked ? 'annual' : 'month')}
+                    />
+                    <div className="text-sm text-gray-700">{pricing.billedLabel}</div>
+                  </div>
+
+                  {billing === 'annual' && pricing.billedDetail ? (
+                    <div className="text-xs text-gray-500 mt-1">{pricing.billedDetail} / year</div>
+                  ) : null}
+                </div>
+              </div>
+
+              {/* Features (compact, minimal separators) */}
+              <div className="border-t border-gray-200">
+                {[
+                  'Access to all flows and practices',
+                  'Guided programs for stress, focus, and sleep',
+                  'Track your progress',
+                  'New content added regularly',
+                ].map((txt, idx) => (
+                  <div
+                    key={txt}
+                    className={`flex items-start gap-3 px-6 py-3 text-sm text-gray-800 ${idx === 0 ? '' : 'border-t border-gray-100'}`}
+                  >
+                    <span className="mt-0.5 text-gray-500">✓</span>
+                    <span className="leading-5">{txt}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-6 border-t border-gray-200">
+                <SignedIn>
+                  <IonButton expand="block" color="primary" onClick={openCheckout}>
+                    Subscribe
+                  </IonButton>
+                  <p className="text-center text-xs text-gray-600 mt-3">
+                    Opens in browser to complete payment
+                  </p>
+                </SignedIn>
+
+                <SignedOut>
+                  <IonButton expand="block" color="primary" onClick={() => (window.location.href = '/sign-in')}>
+                    Sign in to Subscribe
+                  </IonButton>
+                </SignedOut>
               </div>
             </div>
-
-            {/* Clerk plan box (pulled from Clerk plan data) */}
-            <SignedIn>
-              <div className="bg-white rounded-2xl shadow-2xl p-6">
-                {plansLoading ? (
-                  <p className="text-gray-700 text-center">Loading plan…</p>
-                ) : !proPlan ? (
-                  <p className="text-gray-700 text-center">No plan found in Clerk.</p>
-                ) : (
-                  <>
-                    <div className="text-center">
-                      <h3 className="text-xl font-bold text-gray-900">Flow Pro</h3>
-                      {priceLabel ? (
-                        <p className="text-2xl font-bold text-gray-900 mt-3">{priceLabel}</p>
-                      ) : (
-                        <p className="text-gray-600 mt-3">Price not available</p>
-                      )}
-                    </div>
-
-                    <IonButton
-                      expand="block"
-                      color="primary"
-                      className="mt-4"
-                      onClick={openCheckout}
-                    >
-                      Subscribe
-                    </IonButton>
-                    <p className="text-center text-sm text-gray-600 mt-3">
-                      Opens in browser to complete payment
-                    </p>
-                  </>
-                )}
-              </div>
-            </SignedIn>
-
-            <SignedOut>
-              <IonButton expand="block" color="primary" onClick={() => (window.location.href = '/sign-in')}>
-                Sign in to Subscribe
-              </IonButton>
-            </SignedOut>
           </div>
         </div>
       </IonContent>

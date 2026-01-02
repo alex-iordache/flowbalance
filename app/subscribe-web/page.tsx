@@ -3,7 +3,6 @@
 import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } from '@clerk/nextjs';
 import { CheckoutButton, usePlans } from '@clerk/nextjs/experimental';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 
 function sanitizeReturnTo(raw: string | null): string {
   if (!raw) return '/home';
@@ -174,26 +173,64 @@ export default function SubscribeWebPage() {
   const [isProcessingToken, setIsProcessingToken] = useState(false);
   const { signIn, isLoaded: signInLoaded, setActive } = useSignIn();
   const { userId } = useAuth();
-  const searchParams = useSearchParams();
+  const [search, setSearch] = useState<string>(''); // window.location.search snapshot
 
-  // Derive UI state from URL params so it stays correct even if Clerk navigates
-  // to newSubscriptionRedirectUrl via client-side routing (no full reload).
-  const subscriptionSuccess = searchParams.get('subscription') === 'success';
-  const returnTo = sanitizeReturnTo(searchParams.get('return'));
+  // Keep query params in sync even if Clerk mutates URL via history APIs.
+  useEffect(() => {
+    const update = () => {
+      try {
+        setSearch(window.location.search || '');
+      } catch {
+        // ignore
+      }
+    };
+
+    update();
+
+    const onPopState = () => update();
+    window.addEventListener('popstate', onPopState);
+
+    const origPush = history.pushState.bind(history);
+    const origReplace = history.replaceState.bind(history);
+    // Override history mutations so client-side redirects update our derived state.
+    type MutableHistory = Omit<History, 'pushState' | 'replaceState'> & {
+      pushState: History['pushState'];
+      replaceState: History['replaceState'];
+    };
+    const h = history as unknown as MutableHistory;
+
+    h.pushState = function (data: any, unused: string, url?: string | URL | null) {
+      origPush(data, unused, url as any);
+      update();
+    };
+    h.replaceState = function (data: any, unused: string, url?: string | URL | null) {
+      origReplace(data, unused, url as any);
+      update();
+    };
+
+    return () => {
+      window.removeEventListener('popstate', onPopState);
+      h.pushState = origPush;
+      h.replaceState = origReplace;
+    };
+  }, []);
+
+  const params = useMemo(() => new URLSearchParams(search), [search]);
+  const subscriptionSuccess = params.get('subscription') === 'success';
+  const returnTo = sanitizeReturnTo(params.get('return'));
   const period = ((): 'month' | 'annual' => {
-    const p = (searchParams.get('period') || '').toLowerCase();
+    const p = (params.get('period') || '').toLowerCase();
     return p === 'annual' || p === 'year' || p === 'yearly' ? 'annual' : 'month';
   })();
   const autoCheckout = ((): boolean => {
-    const ac = (searchParams.get('autocheckout') || '').toLowerCase();
+    const ac = (params.get('autocheckout') || '').toLowerCase();
     return ac === '1' || ac === 'true';
   })();
   const minimal = ((): boolean => {
-    const min = (searchParams.get('minimal') || '').toLowerCase();
-    // minimal also implied when autocheckout is requested
+    const min = (params.get('minimal') || '').toLowerCase();
     return min === '1' || min === 'true' || autoCheckout;
   })();
-  const signInToken = searchParams.get('__clerk_ticket');
+  const signInToken = params.get('__clerk_ticket');
 
   useEffect(() => {
     // Detect if opened from mobile device (not from Capacitor app, but from browser)

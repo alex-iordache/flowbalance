@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 
 function sanitizeReturnTo(raw: string | null): string {
   if (!raw) return '/home';
@@ -12,8 +11,20 @@ function sanitizeReturnTo(raw: string | null): string {
 }
 
 export default function SubscribeWebReturnPage() {
-  const params = useSearchParams();
-  const returnTo = useMemo(() => sanitizeReturnTo(params.get('return')), [params]);
+  const [search, setSearch] = useState<string>('');
+
+  useEffect(() => {
+    try {
+      setSearch(window.location.search || '');
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const returnTo = useMemo(() => {
+    const params = new URLSearchParams(search);
+    return sanitizeReturnTo(params.get('return'));
+  }, [search]);
 
   useEffect(() => {
     // Deep link back into the app. Android/iOS will open the app via the custom scheme.

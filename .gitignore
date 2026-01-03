@@ -39,3 +39,13 @@ tsconfig.tsbuildinfo
 
 # local tooling (do not commit)
 .tools
+
+# local npm cache (do not commit)
+.npm-cache/
+
+# gradle caches (do not commit)
+.gradle/
+
+# android signing (do not commit)
+*.jks
+android/keystore.properties

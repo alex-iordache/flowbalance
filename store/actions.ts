@@ -1,6 +1,5 @@
 import Store from '.';
 import { ListItem, Settings, TodoListItem } from '../mock';
-import { Flow } from '../data';
 import { saveFlowsState, saveSettingsState, saveListsState } from './persistence';
 
 export const setMenuOpen = (open: boolean) => {
@@ -65,6 +64,14 @@ export const setPracticeFinished = (
     if (!draftPractice) return;
 
     draftPractice.finished = finished;
+
+    // Keep summary fields in sync (best-effort; defaults are still safe).
+    const completed = s.flows[flowIndex].practices.reduce((acc, p) => acc + (p.finished ? 1 : 0), 0);
+    s.flows[flowIndex].practicesCompleted = completed;
+    s.flows[flowIndex].finished = completed >= s.flows[flowIndex].totalPractices;
+    if (finished) {
+      s.flows[flowIndex].lastPracticeFinishedId = practiceId;
+    }
   });
   saveFlowsState();
 };

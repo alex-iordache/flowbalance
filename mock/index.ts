@@ -98,8 +98,10 @@ export const lists: TodoListItem[] = [
 
 export type Settings = {
   enableNotifications: boolean;
+  language: 'ro' | 'en';
 };
 
 export const settings: Settings = {
   enableNotifications: true,
+  language: 'ro',
 };

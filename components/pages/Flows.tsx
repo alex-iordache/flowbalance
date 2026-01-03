@@ -1,4 +1,4 @@
-import { type Flow } from '../../data';
+import { t, type Flow, type Language } from '../../data/flows';
 import { TodoListItem } from '../../mock';
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -18,19 +18,24 @@ import {
 import { useHistory } from 'react-router-dom';
 import { settingsOutline } from 'ionicons/icons';
 import Logo from '../ui/Logo';
+import { Suspense, lazy } from 'react';
+import { isDesktopWeb } from '../admin/adminEnv';
+
+const FlowsAdmin = lazy(() => import('../admin/FlowsAdmin'));
 
 const AllFlows = () => {
   const flows = Store.useState(s => s.flows);
+  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
   return (
     <div className="flex flex-col gap-4 p-4 w-full max-w-2xl mx-auto">
       {flows.map((flow, i) => (
-        <Flow flow={flow} key={i} />
+        <FlowRow flow={flow} key={i} lang={lang} />
       ))}
     </div>
   );
 };
 
-const Flow = ({ flow }: { flow: Flow }) => {
+const FlowRow = ({ flow, lang }: { flow: Flow; lang: Language }) => {
   const history = useHistory();
   
   return (
@@ -39,10 +44,14 @@ const Flow = ({ flow }: { flow: Flow }) => {
       className="flow-entry cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl w-full gap-4"
     >
 
-      <img className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start" src={flow.image} alt={flow.name} />
+      <img
+        className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start"
+        src={t(flow.image, lang)}
+        alt={t(flow.name, lang)}
+      />
       <div className="flex flex-col justify-between flex-1 leading-normal min-w-0">
-        <h5 className="mt-0 mb-2 text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">{flow.name}</h5>
-        <p className="mb-1 text-sm md:text-base text-white">{flow.intro}</p>
+        <h5 className="mt-0 mb-2 text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">{t(flow.name, lang)}</h5>
+        <p className="mb-1 text-sm md:text-base text-white">{t(flow.intro, lang)}</p>
     </div>
 
     </div>
@@ -51,6 +60,9 @@ const Flow = ({ flow }: { flow: Flow }) => {
 
 const Flows = () => {
   const history = useHistory();
+  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
+  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
+  const allowAdmin = isSuperAdmin && isDesktopWeb();
   return (
     <IonPage>
       <IonHeader translucent={true}>
@@ -69,7 +81,13 @@ const Flows = () => {
             <IonTitle size="large">Flows</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <AllFlows />
+        {allowAdmin ? (
+          <Suspense fallback={<AllFlows />}>
+            <FlowsAdmin lang={lang} />
+          </Suspense>
+        ) : (
+          <AllFlows />
+        )}
         </IonContent>
     </IonPage>
   );

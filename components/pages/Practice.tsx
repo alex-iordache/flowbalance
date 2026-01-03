@@ -71,7 +71,7 @@ const Practice = () => {
       const timeout = window.setTimeout(() => {
         // If still no access after a short grace period, take them back to subscribe.
         if (!hasAccess) {
-          history.push(`/subscribe?return=${encodeURIComponent(returnTo)}`);
+          history.replace(`/subscribe?return=${encodeURIComponent(returnTo)}`);
         }
       }, 5000);
 
@@ -81,7 +81,8 @@ const Practice = () => {
       };
     }
 
-    history.push(`/subscribe?return=${encodeURIComponent(returnTo)}`);
+    // Use replace so the Subscribe screen doesn't remain in back stack after returning.
+    history.replace(`/subscribe?return=${encodeURIComponent(returnTo)}`);
   }, [hasAccess, history, flowId, practiceId]);
 
   const handleAudioPlay = () => {

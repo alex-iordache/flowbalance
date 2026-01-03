@@ -11,6 +11,24 @@ function sanitizeReturnTo(raw: string | null): string {
   return raw;
 }
 
+function unwrapReturnTo(raw: string): string {
+  let current = raw;
+  for (let i = 0; i < 3; i += 1) {
+    if (!current.startsWith('/subscribe')) break;
+    const qIndex = current.indexOf('?');
+    if (qIndex === -1) break;
+    const params = new URLSearchParams(current.slice(qIndex + 1));
+    const nested = params.get('return');
+    if (!nested) break;
+    try {
+      current = decodeURIComponent(nested);
+    } catch {
+      current = nested;
+    }
+  }
+  return current;
+}
+
 function SignedInSubscribeContent({
   period,
   minimal,
@@ -217,7 +235,7 @@ export default function SubscribeWebPage() {
 
   const params = useMemo(() => new URLSearchParams(search), [search]);
   const subscriptionSuccess = params.get('subscription') === 'success';
-  const returnTo = sanitizeReturnTo(params.get('return'));
+  const returnTo = sanitizeReturnTo(unwrapReturnTo(sanitizeReturnTo(params.get('return'))));
   const period = ((): 'month' | 'annual' => {
     const p = (params.get('period') || '').toLowerCase();
     return p === 'annual' || p === 'year' || p === 'yearly' ? 'annual' : 'month';

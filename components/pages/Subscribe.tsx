@@ -93,7 +93,7 @@ export default function Subscribe() {
       const data = await response.json();
       const { openExternalUrl } = await import('../../helpers/openExternal');
 
-      const base = 'https://flowbalance-jdk.vercel.app/subscribe-web';
+      const base = 'https://flowbalance.vercel.app/subscribe-web';
       if (data?.token) {
         await openExternalUrl(
           `${base}?autocheckout=1&minimal=1&period=${billing}&return=${encodeURIComponent(returnTo)}&__clerk_ticket=${data.token}`,
@@ -104,7 +104,7 @@ export default function Subscribe() {
     } catch (e) {
       console.error('Error opening checkout:', e);
       const { openExternalUrl } = await import('../../helpers/openExternal');
-      await openExternalUrl(`https://flowbalance-jdk.vercel.app/subscribe-web?return=${encodeURIComponent(returnTo)}`);
+      await openExternalUrl(`https://flowbalance.vercel.app/subscribe-web?return=${encodeURIComponent(returnTo)}`);
     }
   };
 

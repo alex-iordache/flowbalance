@@ -112,7 +112,7 @@ export default function Subscribe() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButton slot="start" fill="clear" onClick={() => history.goBack()}>
+          <IonButton slot="start" fill="clear" onClick={() => history.replace(returnTo || '/home')}>
             <IonIcon icon={chevronBackOutline} className="text-white" />
           </IonButton>
           <IonTitle className="text-white">Subscribe to Flow Pro</IonTitle>

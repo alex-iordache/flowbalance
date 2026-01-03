@@ -41,8 +41,19 @@ export default function DeepLinkReturnHandler() {
               } catch {
                 // ignore
               }
+
+              // Best-effort: force a Clerk session refresh so `has({ plan: ... })` updates ASAP.
+              try {
+                const w = window as unknown as {
+                  Clerk?: { session?: { reload?: () => Promise<unknown> } };
+                };
+                void w.Clerk?.session?.reload?.();
+              } catch {
+                // ignore
+              }
             }
 
+            // Navigate within the Ionic router (no full reload)
             history.replace(returnTo);
           } catch {
             // ignore

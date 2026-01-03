@@ -17,6 +17,14 @@ import * as actions from '../../store/actions';
 import { settingsOutline, lockClosedOutline } from 'ionicons/icons';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 
+function getSubscribePending(): boolean {
+  try {
+    return sessionStorage.getItem('flow_subscribe_pending') === '1';
+  } catch {
+    return false;
+  }
+}
+
 const Practice = () => {
   const { flowId, practiceId } = useParams<{ flowId: string; practiceId: string }>();
   const history = useHistory();
@@ -31,30 +39,49 @@ const Practice = () => {
   
   // Check if user has access to this practice
   const hasAccess = usePracticeAccess(flowId, practiceId, flowIndex, practiceIndex);
+  const [isActivating, setIsActivating] = useState(false);
 
   // If the user doesn't have access, route them to the in-app subscribe screen.
   useEffect(() => {
-    if (!hasAccess) {
-      // If we just returned from a successful subscription, give Clerk a moment to sync entitlements
-      // before bouncing the user back to /subscribe.
-      try {
-        if (sessionStorage.getItem('flow_subscribe_pending') === '1') {
-          const t = window.setTimeout(() => {
-            if (!hasAccess) {
-              const returnTo = `${window.location.pathname}${window.location.search}`;
-              history.push(`/subscribe?return=${encodeURIComponent(returnTo)}`);
-            }
-          }, 1500);
-          return () => window.clearTimeout(t);
-        }
-      } catch {
-        // ignore
-      }
-
-      const returnTo =
-        typeof window !== 'undefined' ? `${window.location.pathname}${window.location.search}` : '/home';
-      history.push(`/subscribe?return=${encodeURIComponent(returnTo)}`);
+    if (hasAccess) {
+      setIsActivating(false);
+      return;
     }
+
+    const returnTo = `${window.location.pathname}${window.location.search}`;
+
+    // If we just returned from checkout, hold on this screen briefly and try to refresh Clerk session
+    // instead of immediately bouncing back to /subscribe (which creates a "subscribe trap").
+    if (getSubscribePending()) {
+      setIsActivating(true);
+
+      // Try a couple quick Clerk session reloads to pick up the new plan.
+      let attempts = 0;
+      const interval = window.setInterval(() => {
+        attempts += 1;
+        try {
+          const w = window as unknown as { Clerk?: { session?: { reload?: () => Promise<unknown> } } };
+          void w.Clerk?.session?.reload?.();
+        } catch {
+          // ignore
+        }
+        if (attempts >= 3) window.clearInterval(interval);
+      }, 800);
+
+      const timeout = window.setTimeout(() => {
+        // If still no access after a short grace period, take them back to subscribe.
+        if (!hasAccess) {
+          history.push(`/subscribe?return=${encodeURIComponent(returnTo)}`);
+        }
+      }, 5000);
+
+      return () => {
+        window.clearInterval(interval);
+        window.clearTimeout(timeout);
+      };
+    }
+
+    history.push(`/subscribe?return=${encodeURIComponent(returnTo)}`);
   }, [hasAccess, history, flowId, practiceId]);
 
   const handleAudioPlay = () => {
@@ -96,6 +123,12 @@ const Practice = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent class="ion-padding flow-background">
+        {isActivating && !hasAccess ? (
+          <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+            <p className="text-white text-lg font-semibold mb-2">Activating your subscription…</p>
+            <p className="text-white/80 text-sm">This usually takes a few seconds.</p>
+          </div>
+        ) : null}
         {/* Show content only if user has access */}
         {hasAccess ? (
           <>

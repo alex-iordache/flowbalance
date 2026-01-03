@@ -24,6 +24,24 @@ npm run make-android
 npm run make-android-release
 ```
 
+### Staging / Production Android builds (recommended)
+
+These produce **two separate APKs** (different app IDs), so you can install both on one phone:
+
+```bash
+# Staging APK (debug) → points at https://flowbalance-staging.vercel.app
+npm run make-android-staging
+```
+
+```bash
+# Production APK (release) → points at https://flowbalance.vercel.app
+npm run make-android-prod
+```
+
+APK output paths:
+- **Staging (debug)**: `android/app/build/outputs/apk/staging/debug/app-staging-debug.apk`
+- **Prod (release)**: `android/app/build/outputs/apk/prod/release/app-prod-release.apk`
+
 ### One-command “commit & deploy to Vercel”
 
 We added a helper script:
@@ -33,6 +51,31 @@ npm run vercel -- "your commit message"
 ```
 
 This runs: `git add .` → `git commit -m ...` → `git push origin main`.
+
+---
+
+## Environments: production vs staging (Vercel split)
+
+We use **two Vercel projects** connected to the same GitHub repo:
+
+- **Production**
+  - **Domain**: `https://flowbalance.vercel.app`
+  - **Vercel project**: `flowbalance`
+  - **Git branch**: `main`
+
+- **Staging**
+  - **Domain**: `https://flowbalance-staging.vercel.app`
+  - **Vercel project**: `flowbalance-staging` (renamed from `flowbalance-jdk`)
+  - **Git branch**: `staging` (this is the *Production Branch* of the staging project)
+
+Rules:
+- **Users should only be pointed at Production.**
+- **All testing goes to Staging** (or per-PR Preview URLs).
+
+How updates roll out:
+- Most app changes are **web changes**. Pushing to `main` updates `flowbalance.vercel.app`, so **users get the update instantly** (no store update required).
+- Use `staging` to test first. When stable, merge `staging` → `main`.
+- You only need to ship a new APK/AAB when you change **native** things (Capacitor plugins, Android/iOS files, deep links, permissions, etc.).
 
 ---
 
@@ -65,6 +108,22 @@ This repo uses Ionic’s router for the in-app experience, and Next routes for a
 - Redirect URLs: `https://clerk.com/docs/guides/development/customize-redirect-urls`
 - Billing (B2C): `https://clerk.com/docs/nextjs/guides/billing/for-b2c`
 
+### Mobile SSO Redirect allowlist (Clerk Dashboard)
+Clerk → **Configure → Developers → Native applications → Allowlist for mobile SSO Redirect → Redirect URLs**
+
+Current expected entries:
+
+```text
+capacitor://localhost/post-signup-redirect?
+http://localhost/post-signup-redirect?
+com.flowapp.app://oauth?
+clerk://com.flowapp.app.oauth?
+https://flowbalance.vercel.app/post-signup-redirect?
+https://flowbalance.vercel.app/sign-in?
+https://flowbalance-staging.vercel.app/post-signup-redirect?
+https://flowbalance-staging.vercel.app/sign-in?
+```
+
 ---
 
 ## Mobile: Capacitor configuration (critical)
@@ -89,6 +148,29 @@ If you change Capacitor config, always sync:
 npx cap sync android
 ```
 
+### Android: prod vs staging apps (two installs)
+
+We build **two Android flavors** so you can install both on a single phone:
+
+- **Prod**
+  - App ID: `com.flowapp.app`
+  - Label: `Flow`
+  - WebView loads: `https://flowbalance.vercel.app`
+  - Deep link scheme: `com.flowapp.app://sso-callback?...`
+
+- **Staging**
+  - App ID: `com.flowapp.app.staging`
+  - Label: `Flow Staging`
+  - WebView loads: `https://flowbalance-staging.vercel.app`
+  - Deep link scheme: `com.flowapp.app.staging://sso-callback?...`
+
+Implementation notes:
+- Android flavors are configured in `android/app/build.gradle`.
+- Deep link scheme is parameterized via `manifestPlaceholders` in `AndroidManifest.xml`.
+- Capacitor config is per-flavor via:
+  - `android/app/src/prod/assets/capacitor.config.json`
+  - `android/app/src/staging/assets/capacitor.config.json`
+
 ---
 
 ## Billing / subscriptions (Google Play compliance)
@@ -98,7 +180,7 @@ npx cap sync android
 
 ### Current approach
 - In-app buttons open the **system browser** to:
-  - `https://flowbalance.vercel.app/subscribe-web`
+  - `${current web origin}/subscribe-web` (prod → `flowbalance.vercel.app`, staging → `flowbalance-staging.vercel.app`)
 - We pass a **Clerk sign-in token** so the browser page is authenticated:
   - `app/api/create-sign-in-token/route.ts`
   - The native app opens: `/subscribe-web?__clerk_ticket=...`
@@ -108,6 +190,7 @@ Key files:
 - `components/pages/Settings.tsx` (“Manage Subscription”)
 - `components/PaywallModal.tsx` (premium upsell → external browser)
 - `helpers/openExternal.ts` / `helpers/openSubscriptionPage.ts`
+- `helpers/webBaseUrl.ts` (figures out which domain we’re on)
 - `app/subscribe-web/page.tsx`
 
 ---
@@ -156,5 +239,28 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
 CLERK_SECRET_KEY=sk_...
 ```
 
-If you use any redirect env vars, document them here and ensure they match existing routes. Avoid deprecated `NEXT_PUBLIC_CLERK_AFTER_*` variables.
+Notes:
+- We intentionally **do not rely** on old Clerk redirect env vars (like `NEXT_PUBLIC_CLERK_AFTER_*`).
+  Redirect behavior is handled in code via Clerk component props on:
+  - `app/sign-in/[[...sign-in]]/page.tsx`
+  - `app/sign-up/[[...sign-up]]/page.tsx`
+
+Optional (only relevant if you ever run in a non-http origin, e.g. a bundled mode):
+
+```bash
+NEXT_PUBLIC_WEB_BASE_URL=https://flowbalance.vercel.app
+```
+
+---
+
+## Git hygiene (don’t commit these)
+
+Ensure `.gitignore` contains:
+
+```gitignore
+.npm-cache/
+.gradle/
+*.jks
+android/keystore.properties
+```
 

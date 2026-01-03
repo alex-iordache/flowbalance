@@ -45,6 +45,7 @@ export default function RootLayout({
       clerkJSVersion="5.117.0"
       allowedRedirectOrigins={[
         'https://flowbalance.vercel.app',
+        'https://flowbalance-staging.vercel.app',
         'capacitor://localhost',
         'http://localhost',
         'ionic://localhost'

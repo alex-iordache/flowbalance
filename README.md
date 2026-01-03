@@ -98,7 +98,7 @@ npx cap sync android
 
 ### Current approach
 - In-app buttons open the **system browser** to:
-  - `https://flowbalance-jdk.vercel.app/subscribe-web`
+  - `https://flowbalance.vercel.app/subscribe-web`
 - We pass a **Clerk sign-in token** so the browser page is authenticated:
   - `app/api/create-sign-in-token/route.ts`
   - The native app opens: `/subscribe-web?__clerk_ticket=...`

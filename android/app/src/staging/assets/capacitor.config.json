@@ -1,0 +1,36 @@
+{
+  "appId": "com.flowapp.app.staging",
+  "appName": "Flow Staging",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "out",
+  "server": {
+    "url": "https://flowbalance-staging.vercel.app",
+    "cleartext": false,
+    "androidScheme": "https",
+    "allowNavigation": [
+      "flowbalance-staging.vercel.app",
+      "*.vercel.app",
+      "clerk.com",
+      "*.clerk.com",
+      "accounts.clerk.dev",
+      "*.clerk.accounts.dev",
+      "clerk.accounts.dev",
+      "clerk.shared.lcl.dev",
+      "*.lcl.dev"
+    ]
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    },
+    "CapacitorCookies": {
+      "enabled": true
+    },
+    "CapacitorHttp": {
+      "enabled": false
+    }
+  },
+  "cordova": {}
+}
+

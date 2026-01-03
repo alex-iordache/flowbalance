@@ -15,6 +15,7 @@ import { SignedIn, SignedOut } from '@clerk/nextjs';
 import { usePlans } from '@clerk/nextjs/experimental';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 
 export default function Subscribe() {
   const history = useHistory();
@@ -93,7 +94,7 @@ export default function Subscribe() {
       const data = await response.json();
       const { openExternalUrl } = await import('../../helpers/openExternal');
 
-      const base = 'https://flowbalance.vercel.app/subscribe-web';
+      const base = `${getWebBaseUrl()}/subscribe-web`;
       if (data?.token) {
         await openExternalUrl(
           `${base}?autocheckout=1&minimal=1&period=${billing}&return=${encodeURIComponent(returnTo)}&__clerk_ticket=${data.token}`,
@@ -104,7 +105,7 @@ export default function Subscribe() {
     } catch (e) {
       console.error('Error opening checkout:', e);
       const { openExternalUrl } = await import('../../helpers/openExternal');
-      await openExternalUrl(`https://flowbalance.vercel.app/subscribe-web?return=${encodeURIComponent(returnTo)}`);
+      await openExternalUrl(`${getWebBaseUrl()}/subscribe-web?return=${encodeURIComponent(returnTo)}`);
     }
   };
 

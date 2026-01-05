@@ -2,6 +2,8 @@
 
 import { SignIn } from '@clerk/nextjs';
 import { IonPage, IonContent } from '@ionic/react';
+import DebugInfoBox from '../../../components/DebugInfoBox';
+import { useRuntimeFlag } from '../../../hooks/useRuntimeFlag';
 
 /**
  * Sign In Page
@@ -11,6 +13,8 @@ import { IonPage, IonContent } from '@ionic/react';
  * Sign-up URL points to in-app sign-up page.
  */
 export default function SignInPage() {
+  const enableDebugBox = useRuntimeFlag('enableDebugBox');
+
   return (
     <IonPage>
       <IonContent scrollY={true}>
@@ -36,6 +40,12 @@ export default function SignInPage() {
               }}
             />
           </div>
+
+          {enableDebugBox ? (
+            <div className="w-full max-w-md mt-6">
+              <DebugInfoBox title="Debug (Sign-In)" maxHeightClassName="max-h-80" />
+            </div>
+          ) : null}
         </div>
       </IonContent>
     </IonPage>

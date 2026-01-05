@@ -2,6 +2,7 @@
 
 import { IonButton } from '@ionic/react';
 import { useEffect, useMemo, useState } from 'react';
+import { clearRuntimeFlags, getRuntimeFlags, setRuntimeFlag } from '../config/runtimeFlags';
 
 type DebugInfoBoxProps = {
   title?: string;
@@ -18,6 +19,8 @@ export default function DebugInfoBox({
   const [clerkPublishableKey, setClerkPublishableKey] = useState<string>('Loading...');
   const [runtimeUrl, setRuntimeUrl] = useState<string>(''); // avoid SSR/CSR mismatch
   const [runtimeUserAgent, setRuntimeUserAgent] = useState<string>(''); // avoid SSR/CSR mismatch
+  const [windowOpenLog, setWindowOpenLog] = useState<string>(''); // avoid SSR/CSR mismatch
+  const [flagsSnapshot, setFlagsSnapshot] = useState<string>(''); // avoid SSR/CSR mismatch
 
   useEffect(() => {
     // Capture runtime-only values in an effect so SSR HTML matches initial client render.
@@ -90,6 +93,20 @@ export default function DebugInfoBox({
       // ignore
     }
 
+    // Capture any persisted window.open logs (if enabled).
+    try {
+      const raw = localStorage.getItem('fb_window_open_log_v1') || '';
+      setWindowOpenLog(raw);
+    } catch {
+      setWindowOpenLog('');
+    }
+
+    try {
+      setFlagsSnapshot(JSON.stringify(getRuntimeFlags()));
+    } catch {
+      setFlagsSnapshot('');
+    }
+
     // Capture console errors/warnings while mounted
     const originalError = console.error;
     const originalWarn = console.warn;
@@ -115,6 +132,9 @@ export default function DebugInfoBox({
       '=== DEBUG INFO ===',
       debugInfo,
       '',
+      '=== WINDOW.OPEN LOG ===',
+      windowOpenLog || 'No window.open log found (enable NEXT_PUBLIC_DEBUG_WINDOW_OPEN_LOG=1)',
+      '',
       '=== ERRORS ===',
       errors.length > 0 ? errors.join('\n') : 'No errors',
       '',
@@ -124,7 +144,7 @@ export default function DebugInfoBox({
       '=== TIMESTAMP ===',
       new Date().toISOString(),
     ].join('\n');
-  }, [debugInfo, errors, warnings]);
+  }, [debugInfo, windowOpenLog, errors, warnings]);
 
   const copyToClipboard = async () => {
     try {
@@ -162,6 +182,43 @@ export default function DebugInfoBox({
       </div>
 
       <div className="space-y-2">
+        <div className="flex flex-wrap gap-2">
+          <IonButton
+            size="small"
+            fill="outline"
+            onClick={() => {
+              setRuntimeFlag('enableDebugBox', true);
+              window.location.reload();
+            }}
+          >
+            Enable Debug Box
+          </IonButton>
+          <IonButton
+            size="small"
+            fill="outline"
+            onClick={() => {
+              setRuntimeFlag('debugWindowOpenLog', true);
+              window.location.reload();
+            }}
+          >
+            Enable window.open Log
+          </IonButton>
+          <IonButton
+            size="small"
+            fill="outline"
+            onClick={() => {
+              clearRuntimeFlags();
+              window.location.reload();
+            }}
+          >
+            Reset Debug Flags
+          </IonButton>
+        </div>
+
+        <div className="text-gray-300 break-all">
+          <strong>Runtime Flags:</strong> {flagsSnapshot || '(unavailable)'}
+        </div>
+
         <div className="text-green-400">
           <strong>URL:</strong> {runtimeUrl || 'Loading...'}
         </div>

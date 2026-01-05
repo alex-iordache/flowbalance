@@ -10,7 +10,8 @@ import AuthGuard from './AuthGuard';
 import { loadAllPersistedState } from '../store/persistence';
 import Subscribe from './pages/Subscribe';
 import DeepLinkReturnHandler from './DeepLinkReturnHandler';
-import NativeWindowOpenShim from './NativeWindowOpenShim';
+import WindowOpenLogger from './WindowOpenLogger';
+import { useRuntimeFlag } from '../hooks/useRuntimeFlag';
 
 setupIonicReact({});
 
@@ -25,6 +26,8 @@ window
   });
 
 const AppShell = () => {
+  const debugWindowOpenLog = useRuntimeFlag('debugWindowOpenLog');
+
   useEffect(() => {
     // Load persisted state when app initializes
     loadAllPersistedState();
@@ -34,7 +37,7 @@ const AppShell = () => {
     <AuthGuard>
       <IonApp>
         <IonReactRouter>
-          <NativeWindowOpenShim />
+          {debugWindowOpenLog ? <WindowOpenLogger /> : null}
           <DeepLinkReturnHandler />
           <IonRouterOutlet id="main">
             {/* Main app routes - protected by AuthGuard */}

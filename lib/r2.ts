@@ -34,9 +34,8 @@ function hmac(key: Buffer | string, data: string): Buffer {
 
 function toAmzDate(d: Date): { amzDate: string; dateStamp: string } {
   // 20260105T123456Z
-  const iso = d.toISOString().replace(/[:-]|\.\d{3}/g, '');
-  const amzDate = `${iso.slice(0, 8)}T${iso.slice(8, 14)}Z`;
-  const dateStamp = iso.slice(0, 8);
+  const amzDate = d.toISOString().replace(/[:-]|\.\d{3}/g, '');
+  const dateStamp = amzDate.slice(0, 8);
   return { amzDate, dateStamp };
 }
 

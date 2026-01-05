@@ -14,6 +14,7 @@
       "clerk.com",
       "*.clerk.com",
       "accounts.clerk.dev",
+      "popular-gibbon-62.clerk.accounts.dev",
       "*.clerk.accounts.dev",
       "clerk.accounts.dev",
       "clerk.shared.lcl.dev",

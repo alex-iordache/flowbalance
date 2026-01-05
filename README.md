@@ -34,7 +34,7 @@ npm run make-android-staging
 ```
 
 ```bash
-# Production APK (release) → points at https://flowbalance.vercel.app
+# Production APK (release) → points at https://flowbalance.app
 npm run make-android-prod
 ```
 
@@ -59,7 +59,7 @@ This runs: `git add .` → `git commit -m ...` → `git push origin main`.
 We use **two Vercel projects** connected to the same GitHub repo:
 
 - **Production**
-  - **Domain**: `https://flowbalance.vercel.app`
+  - **Domain**: `https://flowbalance.app` (alias: `https://flowbalance.vercel.app`)
   - **Vercel project**: `flowbalance`
   - **Git branch**: `main`
 
@@ -73,7 +73,7 @@ Rules:
 - **All testing goes to Staging** (or per-PR Preview URLs).
 
 How updates roll out:
-- Most app changes are **web changes**. Pushing to `main` updates `flowbalance.vercel.app`, so **users get the update instantly** (no store update required).
+- Most app changes are **web changes**. Pushing to `main` updates `flowbalance.app`, so **users get the update instantly** (no store update required).
 - Use `staging` to test first. When stable, merge `staging` → `main`.
 - You only need to ship a new APK/AAB when you change **native** things (Capacitor plugins, Android/iOS files, deep links, permissions, etc.).
 
@@ -120,6 +120,8 @@ com.flowapp.app://oauth?
 clerk://com.flowapp.app.oauth?
 https://flowbalance.vercel.app/post-signup-redirect?
 https://flowbalance.vercel.app/sign-in?
+https://flowbalance.app/post-signup-redirect?
+https://flowbalance.app/sign-in?
 https://flowbalance-staging.vercel.app/post-signup-redirect?
 https://flowbalance-staging.vercel.app/sign-in?
 ```
@@ -155,7 +157,7 @@ We build **two Android flavors** so you can install both on a single phone:
 - **Prod**
   - App ID: `com.flowapp.app`
   - Label: `Flow`
-  - WebView loads: `https://flowbalance.vercel.app`
+  - WebView loads: `https://flowbalance.app` (alias: `https://flowbalance.vercel.app`)
   - Deep link scheme: `com.flowapp.app://sso-callback?...`
 
 - **Staging**
@@ -180,7 +182,7 @@ Implementation notes:
 
 ### Current approach
 - In-app buttons open the **system browser** to:
-  - `${current web origin}/subscribe-web` (prod → `flowbalance.vercel.app`, staging → `flowbalance-staging.vercel.app`)
+  - `${current web origin}/subscribe-web` (prod → `flowbalance.app`, staging → `flowbalance-staging.vercel.app`)
 - We pass a **Clerk sign-in token** so the browser page is authenticated:
   - `app/api/create-sign-in-token/route.ts`
   - The native app opens: `/subscribe-web?__clerk_ticket=...`
@@ -248,10 +250,89 @@ Notes:
 Optional (only relevant if you ever run in a non-http origin, e.g. a bundled mode):
 
 ```bash
-NEXT_PUBLIC_WEB_BASE_URL=https://flowbalance.vercel.app
+NEXT_PUBLIC_WEB_BASE_URL=https://flowbalance.app
 ```
 
 ---
+
+## Private audio (Cloudflare R2)
+
+Audio is served via a **gated streaming endpoint**: `GET /api/audio?...` which:
+- checks Clerk auth + entitlement (free preview = first practice of first flow)
+- streams the mp3 from **private R2** using AWS SigV4 (supports `Range` for seeking)
+
+### Security note (important)
+
+**Never commit or paste real credentials into this repo** (including `README.md`).
+Store secrets only in:
+- local `.env.local` (not committed)
+- Vercel Environment Variables (Prod + Staging)
+
+If a secret was shared in chat or committed by accident, **revoke/rotate it immediately** in Cloudflare and update Vercel.
+
+### Required Vercel env vars
+
+Set these in Vercel (Prod + Staging) and locally in `.env.local`:
+
+```bash
+R2_ACCOUNT_ID=...                  # Cloudflare account id (for R2)
+R2_ACCESS_KEY_ID=...               # R2 API token access key
+R2_SECRET_ACCESS_KEY=...           # R2 API token secret
+R2_BUCKET_NAME=...                 # bucket containing mp3s
+R2_REGION=auto                     # recommended for R2
+```
+
+Tip: this repo includes a copy/paste template at `config/env.example`.
+Create your local `.env.local` by copying it and filling in real values:
+
+```bash
+cp config/env.example .env.local
+```
+
+### How to create the Cloudflare token (recommended settings)
+
+Create a token under Cloudflare R2 “S3 API tokens / R2 API tokens” (account-scoped).
+
+Recommended settings for the **Vercel backend** token:
+- **Name**: `vercel-flowbalance-prod-r2-read` (and optionally `vercel-flowbalance-staging-r2-read`)
+- **Permission type**: **Object Read only**
+- **Buckets**: **Apply to specific buckets only** → select `flowbalance`
+- **Client IP filtering**: leave unset (Vercel does not have stable fixed egress IPs by default)
+
+Cloudflare will show you (one-time):
+- **Access Key ID** → set as `R2_ACCESS_KEY_ID` in Vercel
+- **Secret Access Key** → set as `R2_SECRET_ACCESS_KEY` in Vercel
+
+Note: Cloudflare also shows a “Cloudflare API token value” on that screen. **The app does not use it**.
+For this project we only need the **S3-compatible Access Key ID / Secret Access Key** for SigV4.
+
+### S3 endpoint (informational)
+
+R2’s S3-compatible endpoint is derived from `R2_ACCOUNT_ID`:
+
+```text
+https://<accountId>.r2.cloudflarestorage.com
+```
+
+You do not need to set this as an env var; the backend builds it automatically.
+
+### R2 object key convention
+
+Practices store audio as the **R2 object key**, e.g. `"<filename>.mp3"` (bucket root).
+
+Example:
+- Practice audioUrl: `"1-2-trecerea-peste-obstacole.mp3"`
+- R2 key: `"1-2-trecerea-peste-obstacole.mp3"`
+
+### Cloudflare settings (security)
+
+To actually prevent unauthorized access:
+- Make the R2 bucket **private** (disable public access / public bucket URLs)
+- If you keep `audio.flowbalance.app` publicly serving the bucket, it will remain bypassable
+
+Code references:
+- API route: `app/api/audio/route.ts`
+- R2 signer/fetch: `lib/r2.ts`
 
 ## Git hygiene (don’t commit these)
 

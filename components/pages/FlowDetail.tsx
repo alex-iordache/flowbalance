@@ -21,6 +21,7 @@ import Store from '../../store';
 import { t, type Practice, type Language } from '../../data/flows';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { isDesktopWeb } from '../admin/adminEnv';
+import { getCategoryForFlowId } from './flowsCatalog';
 
 import { playCircleOutline, checkmarkDoneCircleOutline, ellipseOutline, settingsOutline, lockClosedOutline } from 'ionicons/icons';
 
@@ -83,18 +84,22 @@ const FlowDetail = () => {
   const { flowId } = useParams<{ flowId: string }>();
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
-  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
+  // Until we ship an in-app language switch, keep English on display.
+  const lang: Language = 'en';
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
   const allowAdmin = isSuperAdmin && isDesktopWeb();
   const flow = flows.find((flow) => flow.id === flowId);
   const flowIndex = flows.findIndex((flow) => flow.id === flowId);
+  const category = getCategoryForFlowId(flowId);
+  const themedStyle = category ? ({ '--background': category.gradientCss } as any) : undefined;
+  const backHref = category ? `/flows/category/${category.id}` : '/flows';
   
   return (
     <IonPage>
       <IonHeader translucent={true}>
-        <IonToolbar>
+        <IonToolbar style={themedStyle}>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/flows" className="text-white" />
+            <IonBackButton defaultHref={backHref} className="text-white" />
           </IonButtons>
           <IonTitle className="text-white">{flow ? t(flow.title, lang) : ''}</IonTitle>
           <IonButtons slot="end">
@@ -104,7 +109,7 @@ const FlowDetail = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent className="ion-padding" style={themedStyle}>
         <p className="text-white">{flow ? t(flow.description, lang) : ''}</p>
         {flowId ? (
           allowAdmin ? (

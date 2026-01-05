@@ -10,13 +10,16 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import { useParams, useHistory } from 'react-router-dom';
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 import Store from '../../store';
 import * as actions from '../../store/actions';
 import { settingsOutline, lockClosedOutline } from 'ionicons/icons';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { t, type Language } from '../../data/flows';
+import { getCategoryForFlowId } from './flowsCatalog';
+import AudioPlayer from '../ui/AudioPlayer';
+import { getAudioSrc } from '../../helpers/getAudioSrc';
 
 function getSubscribePending(): boolean {
   try {
@@ -30,10 +33,12 @@ const Practice = () => {
   const { flowId, practiceId } = useParams<{ flowId: string; practiceId: string }>();
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
-  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
+  // Until we ship an in-app language switch, keep English on display.
+  const lang: Language = 'en';
   const flow = flows.find((f) => f.id === flowId);
   const practice = flow?.practices.find((p) => p.id === practiceId);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const category = flowId ? getCategoryForFlowId(flowId) : null;
+  const themedStyle = category ? ({ '--background': category.gradientCss } as any) : undefined;
   
   // Get flow and practice indices for access check
   const flowIndex = flows.findIndex((f) => f.id === flowId);
@@ -111,8 +116,8 @@ const Practice = () => {
 
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
+      <IonHeader translucent={true}>
+        <IonToolbar style={themedStyle}>
           <IonButtons slot="start">
             <IonBackButton defaultHref={`/flows/${flowId}`} className="text-white" />
           </IonButtons>
@@ -127,7 +132,7 @@ const Practice = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent class="ion-padding flow-background">
+      <IonContent className="ion-padding text-white" style={themedStyle}>
         {isActivating && !hasAccess ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
             <p className="text-white text-lg font-semibold mb-2">Activating your subscription…</p>
@@ -137,19 +142,24 @@ const Practice = () => {
         {/* Show content only if user has access */}
         {hasAccess ? (
           <>
-            {practice && t(practice.description, lang) ? <p>{t(practice.description, lang)}</p> : null}
+            {practice && t(practice.description, lang) ? (
+              <p className="text-white">{t(practice.description, lang)}</p>
+            ) : null}
             {practice && t(practice.audioUrl, lang) ? (
-              <audio
-                ref={audioRef}
-                controls
-                controlsList="nodownload nofullscreen noremoteplayback noplaybackrate"
-                style={{ width: '100%', marginTop: '1rem' }}
-                onPlay={handleAudioPlay}
-                onEnded={handleAudioEnded}
-              >
-                <source src={t(practice.audioUrl, lang)} type="audio/mpeg" />
-                Your browser does not support the audio element.
-              </audio>
+              <div className="mt-4">
+                <AudioPlayer
+                  src={getAudioSrc({
+                    audioUrlOrPath: t(practice.audioUrl, lang),
+                    flowId,
+                    practiceId,
+                  })}
+                  title={t(practice.name, lang)}
+                  subtitle={flow ? t(flow.name, lang) : undefined}
+                  variant="floatingCircle"
+                  onPlay={handleAudioPlay}
+                  onEnded={handleAudioEnded}
+                />
+              </div>
             ) : null}
           </>
         ) : null}

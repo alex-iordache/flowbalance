@@ -17,7 +17,8 @@ import { t, type Language } from '../../data/flows';
 const MyProgress = () => {
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
-  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
+  // Until we ship an in-app language switch, keep English on display.
+  const lang: Language = 'en';
   const startedFlows = flows.filter(flow => flow.started);
 
   const calculateProgress = (flow: typeof flows[0]) => {

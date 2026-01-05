@@ -21,6 +21,6 @@ export function getWebBaseUrl(): string {
   if (env) return env.replace(/\/+$/, '');
 
   // Safe default (prod)
-  return 'https://flowbalance.vercel.app';
+  return 'https://flowbalance.app';
 }
 

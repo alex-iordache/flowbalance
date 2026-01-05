@@ -1,0 +1,1 @@
+"use strict";exports.id=853,exports.ids=[853],exports.modules={89853:(e,r,n)=>{n.r(r),n.d(r,{AppLauncherWeb:()=>p});var s=n(73800);class p extends s.Uw{async canOpenUrl(e){return{value:!0}}async openUrl(e){return window.open(e.url,"_blank"),{completed:!0}}}}};

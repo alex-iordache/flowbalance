@@ -10,6 +10,7 @@ import AuthGuard from './AuthGuard';
 import { loadAllPersistedState } from '../store/persistence';
 import Subscribe from './pages/Subscribe';
 import DeepLinkReturnHandler from './DeepLinkReturnHandler';
+import NativeWindowOpenShim from './NativeWindowOpenShim';
 
 setupIonicReact({});
 
@@ -33,6 +34,7 @@ const AppShell = () => {
     <AuthGuard>
       <IonApp>
         <IonReactRouter>
+          <NativeWindowOpenShim />
           <DeepLinkReturnHandler />
           <IonRouterOutlet id="main">
             {/* Main app routes - protected by AuthGuard */}

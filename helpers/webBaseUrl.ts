@@ -21,6 +21,6 @@ export function getWebBaseUrl(): string {
   if (env) return env.replace(/\/+$/, '');
 
   // Safe default (prod)
-  return 'https://flowbalance.app';
+  return 'https://www.flowbalance.app';
 }
 

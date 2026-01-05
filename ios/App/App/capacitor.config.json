@@ -5,10 +5,11 @@
 	"npmClient": "npm",
 	"webDir": "out",
 	"server": {
-		"url": "https://flowbalance.app",
+		"url": "https://www.flowbalance.app",
 		"cleartext": false,
 		"androidScheme": "https",
 		"allowNavigation": [
+			"www.flowbalance.app",
 			"flowbalance.app",
 			"flowbalance.vercel.app",
 			"*.vercel.app",

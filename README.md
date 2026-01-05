@@ -34,7 +34,7 @@ npm run make-android-staging
 ```
 
 ```bash
-# Production APK (release) → points at https://flowbalance.app
+# Production APK (release) → points at https://www.flowbalance.app
 npm run make-android-prod
 ```
 
@@ -59,7 +59,7 @@ This runs: `git add .` → `git commit -m ...` → `git push origin main`.
 We use **two Vercel projects** connected to the same GitHub repo:
 
 - **Production**
-  - **Domain**: `https://flowbalance.app` (alias: `https://flowbalance.vercel.app`)
+  - **Domain**: `https://www.flowbalance.app` (aliases: `https://flowbalance.app`, `https://flowbalance.vercel.app`)
   - **Vercel project**: `flowbalance`
   - **Git branch**: `main`
 
@@ -73,7 +73,7 @@ Rules:
 - **All testing goes to Staging** (or per-PR Preview URLs).
 
 How updates roll out:
-- Most app changes are **web changes**. Pushing to `main` updates `flowbalance.app`, so **users get the update instantly** (no store update required).
+- Most app changes are **web changes**. Pushing to `main` updates `www.flowbalance.app`, so **users get the update instantly** (no store update required).
 - Use `staging` to test first. When stable, merge `staging` → `main`.
 - You only need to ship a new APK/AAB when you change **native** things (Capacitor plugins, Android/iOS files, deep links, permissions, etc.).
 
@@ -122,6 +122,8 @@ https://flowbalance.vercel.app/post-signup-redirect?
 https://flowbalance.vercel.app/sign-in?
 https://flowbalance.app/post-signup-redirect?
 https://flowbalance.app/sign-in?
+https://www.flowbalance.app/post-signup-redirect?
+https://www.flowbalance.app/sign-in?
 https://flowbalance-staging.vercel.app/post-signup-redirect?
 https://flowbalance-staging.vercel.app/sign-in?
 ```
@@ -157,7 +159,7 @@ We build **two Android flavors** so you can install both on a single phone:
 - **Prod**
   - App ID: `com.flowapp.app`
   - Label: `Flow`
-  - WebView loads: `https://flowbalance.app` (alias: `https://flowbalance.vercel.app`)
+  - WebView loads: `https://www.flowbalance.app` (aliases: `https://flowbalance.app`, `https://flowbalance.vercel.app`)
   - Deep link scheme: `com.flowapp.app://sso-callback?...`
 
 - **Staging**
@@ -182,7 +184,7 @@ Implementation notes:
 
 ### Current approach
 - In-app buttons open the **system browser** to:
-  - `${current web origin}/subscribe-web` (prod → `flowbalance.app`, staging → `flowbalance-staging.vercel.app`)
+  - `${current web origin}/subscribe-web` (prod → `www.flowbalance.app`, staging → `flowbalance-staging.vercel.app`)
 - We pass a **Clerk sign-in token** so the browser page is authenticated:
   - `app/api/create-sign-in-token/route.ts`
   - The native app opens: `/subscribe-web?__clerk_ticket=...`
@@ -250,7 +252,7 @@ Notes:
 Optional (only relevant if you ever run in a non-http origin, e.g. a bundled mode):
 
 ```bash
-NEXT_PUBLIC_WEB_BASE_URL=https://flowbalance.app
+NEXT_PUBLIC_WEB_BASE_URL=https://www.flowbalance.app
 ```
 
 ---

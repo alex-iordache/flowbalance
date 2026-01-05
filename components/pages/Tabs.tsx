@@ -8,6 +8,7 @@ import {
   IonLabel,
 } from '@ionic/react';
 import { home, pulse, trendingUp } from 'ionicons/icons';
+import { Suspense, lazy } from 'react';
 
 import Home from './Home';
 import Flows from './Flows';
@@ -16,8 +17,15 @@ import Practice from './Practice';
 import Settings from './Settings';
 import MyProgress from './MyProgress';
 import Subscribe from './Subscribe';
+import Store from '../../store';
+import { isDesktopWeb } from '../admin/adminEnv';
+
+const AdminRoutes = lazy(() => import('../admin/AdminRoutes'));
 
 const Tabs = () => {
+  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
+  const allowAdmin = isSuperAdmin && isDesktopWeb();
+
   return (
     <IonTabs>
       <IonRouterOutlet>
@@ -37,6 +45,16 @@ const Tabs = () => {
           <Route path="/settings" render={() => <Settings />} exact={true} />
           <Route path="/subscribe" render={() => <Subscribe />} exact={true} />
           <Route path="/progress" render={() => <MyProgress />} exact={true} />
+          {allowAdmin ? (
+            <Route
+              path="/admin"
+              render={() => (
+                <Suspense fallback={null}>
+                  <AdminRoutes />
+                </Suspense>
+              )}
+            />
+          ) : null}
           <Route render={() => <Redirect to="/home" />}/>
         </Switch>
       </IonRouterOutlet>

@@ -16,6 +16,7 @@ import Store from '../../store';
 import * as actions from '../../store/actions';
 import { settingsOutline, lockClosedOutline } from 'ionicons/icons';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
+import { t, type Language } from '../../data/flows';
 
 function getSubscribePending(): boolean {
   try {
@@ -29,6 +30,7 @@ const Practice = () => {
   const { flowId, practiceId } = useParams<{ flowId: string; practiceId: string }>();
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
+  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
   const flow = flows.find((f) => f.id === flowId);
   const practice = flow?.practices.find((p) => p.id === practiceId);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -98,11 +100,13 @@ const Practice = () => {
   };
 
   const getDisplayName = () => {
-    if (!practice?.name) return '';
-    if (practice.name.length <= 20) return practice.name;
+    if (!practice) return '';
+    const name = t(practice.name, lang);
+    if (!name) return '';
+    if (name.length <= 20) return name;
     // Extract just the day part (e.g., "Day 1", "Day 2")
-    const dayMatch = practice.name.match(/- (Day \d+)$/);
-    return dayMatch ? dayMatch[1] : practice.name;
+    const dayMatch = name.match(/- (Day \d+)$/);
+    return dayMatch ? dayMatch[1] : name;
   };
 
   return (
@@ -133,8 +137,8 @@ const Practice = () => {
         {/* Show content only if user has access */}
         {hasAccess ? (
           <>
-            {practice?.description && <p>{practice.description}</p>}
-            {practice?.audioURL && (
+            {practice && t(practice.description, lang) ? <p>{t(practice.description, lang)}</p> : null}
+            {practice && t(practice.audioUrl, lang) ? (
               <audio
                 ref={audioRef}
                 controls
@@ -143,10 +147,10 @@ const Practice = () => {
                 onPlay={handleAudioPlay}
                 onEnded={handleAudioEnded}
               >
-                <source src={practice.audioURL} type="audio/mpeg" />
+                <source src={t(practice.audioUrl, lang)} type="audio/mpeg" />
                 Your browser does not support the audio element.
               </audio>
-            )}
+            ) : null}
           </>
         ) : null}
       </IonContent>

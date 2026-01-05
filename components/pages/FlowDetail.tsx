@@ -15,21 +15,37 @@ import {
   IonBadge,
 } from '@ionic/react';
 import { useParams, useHistory } from 'react-router-dom';
+import { Suspense, lazy } from 'react';
 
 import Store from '../../store';
-import { type Practices } from '../../data';
+import { t, type Practice, type Language } from '../../data/flows';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
+import { isDesktopWeb } from '../admin/adminEnv';
 
 import { playCircleOutline, checkmarkDoneCircleOutline, ellipseOutline, settingsOutline, lockClosedOutline } from 'ionicons/icons';
 
-function Practice ({practice, flowId, flowIndex, practiceIndex}: {practice: Practices; flowId: string; flowIndex: number; practiceIndex: number}) {
+const FlowDetailAdmin = lazy(() => import('../admin/FlowDetailAdmin'));
+
+function PracticeRow({
+  practice,
+  flowId,
+  flowIndex,
+  practiceIndex,
+  lang,
+}: {
+  practice: Practice;
+  flowId: string;
+  flowIndex: number;
+  practiceIndex: number;
+  lang: Language;
+}) {
   const hasAccess = usePracticeAccess(flowId, practice.id, flowIndex, practiceIndex);
   
   return practice && (
         <IonItem className="no-bg-color py-4 text-white" routerLink={`/flows/${flowId}/${practice.id}`}>
           <IonIcon className="text-white text-3xl" icon={practice.finished ? checkmarkDoneCircleOutline : ellipseOutline} />
           <IonLabel className="pl-5 text-white text-lg">
-            {practice.name}
+            {t(practice.name, lang)}
             {!hasAccess && (
               <IonBadge color="warning" className="ml-2">Premium</IonBadge>
             )}
@@ -39,15 +55,26 @@ function Practice ({practice, flowId, flowIndex, practiceIndex}: {practice: Prac
   )
 }
 
-function Practices ({practices, flowId, flowIndex} : {practices: Practices[]; flowId: string; flowIndex: number}) {
+function PracticesList({
+  practices,
+  flowId,
+  flowIndex,
+  lang,
+}: {
+  practices: Practice[];
+  flowId: string;
+  flowIndex: number;
+  lang: Language;
+}) {
   return practices && (<div className="no-bg-color">
     {practices.map((practice, index) => (
-      <Practice 
+      <PracticeRow
         practice={practice} 
         flowId={flowId} 
         flowIndex={flowIndex}
         practiceIndex={index}
         key={practice.id}
+        lang={lang}
       />
     ))}
   </div>)
@@ -56,6 +83,9 @@ const FlowDetail = () => {
   const { flowId } = useParams<{ flowId: string }>();
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
+  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
+  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
+  const allowAdmin = isSuperAdmin && isDesktopWeb();
   const flow = flows.find((flow) => flow.id === flowId);
   const flowIndex = flows.findIndex((flow) => flow.id === flowId);
   
@@ -66,7 +96,7 @@ const FlowDetail = () => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/flows" className="text-white" />
           </IonButtons>
-          <IonTitle className="text-white">{flow?.name || ''}</IonTitle>
+          <IonTitle className="text-white">{flow ? t(flow.title, lang) : ''}</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => history.push('/settings')}>
               <IonIcon icon={settingsOutline} className="text-white text-2xl" />
@@ -75,8 +105,18 @@ const FlowDetail = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <p className="text-white">{flow?.description}</p>
-        {flowId && <Practices practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} />}
+        <p className="text-white">{flow ? t(flow.description, lang) : ''}</p>
+        {flowId ? (
+          allowAdmin ? (
+            <Suspense
+              fallback={<PracticesList practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} lang={lang} />}
+            >
+              <FlowDetailAdmin flowId={flowId} flowIndex={flowIndex} lang={lang} />
+            </Suspense>
+          ) : (
+            <PracticesList practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} lang={lang} />
+          )
+        ) : null}
       </IonContent>
     </IonPage>
   );

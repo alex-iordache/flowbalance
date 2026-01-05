@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import { flows} from '../../data';
+import { defaultFlows } from '../../data/flows';
 
 const App = dynamic(() => import('../../components/AppShell'), {
   ssr: false,
@@ -11,8 +11,8 @@ export async function generateStaticParams() {
     { all: ['flows'] },
     { all: ['settings'] },
     { all: ['progress'] },
-    ...flows.map(flow => ({ all: ['flows', flow.id] })),
-    ...flows.flatMap(flow => 
+    ...defaultFlows.map(flow => ({ all: ['flows', flow.id] })),
+    ...defaultFlows.flatMap(flow =>
       flow.practices.map(practice => ({ 
         all: ['flows', flow.id, practice.id] 
       }))

@@ -12,10 +12,12 @@ import { useHistory } from 'react-router-dom';
 import { settingsOutline } from 'ionicons/icons';
 import Store from '../../store';
 import Logo from '../ui/Logo';
+import { t, type Language } from '../../data/flows';
 
 const MyProgress = () => {
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
+  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
   const startedFlows = flows.filter(flow => flow.started);
 
   const calculateProgress = (flow: typeof flows[0]) => {
@@ -61,12 +63,12 @@ const MyProgress = () => {
                 >
                   <img
                     className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start"
-                    src={flow.image}
-                    alt={flow.name}
+                    src={t(flow.image, lang)}
+                    alt={t(flow.name, lang)}
                   />
                   <div className="flex flex-col justify-between flex-1 leading-normal min-w-0">
                     <h5 className="mt-0 mb-2 text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
-                      {flow.name}
+                      {t(flow.name, lang)}
                     </h5>
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-1">

@@ -12,6 +12,7 @@ import { Suspense, lazy } from 'react';
 
 import Home from './Home';
 import Flows from './Flows';
+import FlowCategory from './FlowCategory';
 import FlowDetail from './FlowDetail';
 import Practice from './Practice';
 import Settings from './Settings';
@@ -32,6 +33,11 @@ const Tabs = () => {
         <Switch>
           <Route path="/home" render={() => <Home />} exact={true} />
           <Route path="/flows" render={() => <Flows />} exact={true} />
+          <Route
+            path="/flows/category/:categoryId"
+            render={() => <FlowCategory />}
+            exact={true}
+          />
           <Route
             path="/flows/:flowId"
             render={() => <FlowDetail />}

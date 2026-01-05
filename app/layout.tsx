@@ -44,6 +44,7 @@ export default function RootLayout({
       // (e.g. attempts to load an unversioned @5 script that can be CORS-blocked).
       clerkJSVersion="5.117.0"
       allowedRedirectOrigins={[
+        'https://flowbalance.app',
         'https://flowbalance.vercel.app',
         'https://flowbalance-staging.vercel.app',
         'capacitor://localhost',

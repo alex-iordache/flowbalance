@@ -1,0 +1,96 @@
+import type { LocalizedText } from '../../data/flows';
+
+export type FlowCategoryDef = {
+  id: string;
+  title: LocalizedText;
+  flowIds: string[];
+  /** Tailwind background classes for the category card. */
+  bgClass: string;
+  /** CSS gradient used for category page background + header. */
+  gradientCss: string;
+};
+
+export const FLOW_CATEGORIES: FlowCategoryDef[] = [
+  {
+    id: 'emotional-regulation',
+    title: { ro: 'Reglare emoțională', en: 'Emotional Regulation' },
+    flowIds: [
+      'Calming-Anxiety',
+      'Panic-Support',
+      'Craving-Relief',
+      'Ease-Overwhelm',
+      'Stress-Soothing',
+      'Calm-Your-Nervous-System',
+      'Improve-Sleep',
+    ],
+    bgClass: 'bg-gradient-to-br from-sky-500 to-indigo-600',
+    gradientCss: 'linear-gradient(135deg, #0ea5e9 0%, #4f46e5 100%)',
+  },
+  {
+    id: 'performance-boost',
+    title: { ro: 'Performanță', en: 'Performance Boost' },
+    flowIds: [
+      'Boost-Performance',
+      'Improve-Focus',
+      'Productivity-Support',
+      'Mental-Clarity',
+      'Calm-Under-Pressure',
+      'Decision-Confidence',
+      'Energy-Balance',
+    ],
+    bgClass: 'bg-gradient-to-br from-emerald-500 to-teal-600',
+    gradientCss: 'linear-gradient(135deg, #10b981 0%, #0d9488 100%)',
+  },
+  {
+    id: 'mindset',
+    title: { ro: 'Mindset', en: 'Mindset' },
+    flowIds: [
+      'Positive-Mindset',
+      'Mindset-During-Competitions',
+      'Public-Speaking-Confidence',
+      'Goal-Achievement',
+      'Build-Self-Trust',
+      'Boost-Confidence',
+      'Healthy-Money-Mindset',
+    ],
+    bgClass: 'bg-gradient-to-br from-violet-500 to-fuchsia-600',
+    gradientCss: 'linear-gradient(135deg, #8b5cf6 0%, #c026d3 100%)',
+  },
+  {
+    id: 'stories',
+    title: { ro: 'Povești', en: 'Stories' },
+    flowIds: ['Calm-Stories', 'Reflection-Stories', 'Growth-Stories', 'Insight-Stories'],
+    bgClass: 'bg-gradient-to-br from-orange-500 to-amber-600',
+    gradientCss: 'linear-gradient(135deg, #f97316 0%, #d97706 100%)',
+  },
+  {
+    id: 'heart-balance',
+    title: { ro: 'Echilibru al inimii', en: 'Heart Balance' },
+    flowIds: [
+      'Heartful-Gratitude',
+      'Boost-Motivation',
+      'Heart-Centered-Balance',
+      'Self-Compassion',
+      'Daily-Heart-Lift',
+      'Heartful-Affirmations',
+    ],
+    bgClass: 'bg-gradient-to-br from-rose-500 to-pink-600',
+    gradientCss: 'linear-gradient(135deg, #f43f5e 0%, #db2777 100%)',
+  },
+  {
+    id: 'somatic-release',
+    title: { ro: 'Eliberare somatică', en: 'Somatic Release' },
+    flowIds: ['Body-Release', 'Grounding', 'Shake-Method', 'Nervous-System-Reset'],
+    bgClass: 'bg-gradient-to-br from-cyan-500 to-blue-600',
+    gradientCss: 'linear-gradient(135deg, #06b6d4 0%, #2563eb 100%)',
+  },
+];
+
+export function getCategoryById(categoryId: string): FlowCategoryDef | null {
+  return FLOW_CATEGORIES.find(c => c.id === categoryId) ?? null;
+}
+
+export function getCategoryForFlowId(flowId: string): FlowCategoryDef | null {
+  return FLOW_CATEGORIES.find(c => c.flowIds.includes(flowId)) ?? null;
+}
+

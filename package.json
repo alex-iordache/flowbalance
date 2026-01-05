@@ -9,6 +9,7 @@
     "compile": "tsc",
     "compile:watch": "tsc -w",
     "build": "next build",
+    "build:isolated": "NEXT_DIST_DIR=.next-build next build",
     "dev": "next dev",
     "lint": "eslint . --ext .ts,.tsx",
     "prettify": "prettier --write **/*.tsx",

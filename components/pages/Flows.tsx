@@ -1,16 +1,11 @@
 import { t, type Flow, type Language } from '../../data/flows';
-import { TodoListItem } from '../../mock';
 import Store from '../../store';
-import * as selectors from '../../store/selectors';
 import {
   IonPage,
   IonHeader,
   IonToolbar,
   IonTitle,
   IonContent,
-  IonItem,
-  IonLabel,
-  IonList,
   IonButton,
   IonButtons,
   IonIcon,
@@ -18,51 +13,67 @@ import {
 import { useHistory } from 'react-router-dom';
 import { settingsOutline } from 'ionicons/icons';
 import Logo from '../ui/Logo';
-import { Suspense, lazy } from 'react';
-import { isDesktopWeb } from '../admin/adminEnv';
+import { FLOW_CATEGORIES } from './flowsCatalog';
 
-const FlowsAdmin = lazy(() => import('../admin/FlowsAdmin'));
-
-const AllFlows = () => {
-  const flows = Store.useState(s => s.flows);
-  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
-  return (
-    <div className="flex flex-col gap-4 p-4 w-full max-w-2xl mx-auto">
-      {flows.map((flow, i) => (
-        <FlowRow flow={flow} key={i} lang={lang} />
-      ))}
-    </div>
-  );
-};
-
-const FlowRow = ({ flow, lang }: { flow: Flow; lang: Language }) => {
+function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
   const history = useHistory();
-  
+  const flowsById = new Map(flows.map(f => [f.id, f]));
+
   return (
-    <div 
-      onClick={() => history.push(`/flows/${flow.id}`)}
-      className="flow-entry cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl w-full gap-4"
-    >
+    <div className="p-4 w-full max-w-2xl mx-auto flex flex-col gap-4">
+      {FLOW_CATEGORIES.map(cat => {
+        const catFlows = cat.flowIds.map(id => flowsById.get(id)).filter(Boolean) as Flow[];
+        const totalFlows = catFlows.length;
+        const totalPractices = catFlows.reduce((acc, f) => acc + (f.practices?.length ?? 0), 0);
+        const completedPractices = catFlows.reduce(
+          (acc, f) => acc + (f.practices?.filter(p => p.finished).length ?? 0),
+          0,
+        );
+        const pct = totalPractices === 0 ? 0 : Math.round((completedPractices / totalPractices) * 100);
 
-      <img
-        className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start"
-        src={t(flow.image, lang)}
-        alt={t(flow.name, lang)}
-      />
-      <div className="flex flex-col justify-between flex-1 leading-normal min-w-0">
-        <h5 className="mt-0 mb-2 text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">{t(flow.name, lang)}</h5>
-        <p className="mb-1 text-sm md:text-base text-white">{t(flow.intro, lang)}</p>
-    </div>
+        return (
+          <div
+            key={cat.id}
+            role="button"
+            tabIndex={0}
+            onClick={() => history.push(`/flows/category/${cat.id}`)}
+            className={`${cat.bgClass} rounded-2xl p-5 shadow-xl w-full cursor-pointer`}
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="text-[11px] uppercase tracking-wide text-white/85">
+                  {totalFlows} flows • {totalPractices} practices
+                </div>
+                <div className="mt-1 text-lg md:text-xl font-bold text-white truncate">
+                  {t(cat.title, lang)}
+                </div>
+              </div>
+              <div className="text-white font-bold text-lg shrink-0">{pct}%</div>
+            </div>
 
+            <div className="mt-3">
+              <div className="flex items-center justify-between text-[11px] text-white/90">
+                <span>Complete</span>
+                <span>
+                  {completedPractices}/{totalPractices}
+                </span>
+              </div>
+              <div className="w-full h-2 bg-white/25 rounded-full mt-1 overflow-hidden">
+                <div className="h-2 bg-white/85 rounded-full" style={{ width: `${pct}%` }} />
+              </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
-};
+}
 
 const Flows = () => {
   const history = useHistory();
-  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const lang = (Store.useState(s => (s.settings as any)?.language) ?? 'ro') as Language;
-  const allowAdmin = isSuperAdmin && isDesktopWeb();
+  const flows = Store.useState(s => s.flows);
+  // Until we ship an in-app language switch, keep English on display.
+  const lang: Language = 'en';
   return (
     <IonPage>
       <IonHeader translucent={true}>
@@ -81,13 +92,7 @@ const Flows = () => {
             <IonTitle size="large">Flows</IonTitle>
           </IonToolbar>
         </IonHeader>
-        {allowAdmin ? (
-          <Suspense fallback={<AllFlows />}>
-            <FlowsAdmin lang={lang} />
-          </Suspense>
-        ) : (
-          <AllFlows />
-        )}
+        <CategoryList flows={flows} lang={lang} />
         </IonContent>
     </IonPage>
   );

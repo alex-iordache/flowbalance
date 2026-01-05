@@ -1,7 +1,7 @@
 import { Store as PullStateStore } from 'pullstate';
 
 import { lists, homeItems, notifications, settings, TodoListItem, HomeItem, NotificationItem, Settings } from '../mock';
-import { flows, Flow } from '../data';
+import { defaultFlows, type Flow } from '../data/flows';
 
 type StoreProps = {
   safeAreaTop: number;
@@ -15,6 +15,7 @@ type StoreProps = {
   settings: Settings;
   selectedList: TodoListItem | undefined;
   flows: Flow[];
+  isSuperAdmin: boolean;
 }
 
 const Store = new PullStateStore<StoreProps>({
@@ -28,7 +29,8 @@ const Store = new PullStateStore<StoreProps>({
   notifications,
   settings,
   selectedList: undefined,
-  flows,
+  flows: defaultFlows,
+  isSuperAdmin: false,
 });
 
 export default Store;

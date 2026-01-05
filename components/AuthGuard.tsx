@@ -3,6 +3,7 @@
 import { useAuth, SignedIn, SignedOut, ClerkLoading, ClerkLoaded } from '@clerk/nextjs';
 import { useEffect } from 'react';
 import { IonApp, IonContent, IonPage, IonSpinner } from '@ionic/react';
+import SuperAdminBootstrap from './SuperAdminBootstrap';
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -60,6 +61,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         </SignedOut>
 
         <SignedIn>
+          <SuperAdminBootstrap />
           {children}
         </SignedIn>
       </ClerkLoaded>

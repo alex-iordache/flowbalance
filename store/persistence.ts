@@ -1,7 +1,7 @@
 import { Preferences } from '@capacitor/preferences';
 import Store from '.';
-import { Flow } from '../data';
-import { flows as defaultFlows } from '../data';
+import type { Flow } from '../data/flows';
+import { defaultFlows } from '../data/flows';
 
 const STORAGE_KEYS = {
   FLOWS: 'flows_state',
@@ -98,18 +98,40 @@ export const loadAllPersistedState = async () => {
   Store.update(s => {
     // Merge persisted flows with default flows to preserve user progress while using fresh content
     if (persistedFlows) {
+      const persistedAny = persistedFlows as unknown as Array<Record<string, any>>;
       s.flows = defaultFlows.map(defaultFlow => {
-        const persistedFlow = persistedFlows.find(pf => pf.id === defaultFlow.id);
+        const persistedFlow = persistedAny.find(pf => pf?.id === defaultFlow.id);
         if (persistedFlow) {
           // Merge: use default content but preserve user progress
           return {
             ...defaultFlow,
-            started: persistedFlow.started,
-            finished: persistedFlow.finished,
+            started: Boolean(persistedFlow.started),
+            finished: Boolean(persistedFlow.finished),
+            practicesCompleted:
+              typeof persistedFlow.practicesCompleted === 'number'
+                ? persistedFlow.practicesCompleted
+                : defaultFlow.practicesCompleted,
+            lastPracticeFinishedId:
+              typeof persistedFlow.lastPracticeFinishedId === 'string'
+                ? persistedFlow.lastPracticeFinishedId
+                : defaultFlow.lastPracticeFinishedId,
+            lastPracticePositionSec:
+              typeof persistedFlow.lastPracticePositionSec === 'number'
+                ? persistedFlow.lastPracticePositionSec
+                : defaultFlow.lastPracticePositionSec,
             practices: defaultFlow.practices.map(defaultPractice => {
-              const persistedPractice = persistedFlow.practices.find(pp => pp.id === defaultPractice.id);
+              const persistedPractice = Array.isArray(persistedFlow.practices)
+                ? persistedFlow.practices.find((pp: any) => pp?.id === defaultPractice.id)
+                : null;
               return persistedPractice
-                ? { ...defaultPractice, finished: persistedPractice.finished }
+                ? {
+                    ...defaultPractice,
+                    finished: Boolean(persistedPractice.finished),
+                    lastPositionSec:
+                      typeof persistedPractice.lastPositionSec === 'number'
+                        ? persistedPractice.lastPositionSec
+                        : defaultPractice.lastPositionSec,
+                  }
                 : defaultPractice;
             }),
           };
@@ -119,7 +141,9 @@ export const loadAllPersistedState = async () => {
     }
     
     if (settings) {
-      s.settings = settings;
+      // Merge to keep forward-compatible defaults (e.g. newly added settings fields).
+      s.settings = { ...(s.settings as any), ...(settings as any) };
+      if (!(s.settings as any).language) (s.settings as any).language = 'ro';
     }
     if (lists) {
       s.lists = lists;

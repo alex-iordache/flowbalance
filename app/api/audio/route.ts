@@ -57,7 +57,8 @@ function computePracticeAccess(params: {
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const keyParam = url.searchParams.get('key') ?? url.searchParams.get('path') ?? '';
+  // Use `||` (not `??`) so empty strings don't "win" over a valid fallback.
+  const keyParam = url.searchParams.get('key') || url.searchParams.get('path') || '';
   const key = normalizeAudioKey(keyParam);
 
   if (!key) {

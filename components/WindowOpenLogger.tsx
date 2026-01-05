@@ -39,7 +39,7 @@ function safeWrite(entries: WindowOpenLogEntry[]) {
  * Logs every `window.open()` call (URL + stack trace) so we can identify why
  * the system browser is being launched on Android.
  *
- * Enabled via `NEXT_PUBLIC_DEBUG_WINDOW_OPEN_LOG=1`.
+ * This is temporary instrumentation and is currently always mounted in `AppShell`.
  */
 export default function WindowOpenLogger() {
   useEffect(() => {

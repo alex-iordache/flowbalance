@@ -16,6 +16,7 @@ import { settingsOutline } from 'ionicons/icons';
 import Logo from '../ui/Logo';
 import { useUser } from '@clerk/nextjs';
 import { Preferences } from '@capacitor/preferences';
+import DebugInfoBox from '../DebugInfoBox';
 
 type HelloUserProps ={
   firstName?: string;
@@ -108,6 +109,18 @@ const Home = () => {
         />
         <HelloUser firstName={firstName} />
         <SimpleCardCTA minutes={5} />
+
+        {/* Temporary: keep debug info accessible even after sign-in redirect */}
+        <div className="mt-8">
+          <details className="rounded-xl border border-white/20 bg-black/10 p-3">
+            <summary className="cursor-pointer text-white/80 text-sm select-none">
+              Debug
+            </summary>
+            <div className="mt-3">
+              <DebugInfoBox title="Debug (Home)" maxHeightClassName="max-h-80" />
+            </div>
+          </details>
+        </div>
       </IonContent>
     </IonPage>
   );

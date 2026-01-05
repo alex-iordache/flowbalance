@@ -3,7 +3,7 @@
 import { SignIn } from '@clerk/nextjs';
 import { IonPage, IonContent } from '@ionic/react';
 import DebugInfoBox from '../../../components/DebugInfoBox';
-import { useRuntimeFlag } from '../../../hooks/useRuntimeFlag';
+import { useEffect } from 'react';
 
 /**
  * Sign In Page
@@ -13,7 +13,9 @@ import { useRuntimeFlag } from '../../../hooks/useRuntimeFlag';
  * Sign-up URL points to in-app sign-up page.
  */
 export default function SignInPage() {
-  const enableDebugBox = useRuntimeFlag('enableDebugBox');
+  // Keep this page minimal: we temporarily render the DebugInfoBox always,
+  // and we will remove it once the browser-pop issue is diagnosed.
+  useEffect(() => {}, []);
 
   return (
     <IonPage>
@@ -41,11 +43,9 @@ export default function SignInPage() {
             />
           </div>
 
-          {enableDebugBox ? (
-            <div className="w-full max-w-md mt-6">
-              <DebugInfoBox title="Debug (Sign-In)" maxHeightClassName="max-h-80" />
-            </div>
-          ) : null}
+          <div className="w-full max-w-md mt-6">
+            <DebugInfoBox title="Debug (Sign-In)" maxHeightClassName="max-h-80" />
+          </div>
         </div>
       </IonContent>
     </IonPage>

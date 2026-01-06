@@ -13,6 +13,8 @@
 			"flowbalance.app",
 			"flowbalance.vercel.app",
 			"*.vercel.app",
+			"clerk.flowbalance.app",
+			"accounts.flowbalance.app",
 			"clerk.com",
 			"*.clerk.com",
 			"accounts.clerk.dev",

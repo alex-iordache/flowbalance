@@ -22,7 +22,9 @@
 			"*.accounts.dev",
 			"clerk.accounts.dev",
 			"clerk.shared.lcl.dev",
-			"*.lcl.dev"
+			"*.lcl.dev",
+			"clerk.flowbalance.app",
+			"accounts.flowbalance.app"
 		]
 	},
 	"plugins": {

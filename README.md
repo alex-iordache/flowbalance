@@ -130,6 +130,50 @@ https://flowbalance-staging.vercel.app/sign-in?
 
 ---
 
+## Clerk: Production Setup (DNS + Environment Variables)
+
+### DNS Configuration (Cloudflare)
+
+After creating a **production Clerk instance** for `www.flowbalance.app`, Clerk requires these CNAME records in your DNS (Cloudflare):
+
+| Record Type | Name | Target | Purpose |
+|------------|------|--------|---------|
+| CNAME | `clerk` | `frontend-api.clerk.services` | Frontend API |
+| CNAME | `accounts` | `accounts.clerk.services` | Account portal |
+| CNAME | `clkmail` | `mail.k5po7qtsqc7o.clerk.services` | Email delivery |
+| CNAME | `clk._domainkey` | `dkim1.k5po7qtsqc7o.clerk.services` | DKIM signing (email) |
+| CNAME | `clk2._domainkey` | `dkim2.k5po7qtsqc7o.clerk.services` | DKIM signing (email) |
+
+**Note**: The `clkmail` and `_domainkey` targets are instance-specific. Get the exact values from **Clerk Dashboard → Configure → Domains → DNS Configuration**.
+
+### Switching to Production Clerk Keys
+
+Once DNS is verified and SSL certificates are issued:
+
+1. **Get production keys** from Clerk Dashboard:
+   - `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` (starts with `pk_live_...`)
+   - `CLERK_SECRET_KEY` (starts with `sk_live_...`)
+
+2. **Update Vercel Environment Variables** (Production project):
+   - Replace the dev/test keys with production keys
+   - **Do NOT** update staging yet (keep staging on dev keys for testing)
+
+3. **Verify in app**:
+   - Production domain (`www.flowbalance.app`) should use `clerk.flowbalance.app` (not `*.clerk.accounts.dev`)
+   - No more "dev-browser-sync" redirect loops
+   - Sign-in should stay inside the WebView (no external browser)
+
+### Capacitor allowNavigation (Production Domains)
+
+The app's Capacitor configs include these production Clerk domains so navigation stays inside the WebView:
+
+- `clerk.flowbalance.app` (Frontend API)
+- `accounts.flowbalance.app` (Account portal)
+
+These are already added to all Capacitor configs (`capacitor.config.json` and platform-specific copies).
+
+---
+
 ## Mobile: Capacitor configuration (critical)
 
 ### 1) Keep navigation inside the app WebView
@@ -242,6 +286,12 @@ Set these in both local `.env.local` and Vercel:
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_...
 CLERK_SECRET_KEY=sk_...
 ```
+
+**Production vs Development keys:**
+- **Production** (`www.flowbalance.app`): Use keys from your **production Clerk instance** (start with `pk_live_...` / `sk_live_...`)
+- **Staging** (`flowbalance-staging.vercel.app`): Can use **dev/test keys** (start with `pk_test_...` / `sk_test_...`) for testing
+
+**Important**: After setting up production Clerk instance (see "Clerk: Production Setup" above), update Vercel Production environment variables with production keys. Staging can keep dev keys.
 
 Notes:
 - We intentionally **do not rely** on old Clerk redirect env vars (like `NEXT_PUBLIC_CLERK_AFTER_*`).

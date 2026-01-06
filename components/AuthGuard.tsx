@@ -37,10 +37,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     if (!isLoaded) return;
     if (userId) {
       try {
-        sessionStorage.removeItem('fb:postAuthTs');
-        console.log('[AuthGuard] cleared fb:postAuthTs');
+        localStorage.removeItem('fb:postAuthTs');
+        localStorage.removeItem('fb:postAuthUserId');
+        localStorage.removeItem('fb:postAuthFrom');
+        console.log('[AuthGuard] cleared fb:postAuth* (localStorage)');
       } catch (e) {
-        console.log('[AuthGuard] clearing fb:postAuthTs failed', e);
+        console.log('[AuthGuard] clearing fb:postAuth* failed', e);
       }
       // If we came from auth return (`/home?auth=1`), clean up the URL once signed in.
       try {
@@ -70,16 +72,21 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     // If we *just* observed a signed-in state on a previous page (SignIn/SignUp) and redirected here,
     // give Clerk longer to rehydrate in iOS WKWebView before forcing /sign-in.
     try {
-      const tsStr = sessionStorage.getItem('fb:postAuthTs');
+      const tsStr = localStorage.getItem('fb:postAuthTs');
       const ts = tsStr ? Number(tsStr) : NaN;
       if (Number.isFinite(ts)) {
         const age = Date.now() - ts;
         if (age >= 0 && age < 15000) {
           delayMs = Math.max(delayMs, 6000);
-          console.log('[AuthGuard] postAuth grace window active', { ageMs: age, delayMs });
+          console.log('[AuthGuard] postAuth grace window active', {
+            ageMs: age,
+            delayMs,
+            from: localStorage.getItem('fb:postAuthFrom'),
+            uid: localStorage.getItem('fb:postAuthUserId'),
+          });
         }
       } else {
-        console.log('[AuthGuard] no postAuthTs in sessionStorage');
+        console.log('[AuthGuard] no postAuthTs in localStorage');
       }
     } catch (e) {
       console.log('[AuthGuard] reading fb:postAuthTs failed', e);

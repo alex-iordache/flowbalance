@@ -5,6 +5,8 @@ import { useAuth } from '@clerk/nextjs';
 import { IonPage, IonContent } from '@ionic/react';
 import { useEffect } from 'react';
 
+const FB_IOS_AUTH_DEBUG_BUILD = 'ios-auth-debug-v3';
+
 /**
  * Sign Up Page (In-App)
  * 
@@ -18,6 +20,10 @@ export default function SignUpPage() {
   const base =
     typeof window !== 'undefined' ? window.location.origin : 'https://www.flowbalance.app';
   const { isLoaded, userId, getToken } = useAuth();
+
+  useEffect(() => {
+    console.log('[SignUpPage] build', FB_IOS_AUTH_DEBUG_BUILD);
+  }, []);
 
   // iOS WKWebView can fail Next RSC client navigations; once signed in, hard-navigate to /home.
   useEffect(() => {
@@ -37,20 +43,32 @@ export default function SignUpPage() {
       try {
         console.log('[SignUpPage] userId observed; waiting for getToken() before redirect');
         await getToken();
-        console.log('[SignUpPage] getToken() ok; redirecting to /home');
+        console.log('[SignUpPage] getToken() ok; preparing redirect to /home', {
+          userId,
+          base,
+        });
       } catch (err) {
         console.log('[SignUpPage] getToken() failed; redirecting to /home anyway', err);
       }
 
       if (cancelled) return;
+      try {
+        localStorage.setItem('fb:postAuthTs', String(Date.now()));
+        localStorage.setItem('fb:postAuthUserId', String(userId));
+        localStorage.setItem('fb:postAuthFrom', 'sign-up');
+        console.log('[SignUpPage] fb:postAuth* set in localStorage');
+      } catch (e) {
+        console.log('[SignUpPage] fb:postAuth* localStorage set failed', e);
+      }
+
+      console.log('[SignUpPage] scheduling redirect to /home in 1500ms');
       setTimeout(() => {
-        console.log('[SignUpPage] redirect timer fired; setting fb:postAuthTs and navigating to /home');
         try {
-          sessionStorage.setItem('fb:postAuthTs', String(Date.now()));
-          console.log('[SignUpPage] fb:postAuthTs set');
-        } catch (e) {
-          console.log('[SignUpPage] fb:postAuthTs set failed', e);
+          console.log('[SignUpPage] current location before nav', window.location.href);
+        } catch {
+          // ignore
         }
+        console.log('[SignUpPage] redirect timer fired; navigating to /home now');
         window.location.href = `${base}/home`;
       }, 1500);
     })();
@@ -59,6 +77,21 @@ export default function SignUpPage() {
       cancelled = true;
     };
   }, [isLoaded, userId, base]);
+
+  useEffect(() => {
+    const onPageHide = () => {
+      try {
+        console.log('[SignUpPage] pagehide', {
+          href: window.location.href,
+          visibility: document.visibilityState,
+        });
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('pagehide', onPageHide);
+    return () => window.removeEventListener('pagehide', onPageHide);
+  }, []);
 
   return (
     <IonPage>

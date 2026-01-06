@@ -16,6 +16,8 @@
       "accounts.clerk.dev",
       "popular-gibbon-62.clerk.accounts.dev",
       "*.clerk.accounts.dev",
+      "popular-gibbon-62.accounts.dev",
+      "*.accounts.dev",
       "clerk.accounts.dev",
       "clerk.shared.lcl.dev",
       "*.lcl.dev"

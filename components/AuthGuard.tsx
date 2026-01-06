@@ -77,7 +77,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       if (Number.isFinite(ts)) {
         const age = Date.now() - ts;
         if (age >= 0 && age < 15000) {
-          delayMs = Math.max(delayMs, 6000);
+          // iOS: allow plenty of time for Clerk to rehydrate session after a full reload.
+          delayMs = Math.max(delayMs, 12000);
           console.log('[AuthGuard] postAuth grace window active', {
             ageMs: age,
             delayMs,

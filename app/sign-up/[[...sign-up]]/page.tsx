@@ -61,16 +61,15 @@ export default function SignUpPage() {
         console.log('[SignUpPage] fb:postAuth* localStorage set failed', e);
       }
 
-      console.log('[SignUpPage] scheduling redirect to /home in 1500ms');
-      setTimeout(() => {
-        try {
-          console.log('[SignUpPage] current location before nav', window.location.href);
-        } catch {
-          // ignore
-        }
-        console.log('[SignUpPage] redirect timer fired; navigating to /home now');
-        window.location.href = `${base}/home`;
-      }, 1500);
+      try {
+        console.log('[SignUpPage] navigating to /home immediately', {
+          from: window.location.href,
+          to: `${base}/home`,
+        });
+      } catch {
+        // ignore
+      }
+      window.location.href = `${base}/home`;
     })();
 
     return () => {

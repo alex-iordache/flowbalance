@@ -63,16 +63,17 @@ export default function SignInPage() {
         console.log('[SignInPage] fb:postAuth* localStorage set failed', e);
       }
 
-      console.log('[SignInPage] scheduling redirect to /home in 1500ms');
-      setTimeout(() => {
-        console.log('[SignInPage] redirect timer fired; navigating to /home now');
-        try {
-          console.log('[SignInPage] current location before nav', window.location.href);
-        } catch {
-          // ignore
-        }
-        window.location.href = `${base}/home`;
-      }, 1500);
+      // Redirect immediately: Next may trigger a fallback full reload after RSC fetch failures,
+      // which can cancel timers before they fire in WKWebView.
+      try {
+        console.log('[SignInPage] navigating to /home immediately', {
+          from: window.location.href,
+          to: `${base}/home`,
+        });
+      } catch {
+        // ignore
+      }
+      window.location.href = `${base}/home`;
     })();
 
     return () => {

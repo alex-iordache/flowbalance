@@ -15,7 +15,7 @@ import { useEffect } from 'react';
 export default function SignInPage() {
   const base =
     typeof window !== 'undefined' ? window.location.origin : 'https://www.flowbalance.app';
-  const { isLoaded, userId } = useAuth();
+  const { isLoaded, userId, getToken } = useAuth();
 
   // iOS WKWebView can fail Next RSC client navigations; once signed in, hard-navigate to /home.
   useEffect(() => {
@@ -29,7 +29,29 @@ export default function SignInPage() {
       // ignore
     }
     if (!isLoaded || !userId) return;
-    window.location.replace(`${base}/home`);
+
+    // In iOS WKWebView we can briefly see userId before the session cookie/token is persisted.
+    // Force a token fetch (which requires an active session) and only then navigate to /home.
+    let cancelled = false;
+    (async () => {
+      try {
+        console.log('[SignInPage] userId observed; waiting for getToken() before redirect');
+        await getToken();
+        console.log('[SignInPage] getToken() ok; redirecting to /home');
+      } catch (err) {
+        console.log('[SignInPage] getToken() failed; redirecting to /home anyway', err);
+      }
+
+      if (cancelled) return;
+      // Small delay to give WKWebView time to flush cookie writes.
+      setTimeout(() => {
+        window.location.replace(`${base}/home`);
+      }, 750);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isLoaded, userId, base]);
 
   return (

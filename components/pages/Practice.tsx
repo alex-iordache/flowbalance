@@ -132,56 +132,63 @@ const Practice = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent 
-        className="text-white" 
-        style={themedStyle}
-        scrollY={true}
-      >
-        <div 
-          className="flex flex-col min-h-full"
-          style={{
-            padding: '16px',
-            paddingBottom: practice && t(practice.audioUrl, lang) ? '0' : '16px',
-          }}
-        >
+      <IonContent className="text-white" style={themedStyle} fullscreen={true} scrollY={false}>
+        <div className="h-full p-4 flex flex-col gap-3">
           {isActivating && !hasAccess ? (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+            <div className="flex flex-col items-center justify-center flex-1 text-center">
               <p className="text-white text-lg font-semibold mb-2">Activating your subscription…</p>
               <p className="text-white/80 text-sm">This usually takes a few seconds.</p>
             </div>
           ) : null}
+
           {/* Show content only if user has access */}
           {hasAccess ? (
-            <>
-              {practice && t(practice.description, lang) ? (
-                <div 
-                  className="text-white flex-1"
+            <div className="flex-1 min-h-0 flex flex-col gap-3">
+              {/* 60%: Scrollable text box */}
+              <div
+                className="fb-no-scrollbar p-1 overflow-auto"
+                style={{
+                  flex: 6,
+                  minHeight: 0,
+                  scrollbarWidth: 'none', // Firefox
+                  msOverflowStyle: 'none', // IE/Edge legacy
+                }}
+              >
+                <style>{`
+                  /* Hide scrollbars (Chrome/Safari/WebView) but keep scrolling */
+                  .fb-no-scrollbar::-webkit-scrollbar { display: none; }
+                `}</style>
+                {practice && t(practice.description, lang) ? (
+                  <p className="text-white leading-relaxed whitespace-pre-wrap">
+                    {t(practice.description, lang)}
+                  </p>
+                ) : null}
+              </div>
+
+              {/* 40%: Player area */}
+              {practice && t(practice.audioUrl, lang) ? (
+                <div
+                  className="flex items-center justify-center"
                   style={{
-                    // Text container - scrollable if content is long
-                    paddingRight: '4px',
-                    lineHeight: '1.6',
-                    marginBottom: practice && t(practice.audioUrl, lang) ? '16px' : '0',
+                    flex: 4,
+                    minHeight: 0,
                   }}
                 >
-                  <p className="text-white leading-relaxed whitespace-pre-wrap">{t(practice.description, lang)}</p>
+                  <AudioPlayer
+                    src={getAudioSrc({
+                      audioUrlOrPath: t(practice.audioUrl, lang),
+                      flowId,
+                      practiceId,
+                    })}
+                    title={t(practice.name, lang)}
+                    subtitle={flow ? t(flow.name, lang) : undefined}
+                    variant="floatingCircle"
+                    onPlay={handleAudioPlay}
+                    onEnded={handleAudioEnded}
+                  />
                 </div>
               ) : null}
-              {/* Audio player at bottom with 15px margin above tab bar */}
-              {practice && t(practice.audioUrl, lang) ? (
-                <AudioPlayer
-                  src={getAudioSrc({
-                    audioUrlOrPath: t(practice.audioUrl, lang),
-                    flowId,
-                    practiceId,
-                  })}
-                  title={t(practice.name, lang)}
-                  subtitle={flow ? t(flow.name, lang) : undefined}
-                  variant="floatingCircle"
-                  onPlay={handleAudioPlay}
-                  onEnded={handleAudioEnded}
-                />
-              ) : null}
-            </>
+            </div>
           ) : null}
         </div>
       </IonContent>

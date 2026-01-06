@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 type Props = {
   src: string;
@@ -261,10 +261,9 @@ export default function AudioPlayer({
 
   const floatingUi = (
     <div
-      className="flex justify-center z-50"
+      className="w-full h-full flex items-center justify-center"
       style={{
-        // 15px margin between circle and bottom tab bar
-        marginBottom: '15px',
+        // Layout is controlled by the parent container (Practice page).
       }}
     >
       <style>{`
@@ -323,10 +322,9 @@ export default function AudioPlayer({
         className={`${ringClass} flex flex-col items-center justify-between relative`}
         style={{
           // Square player: width and height should match (constrained by viewport)
-          width: 'min(70vw, 420px)',
-          height: 'min(70vw, 420px)',
-          minWidth: 280,
-          minHeight: 280,
+          // Also respect parent constraints (e.g. 40% height container on Practice page)
+          width: 'min(100%, 70vw, 70vh, 420px)',
+          height: 'min(100%, 70vw, 70vh, 420px)',
           padding: 14, // ring thickness area
           // keep your nice outer transparency effect (subtle)
           backgroundColor: 'rgba(255,255,255,0.06)',

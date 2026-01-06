@@ -8,6 +8,7 @@
     "url": "https://www.flowbalance.app",
     "cleartext": false,
     "androidScheme": "https",
+    "iosScheme": "https",
     "allowNavigation": [
       "www.flowbalance.app",
       "flowbalance.app",
@@ -15,6 +16,7 @@
       "*.vercel.app",
       "clerk.flowbalance.app",
       "accounts.flowbalance.app",
+      "clkmail.flowbalance.app",
       "clerk.com",
       "*.clerk.com",
       "accounts.clerk.dev",

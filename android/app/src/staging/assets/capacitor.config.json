@@ -8,6 +8,7 @@
     "url": "https://flowbalance-staging.vercel.app",
     "cleartext": false,
     "androidScheme": "https",
+    "iosScheme": "https",
     "allowNavigation": [
       "flowbalance-staging.vercel.app",
       "*.vercel.app",

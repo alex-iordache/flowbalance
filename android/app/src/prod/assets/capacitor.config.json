@@ -8,6 +8,7 @@
     "url": "https://www.flowbalance.app",
     "cleartext": false,
     "androidScheme": "https",
+    "iosScheme": "https",
     "allowNavigation": [
       "www.flowbalance.app",
       "flowbalance.app",
@@ -24,7 +25,8 @@
       "clerk.shared.lcl.dev",
       "*.lcl.dev",
       "clerk.flowbalance.app",
-      "accounts.flowbalance.app"
+      "accounts.flowbalance.app",
+      "clkmail.flowbalance.app"
     ]
   },
   "plugins": {

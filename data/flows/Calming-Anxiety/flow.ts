@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Calmarea anxietății", en: "Calming Anxiety" },
   intro: { ro: "Încetinește anxietatea și revino la o respirație stabilă.", en: "Slow anxious momentum and return to steady breath." },
   description: { ro: "Acest flow te ajută să înmoi grija la nivelul corpului: respirație, maxilar, abdomen și atenție. Vei exersa resetări scurte care întrerup spiralele „dar dacă…” și reconstruiesc senzația de siguranță. Folosește-l când mintea aleargă sau înainte de momente în care ai tendința să supra-analizezi.", en: "This flow helps you soften worry at the level of the body: breath, jaw, belly, and attention. You’ll practice short resets that interrupt “what if…” spirals and rebuild a felt sense of safety. Use it when your mind is racing or before moments you tend to overthink." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flows/calmarea-anxietatii.jpg", en: "/img/flows/calmarea-anxietatii.jpg" },
 
   started: false,
   finished: false,

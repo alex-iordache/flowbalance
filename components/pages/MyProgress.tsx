@@ -62,7 +62,7 @@ const MyProgress = () => {
                   className="cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl max-w-xl gap-4"
                 >
                   <img
-                    className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start"
+                    className="object-contain w-24 h-24 rounded-2xl flex-shrink-0 md:w-48 md:h-48 self-start"
                     src={t(flow.image, lang)}
                     alt={t(flow.name, lang)}
                   />

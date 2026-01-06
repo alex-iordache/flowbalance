@@ -24,7 +24,7 @@ const FlowRow = ({ flow, lang }: { flow: Flow; lang: Language }) => {
       className="flow-entry cursor-pointer flex flex-row items-start p-4 rounded-lg shadow-xl w-full gap-4"
     >
       <img
-        className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start"
+        className="object-contain w-24 h-24 rounded-2xl flex-shrink-0 md:w-48 md:h-48 self-start"
         src={t(flow.image, lang)}
         alt={t(flow.name, lang)}
       />

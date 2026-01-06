@@ -30,8 +30,8 @@ export default function SignUpPage() {
             <SignUp 
               signInUrl="/sign-in"
               // Use an absolute URL to force a full navigation (more reliable in iOS WKWebView)
-              fallbackRedirectUrl={`${base}/home`}
-              forceRedirectUrl={`${base}/home`}
+              fallbackRedirectUrl={`${base}/home?auth=1`}
+              forceRedirectUrl={`${base}/home?auth=1`}
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

@@ -1,7 +1,7 @@
 'use client';
 
 import { useAuth, SignedIn, SignedOut, ClerkLoading, ClerkLoaded } from '@clerk/nextjs';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { IonApp, IonContent, IonPage, IonSpinner } from '@ionic/react';
 import SuperAdminBootstrap from './SuperAdminBootstrap';
 
@@ -21,10 +21,38 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const { isLoaded, userId } = useAuth();
 
   useEffect(() => {
-    // Only redirect after Clerk has loaded and we confirm no user
-    if (isLoaded && !userId) {
-      window.location.href = '/sign-in';
+    if (!isLoaded) return;
+    if (userId) {
+      // If we came from auth return (`/home?auth=1`), clean up the URL once signed in.
+      try {
+        const url = new URL(window.location.href);
+        if (url.searchParams.get('auth') === '1') {
+          url.searchParams.delete('auth');
+          window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+        }
+      } catch {
+        // ignore
+      }
+      return;
     }
+
+    // If signed out, redirect to /sign-in — but give a small grace period on auth return.
+    const pathname = window.location.pathname || '/';
+    if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')) return;
+
+    let delayMs = 300; // normal
+    try {
+      const url = new URL(window.location.href);
+      if (url.searchParams.get('auth') === '1') delayMs = 3000; // post-login settle window (iOS WKWebView)
+    } catch {
+      // ignore
+    }
+
+    const t = window.setTimeout(() => {
+      // Effect will be cleaned up if userId becomes available.
+      window.location.replace('/sign-in');
+    }, delayMs);
+    return () => window.clearTimeout(t);
   }, [isLoaded, userId]);
 
   return (

@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Reducerea copleșirii", en: "Ease Overwhelm" },
   intro: { ro: "Când e prea mult, revino la un singur lucru.", en: "When everything is too much, come back to one thing." },
   description: { ro: "Copleșirea apare când creierul încearcă să rezolve zece lucruri deodată. Acest flow te ghidează spre claritate micșorând sarcina: o respirație, un pas următor, o decizie blândă. E ideal în zile aglomerate, la suprasarcină emoțională sau după prea multă stimulare.", en: "Overwhelm happens when your brain tries to solve ten problems at once. This flow guides you into clarity by shrinking the task: one breath, one next step, one kind decision. It’s ideal for busy days, emotional overload, or after too much stimulation." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flows/ease-overwhelm.png", en: "/img/flows/ease-overwhelm.png" },
 
   started: false,
   finished: false,

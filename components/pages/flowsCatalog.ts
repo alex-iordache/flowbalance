@@ -4,6 +4,8 @@ export type FlowCategoryDef = {
   id: string;
   title: LocalizedText;
   flowIds: string[];
+  /** Theme number (1..6) used by `flowtheme.ts`. */
+  theme: 1 | 2 | 3 | 4 | 5 | 6;
   /** Tailwind background classes for the category card. */
   bgClass: string;
   /** CSS gradient used for category page background + header. */
@@ -23,6 +25,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
       'Calm-Your-Nervous-System',
       'Improve-Sleep',
     ],
+    theme: 1,
     bgClass: 'bg-gradient-to-br from-sky-500 to-indigo-600',
     gradientCss: 'linear-gradient(135deg, #0ea5e9 0%, #4f46e5 100%)',
   },
@@ -38,6 +41,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
       'Decision-Confidence',
       'Energy-Balance',
     ],
+    theme: 2,
     bgClass: 'bg-gradient-to-br from-emerald-500 to-teal-600',
     gradientCss: 'linear-gradient(135deg, #10b981 0%, #0d9488 100%)',
   },
@@ -53,6 +57,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
       'Boost-Confidence',
       'Healthy-Money-Mindset',
     ],
+    theme: 3,
     bgClass: 'bg-gradient-to-br from-violet-500 to-fuchsia-600',
     gradientCss: 'linear-gradient(135deg, #8b5cf6 0%, #c026d3 100%)',
   },
@@ -60,6 +65,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     id: 'stories',
     title: { ro: 'Povești', en: 'Stories' },
     flowIds: ['Calm-Stories', 'Reflection-Stories', 'Growth-Stories', 'Insight-Stories'],
+    theme: 4,
     bgClass: 'bg-gradient-to-br from-orange-500 to-amber-600',
     gradientCss: 'linear-gradient(135deg, #f97316 0%, #d97706 100%)',
   },
@@ -74,6 +80,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
       'Daily-Heart-Lift',
       'Heartful-Affirmations',
     ],
+    theme: 5,
     bgClass: 'bg-gradient-to-br from-rose-500 to-pink-600',
     gradientCss: 'linear-gradient(135deg, #f43f5e 0%, #db2777 100%)',
   },
@@ -81,6 +88,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     id: 'somatic-release',
     title: { ro: 'Eliberare somatică', en: 'Somatic Release' },
     flowIds: ['Body-Release', 'Grounding', 'Shake-Method', 'Nervous-System-Reset'],
+    theme: 6,
     bgClass: 'bg-gradient-to-br from-cyan-500 to-blue-600',
     gradientCss: 'linear-gradient(135deg, #06b6d4 0%, #2563eb 100%)',
   },

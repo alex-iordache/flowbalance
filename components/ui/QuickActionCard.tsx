@@ -21,7 +21,7 @@ export default function QuickActionCard({ meta, title, onClick, metaIcon }: Prop
     <button
       type="button"
       onClick={onClick}
-      className="w-full max-w-md mx-auto rounded-2xl px-4 py-3 text-left"
+      className="w-full rounded-2xl px-4 py-3 text-left"
       style={{
         backgroundColor: 'rgba(255,255,255,0.10)',
         boxShadow: '0 16px 40px rgba(0,0,0,0.18)',

@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Sprijin în panică", en: "Panic Support" },
   intro: { ro: "Împământează-te când apare panica—pas cu pas.", en: "Ground yourself when panic hits—one small step at a time." },
   description: { ro: "Panica se simte rapidă; acest flow încetinește totul. Te ancorezi în senzații, lungești expirația și îi oferi sistemului nervos semnale clare că ești în siguranță acum. Începe cu Ziua 1 când valul crește sau exersează din timp pentru a construi încredere.", en: "Panic feels fast; this flow slows everything down. You’ll anchor in sensation, widen your exhale, and give your nervous system clear signals that you are safe right now. Start with Day 1 when the wave is rising, or practice ahead of time to build confidence." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flows/panic-support.png", en: "/img/flows/panic-support.png" },
 
   started: false,
   finished: false,

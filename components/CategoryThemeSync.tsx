@@ -4,30 +4,24 @@ import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { getCategoryById, getCategoryForFlowId } from './pages/flowsCatalog';
 
-const DEFAULT_BG = '#7d63ff';
-
-function extractFirstHexColor(cssGradient: string | undefined | null): string | null {
-  if (!cssGradient) return null;
-  const m = cssGradient.match(/#([0-9a-fA-F]{6})/);
-  return m ? `#${m[1]}` : null;
-}
+import { DEFAULT_APP_BG, DEFAULT_CARD_GRADIENT, FLOW_THEMES } from '../flowtheme';
 
 function resolveCategoryBgFromPath(pathname: string): string {
   // /flows/category/:categoryId
   const catMatch = pathname.match(/^\/flows\/category\/([^/]+)\/?$/);
   if (catMatch) {
     const cat = getCategoryById(catMatch[1]);
-    return extractFirstHexColor(cat?.gradientCss) ?? DEFAULT_BG;
+    return (cat ? FLOW_THEMES[cat.theme].bg : DEFAULT_APP_BG) ?? DEFAULT_APP_BG;
   }
 
   // /flows/:flowId or /flows/:flowId/:practiceId
   const flowMatch = pathname.match(/^\/flows\/([^/]+)(?:\/[^/]+)?\/?$/);
   if (flowMatch) {
     const cat = getCategoryForFlowId(flowMatch[1]);
-    return extractFirstHexColor(cat?.gradientCss) ?? DEFAULT_BG;
+    return (cat ? FLOW_THEMES[cat.theme].bg : DEFAULT_APP_BG) ?? DEFAULT_APP_BG;
   }
 
-  return DEFAULT_BG;
+  return DEFAULT_APP_BG;
 }
 
 /**
@@ -38,8 +32,9 @@ export default function CategoryThemeSync() {
   const location = useLocation();
 
   useEffect(() => {
-    const next = resolveCategoryBgFromPath(location.pathname);
-    document.documentElement.style.setProperty('--fb-bg', next);
+    const bg = resolveCategoryBgFromPath(location.pathname);
+    document.documentElement.style.setProperty('--fb-bg', bg);
+    document.documentElement.style.setProperty('--fb-card-gradient', DEFAULT_CARD_GRADIENT);
   }, [location.pathname]);
 
   return null;

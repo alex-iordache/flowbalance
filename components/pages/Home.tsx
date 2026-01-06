@@ -159,8 +159,7 @@ function ContinueCard({
       style={{
         // Same as app background, with a subtle grey-ish gradient to read as a card
         backgroundColor: 'var(--fb-bg)',
-        backgroundImage:
-          'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0.06) 55%, rgba(255,255,255,0.06) 100%)',
+        backgroundImage: 'var(--fb-card-gradient)',
       }}
     >
       <div className="p-5">
@@ -245,12 +244,11 @@ function RecommendedFlowsCard({
 
                 <div className="mt-auto pt-3 flex items-end justify-between gap-2">
                   <span className="sr-only">{href}</span>
-                  <div className="flex-1" />
-                  <div className="flex items-end gap-2">
-                    <div className="text-white/85 text-[11px] leading-tight text-right whitespace-nowrap">
-                      {totalPractices} {isRo ? 'practici' : 'practices'} • ~{totalMinutes} min
+                  <div className="flex items-center justify-between gap-2 w-full">
+                    <div className="text-white/85 text-[11px] leading-tight whitespace-nowrap">
+                      {totalPractices} {isRo ? 'practici' : 'practices'} ~{totalMinutes} min
                     </div>
-                    <IonIcon icon={play} className="text-white text-[13px]" aria-hidden="true" />
+                    <IonIcon icon={play} className="text-white text-[13px] shrink-0 mr-0.5" aria-hidden="true" />
                   </div>
                 </div>
               </div>
@@ -269,8 +267,7 @@ function EmptyStateCard({ lang, onBrowse }: { lang: Language; onBrowse: () => vo
       className="w-full max-w-md mx-auto rounded-[28px] p-5 text-white shadow-xl"
       style={{
         backgroundColor: 'var(--fb-bg)',
-        backgroundImage:
-          'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.05) 55%, rgba(255,255,255,0.05) 100%)',
+        backgroundImage: 'var(--fb-card-gradient)',
       }}
     >
       <div className="text-[18px] font-semibold">{isRo ? 'Nu ai început încă niciun flow' : "You haven't started any Flow"}</div>
@@ -411,7 +408,7 @@ const Home = () => {
                     }}
                   />
                 ) : null}
-                <div className="mt-1">
+                <div className="mt-1 w-full max-w-md mx-auto">
                   <QuickActionCard
                     meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
                     title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}
@@ -448,7 +445,7 @@ const Home = () => {
                   }}
                 />
               ) : null}
-              <div className="mt-1">
+              <div className="mt-1 w-full max-w-md mx-auto">
                 <QuickActionCard
                   meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
                   title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}

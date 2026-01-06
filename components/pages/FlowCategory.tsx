@@ -21,7 +21,13 @@ const FlowRow = ({ flow, lang }: { flow: Flow; lang: Language }) => {
   return (
     <div
       onClick={() => history.push(`/flows/${flow.id}`)}
-      className="flow-entry cursor-pointer flex flex-row items-start p-4 rounded-lg shadow-xl w-full gap-4"
+      className="flow-entry cursor-pointer flex flex-row items-start p-4 rounded-[20px] w-full gap-4"
+      style={{
+        backgroundColor: 'var(--fb-bg)',
+        backgroundImage: 'var(--fb-card-gradient)',
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -10px 22px rgba(0,0,0,0.14)',
+      }}
     >
       <img
         className="object-contain w-24 h-24 rounded-2xl flex-shrink-0 md:w-48 md:h-48 self-start"

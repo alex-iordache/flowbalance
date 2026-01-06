@@ -155,11 +155,14 @@ function ContinueCard({
 
   return (
     <div
-      className="w-full max-w-md mx-auto rounded-[28px] shadow-2xl overflow-hidden"
+      className="w-full max-w-md mx-auto rounded-[28px] overflow-hidden"
       style={{
         // Same as app background, with a subtle grey-ish gradient to read as a card
         backgroundColor: 'var(--fb-bg)',
         backgroundImage: 'var(--fb-card-gradient)',
+        // Inset shadow (pressed-in look)
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -18px 40px rgba(0,0,0,0.22)',
       }}
     >
       <div className="p-5">
@@ -228,7 +231,7 @@ function RecommendedFlowsCard({
               key={flow.id}
               type="button"
               onClick={() => onOpenFlow(flow)}
-              className="text-left rounded-2xl overflow-hidden shadow-lg"
+              className="text-left rounded-2xl overflow-hidden"
               style={{
                 backgroundImage:
                   category?.gradientCss ??
@@ -264,10 +267,12 @@ function EmptyStateCard({ lang, onBrowse }: { lang: Language; onBrowse: () => vo
   const isRo = lang === 'ro';
   return (
     <div
-      className="w-full max-w-md mx-auto rounded-[28px] p-5 text-white shadow-xl"
+      className="w-full max-w-md mx-auto rounded-[28px] p-5 text-white"
       style={{
         backgroundColor: 'var(--fb-bg)',
         backgroundImage: 'var(--fb-card-gradient)',
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -18px 40px rgba(0,0,0,0.22)',
       }}
     >
       <div className="text-[18px] font-semibold">{isRo ? 'Nu ai început încă niciun flow' : "You haven't started any Flow"}</div>

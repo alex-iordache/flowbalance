@@ -36,7 +36,7 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
             role="button"
             tabIndex={0}
             onClick={() => history.push(`/flows/category/${cat.id}`)}
-            className={`${cat.bgClass} rounded-2xl p-5 shadow-xl w-full cursor-pointer`}
+            className={`${cat.bgClass} rounded-2xl p-5 w-full cursor-pointer`}
           >
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">

@@ -265,7 +265,7 @@ export default function AudioPlayer({
       style={{
         // Fixed gap: 8px between circle bottom and tab bar top
         // Tab bar is typically 56px, so: 56px (tab bar) + 8px (gap) = 64px from bottom
-        bottom: `calc(env(safe-area-inset-bottom) + 30px)`,
+        bottom: `calc(env(safe-area-inset-bottom) + 10px)`,
         // Ensure it stays fixed even on scroll
         position: 'fixed',
       }}

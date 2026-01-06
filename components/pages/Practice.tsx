@@ -133,44 +133,58 @@ const Practice = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent 
-        className="ion-padding text-white" 
-        style={{
-          ...themedStyle,
-          // Add bottom padding to account for fixed floatingCircle audio player
-          // Player height: ~70vw (max 420px) + bottom offset (74px + safe area)
-          // Add extra margin for spacing between text and player
-          paddingBottom: practice && t(practice.audioUrl, lang) 
-            ? 'calc(70vw + 120px + env(safe-area-inset-bottom))' 
-            : undefined,
-        }}
+        className="text-white" 
+        style={themedStyle}
+        scrollY={true}
       >
-        {isActivating && !hasAccess ? (
-          <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-            <p className="text-white text-lg font-semibold mb-2">Activating your subscription…</p>
-            <p className="text-white/80 text-sm">This usually takes a few seconds.</p>
-          </div>
-        ) : null}
-        {/* Show content only if user has access */}
-        {hasAccess ? (
-          <>
-            {practice && t(practice.description, lang) ? (
-              <p className="text-white mb-6">{t(practice.description, lang)}</p>
-            ) : null}
-            {practice && t(practice.audioUrl, lang) ? (
-              <AudioPlayer
-                src={getAudioSrc({
-                  audioUrlOrPath: t(practice.audioUrl, lang),
-                  flowId,
-                  practiceId,
-                })}
-                title={t(practice.name, lang)}
-                subtitle={flow ? t(flow.name, lang) : undefined}
-                variant="floatingCircle"
-                onPlay={handleAudioPlay}
-                onEnded={handleAudioEnded}
-              />
-            ) : null}
-          </>
+        <div 
+          className="h-full flex flex-col"
+          style={{
+            // Padding for content area, accounting for fixed audio player
+            padding: '16px',
+            paddingBottom: practice && t(practice.audioUrl, lang)
+              ? 'calc(70vw + 88px + env(safe-area-inset-bottom))' // Player height + gap + tab bar + safe area
+              : 'calc(56px + env(safe-area-inset-bottom))', // Just tab bar + safe area if no player
+          }}
+        >
+          {isActivating && !hasAccess ? (
+            <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
+              <p className="text-white text-lg font-semibold mb-2">Activating your subscription…</p>
+              <p className="text-white/80 text-sm">This usually takes a few seconds.</p>
+            </div>
+          ) : null}
+          {/* Show content only if user has access */}
+          {hasAccess ? (
+            <>
+              {practice && t(practice.description, lang) ? (
+                <div 
+                  className="text-white flex-1 overflow-y-auto"
+                  style={{
+                    // Scrollable text container with proper spacing
+                    paddingRight: '4px', // Space for scrollbar
+                    marginBottom: practice && t(practice.audioUrl, lang) ? '24px' : '0',
+                  }}
+                >
+                  <p className="text-white leading-relaxed">{t(practice.description, lang)}</p>
+                </div>
+              ) : null}
+            </>
+          ) : null}
+        </div>
+        {/* Audio player rendered outside scroll container, fixed to bottom */}
+        {hasAccess && practice && t(practice.audioUrl, lang) ? (
+          <AudioPlayer
+            src={getAudioSrc({
+              audioUrlOrPath: t(practice.audioUrl, lang),
+              flowId,
+              practiceId,
+            })}
+            title={t(practice.name, lang)}
+            subtitle={flow ? t(flow.name, lang) : undefined}
+            variant="floatingCircle"
+            onPlay={handleAudioPlay}
+            onEnded={handleAudioEnded}
+          />
         ) : null}
       </IonContent>
     </IonPage>

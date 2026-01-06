@@ -263,7 +263,8 @@ export default function AudioPlayer({
     <div
       className="fixed left-1/2 -translate-x-1/2 z-50"
       style={{
-        bottom: `calc(env(safe-area-inset-bottom) + 74px)`,
+        // Fixed gap: 16px between circle and tab bar (56px tab bar height)
+        bottom: `calc(env(safe-area-inset-bottom) + 72px)`,
       }}
     >
       <style>{`

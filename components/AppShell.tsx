@@ -10,6 +10,7 @@ import AuthGuard from './AuthGuard';
 import { loadAllPersistedState } from '../store/persistence';
 import Subscribe from './pages/Subscribe';
 import DeepLinkReturnHandler from './DeepLinkReturnHandler';
+import HardwareBackHandler from './HardwareBackHandler';
 
 setupIonicReact({});
 
@@ -34,6 +35,7 @@ const AppShell = () => {
       <IonApp>
         <IonReactRouter>
           <DeepLinkReturnHandler />
+          <HardwareBackHandler />
           <IonRouterOutlet id="main">
             {/* Main app routes - protected by AuthGuard */}
             <Route path="/home" component={Tabs} />

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
-import { ClerkProvider } from '@clerk/nextjs';
+import ClerkProviderClient from '../components/ClerkProviderClient';
 
 import 'tailwindcss/tailwind.css';
 /* Core CSS required for Ionic components to work properly */
@@ -39,24 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      // Pin Clerk JS to a specific version to avoid transient load failures in dev
-      // (e.g. attempts to load an unversioned @5 script that can be CORS-blocked).
-      clerkJSVersion="5.117.0"
-      // iOS WKWebView can be picky about dynamic chunk loading from third-party CDNs.
-      // Use the Clerk instance domain so all lazy chunks load from the same origin Clerk expects.
-      // Now that Clerk custom domains are configured, prefer the first-party Clerk frontend API domain.
-      clerkJSUrl="https://clerk.flowbalance.app/npm/@clerk/clerk-js@5.117.0/dist/clerk.browser.js"
-      allowedRedirectOrigins={[
-        'https://www.flowbalance.app',
-        'https://flowbalance.app',
-        'https://flowbalance.vercel.app',
-        'https://flowbalance-staging.vercel.app',
-        'capacitor://localhost',
-        'http://localhost',
-        'ionic://localhost'
-      ]}
-    >
+    <ClerkProviderClient>
       <html lang="en" suppressHydrationWarning>
         <body>
           {children}
@@ -73,6 +56,6 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
       </html>
-    </ClerkProvider>
+    </ClerkProviderClient>
   );
 }

@@ -43,9 +43,9 @@ export default function RootLayout({
       // Pin Clerk JS to a specific version to avoid transient load failures in dev
       // (e.g. attempts to load an unversioned @5 script that can be CORS-blocked).
       clerkJSVersion="5.117.0"
-      // iOS WKWebView can intermittently fail dynamic chunk loads from custom Frontend API domains.
-      // Load Clerk JS from a stable CDN instead; the API domain/cookies still come from your Clerk config.
-      clerkJSUrl="https://unpkg.com/@clerk/clerk-js@5.117.0/dist/clerk.browser.js"
+      // iOS WKWebView can be picky about dynamic chunk loading from third-party CDNs.
+      // Use the Clerk instance domain so all lazy chunks load from the same origin Clerk expects.
+      clerkJSUrl="https://popular-gibbon-62.clerk.accounts.dev/npm/@clerk/clerk-js@5.117.0/dist/clerk.browser.js"
       allowedRedirectOrigins={[
         'https://www.flowbalance.app',
         'https://flowbalance.app',

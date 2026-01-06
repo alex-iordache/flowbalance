@@ -45,7 +45,8 @@ export default function RootLayout({
       clerkJSVersion="5.117.0"
       // iOS WKWebView can be picky about dynamic chunk loading from third-party CDNs.
       // Use the Clerk instance domain so all lazy chunks load from the same origin Clerk expects.
-      clerkJSUrl="https://popular-gibbon-62.clerk.accounts.dev/npm/@clerk/clerk-js@5.117.0/dist/clerk.browser.js"
+      // Now that Clerk custom domains are configured, prefer the first-party Clerk frontend API domain.
+      clerkJSUrl="https://clerk.flowbalance.app/npm/@clerk/clerk-js@5.117.0/dist/clerk.browser.js"
       allowedRedirectOrigins={[
         'https://www.flowbalance.app',
         'https://flowbalance.app',

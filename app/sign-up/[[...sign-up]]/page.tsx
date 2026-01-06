@@ -21,6 +21,15 @@ export default function SignUpPage() {
 
   // iOS WKWebView can fail Next RSC client navigations; once signed in, hard-navigate to /home.
   useEffect(() => {
+    try {
+      console.log('[SignUpPage]', {
+        ts: new Date().toISOString(),
+        isLoaded,
+        userId: userId ?? null,
+      });
+    } catch {
+      // ignore
+    }
     if (!isLoaded || !userId) return;
     window.location.replace(`${base}/home`);
   }, [isLoaded, userId, base]);

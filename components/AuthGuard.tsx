@@ -21,6 +21,18 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const { isLoaded, userId } = useAuth();
 
   useEffect(() => {
+    try {
+      // Helpful for debugging WebView auth issues (iOS): shows whether Clerk ever sees a session.
+      console.log('[AuthGuard]', {
+        ts: new Date().toISOString(),
+        isLoaded,
+        userId: userId ?? null,
+        path: typeof window !== 'undefined' ? window.location.pathname + window.location.search : '',
+      });
+    } catch {
+      // ignore
+    }
+
     if (!isLoaded) return;
     if (userId) {
       // If we came from auth return (`/home?auth=1`), clean up the URL once signed in.

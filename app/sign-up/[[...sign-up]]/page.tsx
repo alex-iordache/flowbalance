@@ -47,9 +47,10 @@ export default function SignUpPage() {
           <div className="w-full max-w-md space-y-4">
             <SignUp 
               signInUrl="/sign-in"
-              // Use an absolute URL to force a full navigation (more reliable in iOS WKWebView)
-              fallbackRedirectUrl={`${base}/home?auth=1`}
-              forceRedirectUrl={`${base}/home?auth=1`}
+              // iOS WKWebView: avoid Next.js App Router navigation (RSC fetch) during auth completion.
+              // Stay on /sign-up and let the useAuth() effect hard-redirect to /home once a session exists.
+              fallbackRedirectUrl={`${base}/sign-up`}
+              forceRedirectUrl={`${base}/sign-up`}
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

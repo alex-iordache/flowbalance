@@ -44,13 +44,15 @@ export default function SignUpPage() {
 
       if (cancelled) return;
       setTimeout(() => {
+        console.log('[SignUpPage] redirect timer fired; setting fb:postAuthTs and navigating to /home');
         try {
           sessionStorage.setItem('fb:postAuthTs', String(Date.now()));
-        } catch {
-          // ignore
+          console.log('[SignUpPage] fb:postAuthTs set');
+        } catch (e) {
+          console.log('[SignUpPage] fb:postAuthTs set failed', e);
         }
-        window.location.replace(`${base}/home`);
-      }, 750);
+        window.location.href = `${base}/home`;
+      }, 1500);
     })();
 
     return () => {
@@ -74,7 +76,6 @@ export default function SignUpPage() {
               // iOS WKWebView: avoid Next.js App Router navigation (RSC fetch) during auth completion.
               // Stay on /sign-up and let the useAuth() effect hard-redirect to /home once a session exists.
               fallbackRedirectUrl={`${base}/sign-up`}
-              forceRedirectUrl={`${base}/sign-up`}
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

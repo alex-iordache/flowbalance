@@ -43,15 +43,17 @@ export default function SignInPage() {
       }
 
       if (cancelled) return;
-      // Small delay to give WKWebView time to flush cookie writes.
       setTimeout(() => {
+        console.log('[SignInPage] redirect timer fired; setting fb:postAuthTs and navigating to /home');
         try {
           sessionStorage.setItem('fb:postAuthTs', String(Date.now()));
-        } catch {
-          // ignore
+          console.log('[SignInPage] fb:postAuthTs set');
+        } catch (e) {
+          console.log('[SignInPage] fb:postAuthTs set failed', e);
         }
-        window.location.replace(`${base}/home`);
-      }, 750);
+        // Use href assignment (not replace) to avoid weird WKWebView replace cancellation behavior.
+        window.location.href = `${base}/home`;
+      }, 1500);
     })();
 
     return () => {
@@ -75,7 +77,6 @@ export default function SignInPage() {
               // iOS WKWebView: avoid Next.js App Router navigation (RSC fetch) during auth completion.
               // Stay on /sign-in and let the useAuth() effect hard-redirect to /home once a session exists.
               fallbackRedirectUrl={`${base}/sign-in`}
-              forceRedirectUrl={`${base}/sign-in`}
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

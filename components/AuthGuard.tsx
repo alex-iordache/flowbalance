@@ -29,16 +29,18 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         userId: userId ?? null,
         path: typeof window !== 'undefined' ? window.location.pathname + window.location.search : '',
       });
-    } catch {
-      // ignore
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('[AuthGuard] debug log failed', e);
     }
 
     if (!isLoaded) return;
     if (userId) {
       try {
         sessionStorage.removeItem('fb:postAuthTs');
-      } catch {
-        // ignore
+        console.log('[AuthGuard] cleared fb:postAuthTs');
+      } catch (e) {
+        console.log('[AuthGuard] clearing fb:postAuthTs failed', e);
       }
       // If we came from auth return (`/home?auth=1`), clean up the URL once signed in.
       try {
@@ -61,8 +63,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     try {
       const url = new URL(window.location.href);
       if (url.searchParams.get('auth') === '1') delayMs = 3000; // post-login settle window (iOS WKWebView)
-    } catch {
-      // ignore
+    } catch (e) {
+      console.log('[AuthGuard] URL parse failed for auth=1 check', e);
     }
 
     // If we *just* observed a signed-in state on a previous page (SignIn/SignUp) and redirected here,
@@ -76,13 +78,17 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           delayMs = Math.max(delayMs, 6000);
           console.log('[AuthGuard] postAuth grace window active', { ageMs: age, delayMs });
         }
+      } else {
+        console.log('[AuthGuard] no postAuthTs in sessionStorage');
       }
-    } catch {
-      // ignore
+    } catch (e) {
+      console.log('[AuthGuard] reading fb:postAuthTs failed', e);
     }
 
+    console.log('[AuthGuard] signed out; scheduling redirect', { delayMs, pathname });
     const t = window.setTimeout(() => {
       // Effect will be cleaned up if userId becomes available.
+      console.log('[AuthGuard] redirect timer fired; sending to /sign-in');
       window.location.replace('/sign-in');
     }, delayMs);
     return () => window.clearTimeout(t);

@@ -12,6 +12,7 @@ import Subscribe from './pages/Subscribe';
 import DeepLinkReturnHandler from './DeepLinkReturnHandler';
 import HardwareBackHandler from './HardwareBackHandler';
 import CategoryThemeSync from './CategoryThemeSync';
+import ChunkLoadRecovery from './ChunkLoadRecovery';
 
 setupIonicReact({});
 
@@ -38,6 +39,7 @@ const AppShell = () => {
           <DeepLinkReturnHandler />
           <HardwareBackHandler />
           <CategoryThemeSync />
+          <ChunkLoadRecovery />
           <IonRouterOutlet id="main">
             {/* Main app routes - protected by AuthGuard */}
             <Route path="/home" component={Tabs} />

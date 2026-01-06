@@ -13,6 +13,8 @@
 			"flowbalance.app",
 			"flowbalance.vercel.app",
 			"*.vercel.app",
+			"clerk.flowbalance.app",
+			"accounts.flowbalance.app",
 			"clerk.com",
 			"*.clerk.com",
 			"accounts.clerk.dev",
@@ -22,9 +24,7 @@
 			"*.accounts.dev",
 			"clerk.accounts.dev",
 			"clerk.shared.lcl.dev",
-			"*.lcl.dev",
-			"clerk.flowbalance.app",
-			"accounts.flowbalance.app"
+			"*.lcl.dev"
 		]
 	},
 	"plugins": {

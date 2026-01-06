@@ -84,8 +84,7 @@ const FlowDetail = () => {
   const { flowId } = useParams<{ flowId: string }>();
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
-  // Until we ship an in-app language switch, keep English on display.
-  const lang: Language = 'en';
+  const lang = Store.useState(s => s.settings.language) as Language;
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
   const allowAdmin = isSuperAdmin && isDesktopWeb();
   const flow = flows.find((flow) => flow.id === flowId);

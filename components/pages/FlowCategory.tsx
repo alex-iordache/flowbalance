@@ -43,8 +43,7 @@ export default function FlowCategory() {
   const history = useHistory();
   const { categoryId } = useParams<{ categoryId: string }>();
   const flows = Store.useState(s => s.flows);
-  // Until we ship an in-app language switch, keep English on display.
-  const lang: Language = 'en';
+  const lang = Store.useState(s => s.settings.language) as Language;
 
   const category = FLOW_CATEGORIES.find(c => c.id === categoryId) ?? null;
   const flowsById = new Map(flows.map(f => [f.id, f]));

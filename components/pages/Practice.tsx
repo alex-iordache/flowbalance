@@ -33,8 +33,7 @@ const Practice = () => {
   const { flowId, practiceId } = useParams<{ flowId: string; practiceId: string }>();
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
-  // Until we ship an in-app language switch, keep English on display.
-  const lang: Language = 'en';
+  const lang = Store.useState(s => s.settings.language) as Language;
   const flow = flows.find((f) => f.id === flowId);
   const practice = flow?.practices.find((p) => p.id === practiceId);
   const category = flowId ? getCategoryForFlowId(flowId) : null;

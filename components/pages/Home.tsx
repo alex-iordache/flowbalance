@@ -16,17 +16,38 @@ import { settingsOutline } from 'ionicons/icons';
 import Logo from '../ui/Logo';
 import { useUser } from '@clerk/nextjs';
 import { Preferences } from '@capacitor/preferences';
+import Store from '../../store';
 
 type HelloUserProps ={
   firstName?: string;
 }
 
-const HelloUser = ({ firstName }: HelloUserProps) => (
+function getGreetingForLocalTime(
+  now: Date,
+  lang: 'ro' | 'en',
+): 'Good morning' | 'Hello' | 'Good evening' | 'Bună dimineața' | 'Salut' | 'Bună seara' {
+  const h = now.getHours();
+  const morning = h >= 5 && h < 12;
+  const evening = h >= 18 || h < 5;
+  if (lang === 'ro') {
+    if (morning) return 'Bună dimineața';
+    if (evening) return 'Bună seara';
+    return 'Salut';
+  }
+  if (morning) return 'Good morning';
+  if (evening) return 'Good evening';
+  return 'Hello';
+}
+
+const HelloUser = ({ firstName, lang }: HelloUserProps & { lang: 'ro' | 'en' }) => (
   <div className="hello-user-container">
-    <h2 className="font-bold text-2xl text-gray-800 dark:text-gray-100">
-      {firstName ? `Hello, ${firstName}!` : 'Hello!'}
+    <h2 className="text-lg text-gray-800 dark:text-gray-100">
+      {(() => {
+        const greeting = getGreetingForLocalTime(new Date(), lang);
+        return firstName ? `${greeting}, ${firstName}!` : `${greeting}!`;
+      })()}
     </h2>
-    <p className="sm:text-sm text-s text-white mr-1 my-3">For you:</p>
+    <p className="sm:text-sm text-s text-white mr-1 my-3">{lang === 'ro' ? 'Pentru tine:' : 'For you:'}</p>
   </div>
 )
 
@@ -48,6 +69,7 @@ const Home = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const history = useHistory();
   const { user, isLoaded } = useUser();
+  const lang = Store.useState(s => s.settings.language);
 
   const displayFirstNameFromClerk = useMemo(() => {
     if (!isLoaded || !user) return '';
@@ -106,7 +128,7 @@ const Home = () => {
           open={showNotifications}
           onDidDismiss={() => setShowNotifications(false)}
         />
-        <HelloUser firstName={firstName} />
+        <HelloUser firstName={firstName} lang={lang} />
         <SimpleCardCTA minutes={5} />
       </IonContent>
     </IonPage>

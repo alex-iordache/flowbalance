@@ -72,8 +72,8 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
 const Flows = () => {
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
-  // Until we ship an in-app language switch, keep English on display.
-  const lang: Language = 'en';
+  const lang = Store.useState(s => s.settings.language) as Language;
+  const isRo = lang === 'ro';
   return (
     <IonPage>
       <IonHeader translucent={true}>
@@ -89,7 +89,7 @@ const Flows = () => {
       <IonContent fullscreen={true}>
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large">Flows</IonTitle>
+            <IonTitle size="large">{isRo ? 'Flows' : 'Flows'}</IonTitle>
           </IonToolbar>
         </IonHeader>
         <CategoryList flows={flows} lang={lang} />

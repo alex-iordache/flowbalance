@@ -9,6 +9,9 @@ import {
   IonListHeader,
   IonToggle,
   IonButton,
+  IonLabel,
+  IonSelect,
+  IonSelectOption,
 } from '@ionic/react';
 import { SignedIn, SignedOut, useClerk } from '@clerk/nextjs';
 
@@ -21,6 +24,7 @@ const Settings = () => {
   const settings = Store.useState(selectors.selectSettings);
   const { signOut } = useClerk();
   const history = useHistory();
+  const isRo = settings.language === 'ro';
 
   const handleSignOut = async () => {
     // Sign out with Clerk
@@ -33,7 +37,7 @@ const Settings = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>Settings</IonTitle>
+          <IonTitle>{isRo ? 'Setări' : 'Settings'}</IonTitle>
         </IonToolbar>
       </IonHeader>
       <IonContent>
@@ -48,14 +52,29 @@ const Settings = () => {
                 });
               }}
             >
-              Enable Notifications
+              {isRo ? 'Notificări' : 'Enable Notifications'}
             </IonToggle>
+          </IonItem>
+
+          <IonItem>
+            <IonLabel>{isRo ? 'Limbă' : 'Language'}</IonLabel>
+            <IonSelect
+              value={settings.language}
+              interface="popover"
+              onIonChange={(e) => {
+                const next = (e.detail.value === 'ro' ? 'ro' : 'en') as typeof settings.language;
+                setSettings({ ...settings, language: next });
+              }}
+            >
+              <IonSelectOption value="en">English</IonSelectOption>
+              <IonSelectOption value="ro">Română</IonSelectOption>
+            </IonSelect>
           </IonItem>
         </IonList>
 
         {/* Account Section */}
         <IonList>
-          <IonListHeader>Account</IonListHeader>
+          <IonListHeader>{isRo ? 'Cont' : 'Account'}</IonListHeader>
           
           {/* Show Manage Subscription and Sign Out when user is signed in */}
           <SignedIn>
@@ -66,7 +85,7 @@ const Settings = () => {
                 className="w-full mb-2"
                 onClick={() => history.push(`/subscribe?return=${encodeURIComponent('/settings')}`)}
               >
-                Manage Subscription
+                {isRo ? 'Abonament' : 'Manage Subscription'}
               </IonButton>
             </IonItem>
             <IonItem>
@@ -76,7 +95,7 @@ const Settings = () => {
                 className="w-full"
                 onClick={handleSignOut}
               >
-                Sign Out
+                {isRo ? 'Deconectare' : 'Sign Out'}
               </IonButton>
             </IonItem>
           </SignedIn>
@@ -90,7 +109,7 @@ const Settings = () => {
                 className="w-full"
                 onClick={() => window.location.href = '/sign-in'}
               >
-                Sign In
+                {isRo ? 'Autentificare' : 'Sign In'}
               </IonButton>
             </IonItem>
           </SignedOut>

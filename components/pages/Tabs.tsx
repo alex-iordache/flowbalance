@@ -26,6 +26,8 @@ const AdminRoutes = lazy(() => import('../admin/AdminRoutes'));
 const Tabs = () => {
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
   const allowAdmin = isSuperAdmin && isDesktopWeb();
+  const lang = Store.useState(s => s.settings.language);
+  const isRo = lang === 'ro';
 
   return (
     <IonTabs>
@@ -67,15 +69,15 @@ const Tabs = () => {
       <IonTabBar slot="bottom">
         <IonTabButton tab="tab1" href="/home">
           <IonIcon icon={home} />
-          <IonLabel>Home</IonLabel>
+          <IonLabel>{isRo ? 'Acasă' : 'Home'}</IonLabel>
         </IonTabButton>
         <IonTabButton tab="tab2" href="/flows">
           <IonIcon icon={pulse} />
-          <IonLabel>Flows</IonLabel>
+          <IonLabel>{isRo ? 'Flows' : 'Flows'}</IonLabel>
         </IonTabButton>
         <IonTabButton tab="tab3" href="/progress">
           <IonIcon icon={trendingUp} />
-          <IonLabel>My Progress</IonLabel>
+          <IonLabel>{isRo ? 'Progresul meu' : 'My Progress'}</IonLabel>
         </IonTabButton>
       </IonTabBar>
     </IonTabs>

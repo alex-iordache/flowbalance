@@ -17,8 +17,8 @@ import { t, type Language } from '../../data/flows';
 const MyProgress = () => {
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
-  // Until we ship an in-app language switch, keep English on display.
-  const lang: Language = 'en';
+  const lang = Store.useState(s => s.settings.language) as Language;
+  const isRo = lang === 'ro';
   const startedFlows = flows.filter(flow => flow.started);
 
   const calculateProgress = (flow: typeof flows[0]) => {
@@ -43,14 +43,14 @@ const MyProgress = () => {
       <IonContent className="ion-padding">
         <IonHeader collapse="condense">
           <IonToolbar>
-            <IonTitle size="large" className="text-white">My Progress</IonTitle>
+            <IonTitle size="large" className="text-white">{isRo ? 'Progresul meu' : 'My Progress'}</IonTitle>
           </IonToolbar>
         </IonHeader>
         
         {startedFlows.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
-            <p className="text-white text-lg mb-4">No flows started yet</p>
-            <p className="text-white/70 text-sm">Start a flow to track your progress here</p>
+            <p className="text-white text-lg mb-4">{isRo ? 'Nu ai început încă niciun flow' : 'No flows started yet'}</p>
+            <p className="text-white/70 text-sm">{isRo ? 'Începe un flow ca să îți vezi progresul aici' : 'Start a flow to track your progress here'}</p>
           </div>
         ) : (
           <div className="flex flex-col gap-4 p-4">
@@ -73,9 +73,11 @@ const MyProgress = () => {
                     </h5>
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-1">
-                        <span className="text-white text-sm font-medium">{percentage}% Complete</span>
+                        <span className="text-white text-sm font-medium">
+                          {percentage}% {isRo ? 'Complet' : 'Complete'}
+                        </span>
                         <span className="text-white/70 text-xs">
-                          {completedPractices} / {totalPractices} practices
+                          {completedPractices} / {totalPractices} {isRo ? 'practici' : 'practices'}
                         </span>
                       </div>
                       <div className="w-full bg-white/20 rounded-full h-2">

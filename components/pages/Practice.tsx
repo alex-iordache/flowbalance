@@ -138,13 +138,14 @@ const Practice = () => {
         scrollY={true}
       >
         <div 
-          className="h-full flex flex-col"
+          className="flex flex-col min-h-full"
           style={{
-            // Padding for content area, accounting for fixed audio player
             padding: '16px',
+            // Bottom padding to prevent overlap with fixed audio player
+            // Player max height: 420px (70vw capped), gap: 16px, tab bar: 56px
             paddingBottom: practice && t(practice.audioUrl, lang)
-              ? 'calc(70vw + 88px + env(safe-area-inset-bottom))' // Player height + gap + tab bar + safe area
-              : 'calc(56px + env(safe-area-inset-bottom))', // Just tab bar + safe area if no player
+              ? 'calc(min(70vw, 420px) + 16px + 56px + env(safe-area-inset-bottom))' 
+              : 'calc(56px + env(safe-area-inset-bottom))',
           }}
         >
           {isActivating && !hasAccess ? (
@@ -158,14 +159,14 @@ const Practice = () => {
             <>
               {practice && t(practice.description, lang) ? (
                 <div 
-                  className="text-white flex-1 overflow-y-auto"
+                  className="text-white"
                   style={{
-                    // Scrollable text container with proper spacing
-                    paddingRight: '4px', // Space for scrollbar
-                    marginBottom: practice && t(practice.audioUrl, lang) ? '24px' : '0',
+                    // Text container - scrollable if content is long
+                    paddingRight: '4px',
+                    lineHeight: '1.6',
                   }}
                 >
-                  <p className="text-white leading-relaxed">{t(practice.description, lang)}</p>
+                  <p className="text-white leading-relaxed whitespace-pre-wrap">{t(practice.description, lang)}</p>
                 </div>
               ) : null}
             </>

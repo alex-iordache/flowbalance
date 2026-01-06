@@ -263,8 +263,11 @@ export default function AudioPlayer({
     <div
       className="fixed left-1/2 -translate-x-1/2 z-50"
       style={{
-        // Fixed gap: 16px between circle and tab bar (56px tab bar height)
+        // Fixed gap: 16px between circle bottom and tab bar top
+        // Tab bar is typically 56px, so: 56px (tab bar) + 16px (gap) = 72px from bottom
         bottom: `calc(env(safe-area-inset-bottom) + 72px)`,
+        // Ensure it stays fixed even on scroll
+        position: 'fixed',
       }}
     >
       <style>{`
@@ -322,12 +325,10 @@ export default function AudioPlayer({
       <div
         className={`${ringClass} flex flex-col items-center justify-between relative`}
         style={{
-          width: '70vw',
-          maxWidth: 420,
+          // Square player: width and height should match (constrained by viewport)
+          width: 'min(70vw, 420px)',
+          height: 'min(70vw, 420px)',
           minWidth: 280,
-          // Avoid aspect-ratio quirks in some webviews: keep explicit square sizing.
-          height: '70vw',
-          maxHeight: 420,
           minHeight: 280,
           padding: 14, // ring thickness area
           // keep your nice outer transparency effect (subtle)

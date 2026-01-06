@@ -2,6 +2,7 @@
 
 import {
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -10,15 +11,18 @@ import {
   IonToolbar,
   IonToggle,
 } from '@ionic/react';
-import { chevronBackOutline } from 'ionicons/icons';
+import { settingsOutline } from 'ionicons/icons';
 import { SignedIn, SignedOut } from '@clerk/nextjs';
 import { usePlans } from '@clerk/nextjs/experimental';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { getWebBaseUrl } from '../../helpers/webBaseUrl';
+import Store from '../../store';
 
 export default function Subscribe() {
   const history = useHistory();
+  const lang = Store.useState(s => s.settings.language);
+  const isRo = lang === 'ro';
   // Match Clerk pricing-table UX: default is "Billed annually"
   const [billing, setBilling] = useState<'month' | 'annual'>('annual');
   const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
@@ -113,10 +117,12 @@ export default function Subscribe() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButton slot="start" fill="clear" onClick={() => history.replace(returnTo || '/home')}>
-            <IonIcon icon={chevronBackOutline} className="text-white" />
-          </IonButton>
-          <IonTitle className="text-white">Subscribe to Flow Pro</IonTitle>
+          <IonTitle className="text-white">{isRo ? 'Abonament Flow Pro' : 'Subscribe to Flow Pro'}</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={() => history.push('/settings')}>
+              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
 

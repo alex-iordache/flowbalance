@@ -1,14 +1,9 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
-  IonCheckbox,
   IonContent,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
   IonPage,
   IonTitle,
   IonToolbar,
@@ -21,7 +16,6 @@ import Store from '../../store';
 import { t, type Practice, type Language } from '../../data/flows';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { isDesktopWeb } from '../admin/adminEnv';
-import { getCategoryForFlowId } from './flowsCatalog';
 
 import { playCircleOutline, checkmarkDoneCircleOutline, ellipseOutline, settingsOutline, lockClosedOutline } from 'ionicons/icons';
 
@@ -40,20 +34,43 @@ function PracticeRow({
   practiceIndex: number;
   lang: Language;
 }) {
+  const history = useHistory();
   const hasAccess = usePracticeAccess(flowId, practice.id, flowIndex, practiceIndex);
   
-  return practice && (
-        <IonItem className="no-bg-color py-4 text-white" routerLink={`/flows/${flowId}/${practice.id}`}>
-          <IonIcon className="text-white text-3xl" icon={practice.finished ? checkmarkDoneCircleOutline : ellipseOutline} />
-          <IonLabel className="pl-5 text-white text-lg">
-            {t(practice.name, lang)}
-            {!hasAccess && (
-              <IonBadge color="warning" className="ml-2">Premium</IonBadge>
-            )}
-          </IonLabel>
-          <IonIcon className="text-white text-3xl" icon={hasAccess ? playCircleOutline : lockClosedOutline} />          
-        </IonItem>
-  )
+  if (!practice) return null;
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => history.push(`/flows/${flowId}/${practice.id}`)}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') history.push(`/flows/${flowId}/${practice.id}`);
+      }}
+      className="w-full rounded-[20px] p-4 flex items-center gap-3 cursor-pointer"
+      style={{
+        backgroundColor: 'var(--fb-bg)',
+        backgroundImage:
+          'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.05) 55%, rgba(255,255,255,0.05) 100%)',
+      }}
+    >
+      <IonIcon
+        className="text-white text-2xl shrink-0"
+        icon={practice.finished ? checkmarkDoneCircleOutline : ellipseOutline}
+      />
+
+      <div className="min-w-0 flex-1">
+        <div className="text-white text-[15px] font-semibold truncate">
+          {t(practice.name, lang)}
+          {!hasAccess ? (
+            <IonBadge color="warning" className="ml-2 align-middle">Premium</IonBadge>
+          ) : null}
+        </div>
+      </div>
+
+      <IonIcon className="text-white text-xl shrink-0" icon={hasAccess ? playCircleOutline : lockClosedOutline} />
+    </div>
+  );
 }
 
 function PracticesList({
@@ -67,7 +84,7 @@ function PracticesList({
   flowIndex: number;
   lang: Language;
 }) {
-  return practices && (<div className="no-bg-color">
+  return practices && (<div className="flex flex-col gap-3 mt-4">
     {practices.map((practice, index) => (
       <PracticeRow
         practice={practice} 
@@ -89,17 +106,11 @@ const FlowDetail = () => {
   const allowAdmin = isSuperAdmin && isDesktopWeb();
   const flow = flows.find((flow) => flow.id === flowId);
   const flowIndex = flows.findIndex((flow) => flow.id === flowId);
-  const category = getCategoryForFlowId(flowId);
-  const themedStyle = category ? ({ '--background': category.gradientCss } as any) : undefined;
-  const backHref = category ? `/flows/category/${category.id}` : '/flows';
   
   return (
     <IonPage>
       <IonHeader translucent={true}>
-        <IonToolbar style={themedStyle}>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref={backHref} className="text-white" />
-          </IonButtons>
+        <IonToolbar>
           <IonTitle className="text-white">{flow ? t(flow.title, lang) : ''}</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => history.push('/settings')}>
@@ -108,7 +119,7 @@ const FlowDetail = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding" style={themedStyle}>
+      <IonContent className="ion-padding">
         <p className="text-white">{flow ? t(flow.description, lang) : ''}</p>
         {flowId ? (
           allowAdmin ? (

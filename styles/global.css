@@ -28,6 +28,26 @@ body {
   overflow: auto;
 }
 
+/* Hide scrollbars everywhere (keep scrolling enabled) */
+html,
+body {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Ionic scroll host is inside shadow DOM; `ion-content` exposes it via ::part(scroll). */
+ion-content::part(scroll) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+ion-content::part(scroll)::-webkit-scrollbar {
+  display: none;
+}
+
 /* Keep the Capacitor/Ionic app shell constrained to the viewport */
 ion-app {
   height: 100vh;

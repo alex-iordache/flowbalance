@@ -1,5 +1,4 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -17,7 +16,6 @@ import * as actions from '../../store/actions';
 import { settingsOutline, lockClosedOutline } from 'ionicons/icons';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { t, type Language } from '../../data/flows';
-import { getCategoryForFlowId } from './flowsCatalog';
 import AudioPlayer from '../ui/AudioPlayer';
 import { getAudioSrc } from '../../helpers/getAudioSrc';
 
@@ -36,8 +34,7 @@ const Practice = () => {
   const lang = Store.useState(s => s.settings.language) as Language;
   const flow = flows.find((f) => f.id === flowId);
   const practice = flow?.practices.find((p) => p.id === practiceId);
-  const category = flowId ? getCategoryForFlowId(flowId) : null;
-  const themedStyle = category ? ({ '--background': category.gradientCss } as any) : undefined;
+  // Category theming is handled globally (header/footer/background) via CategoryThemeSync.
   
   // Get flow and practice indices for access check
   const flowIndex = flows.findIndex((f) => f.id === flowId);
@@ -116,10 +113,7 @@ const Practice = () => {
   return (
     <IonPage>
       <IonHeader translucent={true}>
-        <IonToolbar style={themedStyle}>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref={`/flows/${flowId}`} className="text-white" />
-          </IonButtons>
+        <IonToolbar>
           <IonTitle className="text-white">
             {getDisplayName()}
             {!hasAccess && <IonIcon icon={lockClosedOutline} className="ml-2" />}
@@ -131,7 +125,7 @@ const Practice = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="text-white" style={themedStyle} fullscreen={true} scrollY={false}>
+      <IonContent className="text-white" fullscreen={true} scrollY={false}>
         <div className="h-full p-4 flex flex-col gap-3">
           {isActivating && !hasAccess ? (
             <div className="flex flex-col items-center justify-center flex-1 text-center">

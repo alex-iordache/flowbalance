@@ -11,6 +11,7 @@ import { loadAllPersistedState } from '../store/persistence';
 import Subscribe from './pages/Subscribe';
 import DeepLinkReturnHandler from './DeepLinkReturnHandler';
 import HardwareBackHandler from './HardwareBackHandler';
+import CategoryThemeSync from './CategoryThemeSync';
 
 setupIonicReact({});
 
@@ -36,6 +37,7 @@ const AppShell = () => {
         <IonReactRouter>
           <DeepLinkReturnHandler />
           <HardwareBackHandler />
+          <CategoryThemeSync />
           <IonRouterOutlet id="main">
             {/* Main app routes - protected by AuthGuard */}
             <Route path="/home" component={Tabs} />

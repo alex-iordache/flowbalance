@@ -1,5 +1,4 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -22,7 +21,7 @@ const FlowRow = ({ flow, lang }: { flow: Flow; lang: Language }) => {
   return (
     <div
       onClick={() => history.push(`/flows/${flow.id}`)}
-      className="flow-entry cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl w-full gap-4"
+      className="flow-entry cursor-pointer flex flex-row items-start p-4 rounded-lg shadow-xl w-full gap-4"
     >
       <img
         className="object-contain w-24 h-24 rounded-base flex-shrink-0 md:w-48 md:h-48 self-start"
@@ -33,7 +32,7 @@ const FlowRow = ({ flow, lang }: { flow: Flow; lang: Language }) => {
         <h5 className="mt-0 mb-2 text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
           {t(flow.name, lang)}
         </h5>
-        <p className="mb-1 text-sm md:text-base text-white">{t(flow.intro, lang)}</p>
+        <p className="mb-0 text-sm md:text-base text-white">{t(flow.intro, lang)}</p>
       </div>
     </div>
   );
@@ -48,15 +47,11 @@ export default function FlowCategory() {
   const category = FLOW_CATEGORIES.find(c => c.id === categoryId) ?? null;
   const flowsById = new Map(flows.map(f => [f.id, f]));
   const categoryFlows = category ? category.flowIds.map(id => flowsById.get(id)).filter(Boolean) as Flow[] : [];
-  const themedStyle = category ? ({ '--background': category.gradientCss } as any) : undefined;
 
   return (
     <IonPage>
       <IonHeader translucent={true}>
-        <IonToolbar style={themedStyle}>
-          <IonButtons slot="start">
-            <IonBackButton defaultHref="/flows" className="text-white" />
-          </IonButtons>
+        <IonToolbar>
           <IonTitle className="text-white">{category ? t(category.title, lang) : 'Category'}</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => history.push('/settings')}>
@@ -66,9 +61,9 @@ export default function FlowCategory() {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen={true} style={themedStyle}>
+      <IonContent fullscreen={true}>
         <IonHeader collapse="condense">
-          <IonToolbar style={themedStyle}>
+          <IonToolbar>
             <IonTitle size="large">{category ? t(category.title, lang) : 'Category'}</IonTitle>
           </IonToolbar>
         </IonHeader>

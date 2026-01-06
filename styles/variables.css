@@ -3,13 +3,22 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
+  /* App base styling (FlowBalance purple) */
+  /* Flat background: use the upper-left gradient color */
+  /* Match the tab bar tint (we use this everywhere for a seamless look) */
+  /* Use the footer's actual tint as the global app background for a seamless look */
+  --fb-bg: #7d63ff;
+  --fb-surface: var(--fb-bg);
+  --fb-side-pad: 18px;
+
   /** primary **/
-  --ion-color-primary: #3880ff;
-  --ion-color-primary-rgb: 56, 128, 255;
+  /* Make Ionic's primary match the app palette */
+  --ion-color-primary: #6f52ff;
+  --ion-color-primary-rgb: 111, 82, 255;
   --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 255, 255, 255;
-  --ion-color-primary-shade: #3171e0;
-  --ion-color-primary-tint: #4c8dff;
+  --ion-color-primary-shade: #6348e6;
+  --ion-color-primary-tint: #7f66ff;
 
   /** secondary **/
   --ion-color-secondary: #3dc2ff;
@@ -77,4 +86,67 @@ http://ionicframework.com/docs/theming/ */
 
   /** logo **/
   --logo-filter: brightness(0) invert(1);
+}
+
+/* Seamless Ionic chrome (no borders between header/content/footer) */
+ion-content {
+  --background: var(--fb-bg);
+}
+ion-header,
+ion-toolbar {
+  /* Make header seamless with body */
+  --background: var(--fb-bg);
+  --padding-start: var(--fb-side-pad);
+  --padding-end: var(--fb-side-pad);
+  --border-width: 0px;
+  --border-color: transparent;
+  box-shadow: none;
+}
+
+/* Ionic overrides the first toolbar padding-top with safe-area.
+   Add +10px on top of the safe area (works for both notch + non-notch). */
+ion-header ion-toolbar:first-of-type {
+  padding-top: calc(var(--ion-safe-area-top, 0px) + 10px) !important;
+}
+/* Ionic (Android/MD mode) adds a default header shadow via `.header-md`. Remove it. */
+ion-header.header-md,
+.header-md {
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+/* Remove Ionic's iOS hairline separators (rendered via ::after pseudo-elements) */
+ion-header::after,
+ion-toolbar::after {
+  background-image: none !important;
+  box-shadow: none !important;
+  height: 0 !important;
+}
+ion-header ion-toolbar::part(border),
+ion-tab-bar::part(border) {
+  opacity: 0;
+}
+ion-tab-bar {
+  --background: var(--fb-bg);
+  --border: 0;
+  --border-color: transparent;
+  box-shadow: none;
+  padding-left: var(--fb-side-pad);
+  padding-right: var(--fb-side-pad);
+  padding-top: 10px;
+  padding-bottom: calc(var(--ion-safe-area-bottom, 0px) + 10px) !important;
+}
+
+/* Bottom nav: white icons + white text (selected + unselected) */
+ion-tab-button {
+  --color: rgba(255, 255, 255, 0.95);
+  --color-selected: rgba(255, 255, 255, 1);
+  flex: 1;
+}
+
+/* Ensure the 3 bottom nav items distribute evenly and center align */
+ion-tab-bar {
+  justify-content: space-between;
+}
+ion-tab-button::part(native) {
+  justify-content: center;
 }

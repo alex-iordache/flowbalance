@@ -12,11 +12,15 @@ import {
 import Notifications from './Notifications';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { settingsOutline } from 'ionicons/icons';
+import { bookOutline, play, settingsOutline } from 'ionicons/icons';
 import Logo from '../ui/Logo';
 import { useUser } from '@clerk/nextjs';
 import { Preferences } from '@capacitor/preferences';
 import Store from '../../store';
+import { t, type Flow, type Practice, type Language } from '../../data/flows';
+import { getAudioSrc } from '../../helpers/getAudioSrc';
+import { getCategoryForFlowId } from './flowsCatalog';
+import QuickActionCard from '../ui/QuickActionCard';
 
 type HelloUserProps ={
   firstName?: string;
@@ -41,35 +45,257 @@ function getGreetingForLocalTime(
 
 const HelloUser = ({ firstName, lang }: HelloUserProps & { lang: 'ro' | 'en' }) => (
   <div className="hello-user-container">
-    <h2 className="text-lg text-gray-800 dark:text-gray-100">
+    <h2 className="text-base text-white/95">
       {(() => {
         const greeting = getGreetingForLocalTime(new Date(), lang);
         return firstName ? `${greeting}, ${firstName}!` : `${greeting}!`;
       })()}
     </h2>
-    <p className="sm:text-sm text-s text-white mr-1 my-3">{lang === 'ro' ? 'Pentru tine:' : 'For you:'}</p>
   </div>
 )
 
-type SimpleCardCTAProps = {
-  minutes: number;
+function pickActiveFlow(flows: Flow[]): Flow | null {
+  const candidates = flows.filter(f => f.started && !f.finished);
+  if (!candidates.length) return null;
+  // Best-effort "most recent": prefer more progress, then latest playback position.
+  return [...candidates].sort((a, b) => {
+    const byCompleted = (b.practicesCompleted ?? 0) - (a.practicesCompleted ?? 0);
+    if (byCompleted !== 0) return byCompleted;
+    return (b.lastPracticePositionSec ?? 0) - (a.lastPracticePositionSec ?? 0);
+  })[0] ?? null;
 }
 
-const SimpleCardCTA = ({ minutes }: SimpleCardCTAProps) => (
-  <div className="bg-white text-black block w-full max-w-sm mx-auto p-6 border border-gray-200 rounded-lg shadow-md flex flex-col items-center justify-center text-center">
-      <p className="text-gray-600">Stress Break Ziua 1 - {minutes} min</p>
-      <h5 className="mb-3 text-2xl font-semibold tracking-tight text-black leading-8">Stress Break</h5>
-      <button className="inline-flex items-center justify-center text-white bg-amber-500 hover:bg-amber-600 focus:ring-4 focus:ring-amber-300 shadow-sm font-medium leading-5 rounded-lg text-sm px-4 py-2.5 focus:outline-none transition-colors">
-          Continue
-          <svg className="w-4 h-4 ml-1.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 12H5m14 0-4 4m4-4-4-4"/></svg>
+function pickInProgressPractice(flow: Flow): Practice | null {
+  const candidates = (flow.practices ?? []).filter(p => !p.finished && (p.lastPositionSec ?? 0) > 0);
+  if (!candidates.length) return null;
+  return [...candidates].sort((a, b) => (b.lastPositionSec ?? 0) - (a.lastPositionSec ?? 0))[0] ?? null;
+}
+
+function pickNextUnfinishedPractice(flow: Flow): Practice | null {
+  return (flow.practices ?? []).find(p => !p.finished) ?? null;
+}
+
+function formatMinutesFromSeconds(sec: number): string {
+  if (!Number.isFinite(sec) || sec <= 0) return '';
+  return `${Math.max(1, Math.round(sec / 60))} min`;
+}
+
+function pickRandomDistinct<T>(items: T[], count: number): T[] {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy.slice(0, Math.max(0, Math.min(count, copy.length)));
+}
+
+function estimateTotalMinutes(flow: Flow): number {
+  // Until we have durations in data, use a simple estimate (10 min / practice).
+  const total = flow.totalPractices ?? flow.practices?.length ?? 0;
+  return total * 10;
+}
+
+function ContinueCard({
+  flow,
+  lang,
+  onContinue,
+  flowId,
+  practiceIdForMinutes,
+}: {
+  flow: Flow;
+  lang: Language;
+  onContinue: () => void;
+  flowId: string;
+  practiceIdForMinutes: string | null;
+}) {
+  const isRo = lang === 'ro';
+  const [minutesLabel, setMinutesLabel] = useState<string>('');
+
+  const total = flow.totalPractices ?? flow.practices?.length ?? 0;
+  const completed = flow.practicesCompleted ?? 0;
+  const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+  useEffect(() => {
+    setMinutesLabel('');
+    if (!practiceIdForMinutes) return;
+    const practice = (flow.practices ?? []).find(p => p.id === practiceIdForMinutes) ?? null;
+    const audioKey = practice ? t(practice.audioUrl, lang) : '';
+    if (!audioKey) return;
+
+    // Load duration via metadata (best-effort). If this fails (no access), we just omit minutes.
+    const audio = document.createElement('audio');
+    audio.preload = 'metadata';
+    audio.src = getAudioSrc({
+      audioUrlOrPath: audioKey,
+      flowId,
+      practiceId: practiceIdForMinutes,
+    });
+    const onLoaded = () => {
+      const dur = Number.isFinite(audio.duration) ? audio.duration : 0;
+      const label = formatMinutesFromSeconds(dur);
+      if (label) setMinutesLabel(label);
+    };
+    audio.addEventListener('loadedmetadata', onLoaded);
+    audio.addEventListener('error', () => {});
+    // Trigger load
+    try {
+      audio.load();
+    } catch {
+      // ignore
+    }
+    return () => {
+      audio.removeEventListener('loadedmetadata', onLoaded);
+      audio.src = '';
+    };
+  }, [flowId, practiceIdForMinutes, lang, flow.practices]);
+
+  const title = t(flow.name, lang);
+  const subtitle = t(flow.intro, lang);
+  const badgeText = isRo ? 'Continuă' : 'Continue';
+
+  return (
+    <div
+      className="w-full max-w-md mx-auto rounded-[28px] shadow-2xl overflow-hidden"
+      style={{
+        // Same as app background, with a subtle grey-ish gradient to read as a card
+        backgroundColor: 'var(--fb-bg)',
+        backgroundImage:
+          'linear-gradient(135deg, rgba(255,255,255,0.12) 0%, rgba(0,0,0,0.06) 55%, rgba(255,255,255,0.06) 100%)',
+      }}
+    >
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-white/75 text-[11px] tracking-wide">
+              {minutesLabel ? `${minutesLabel} • ` : ''}
+              {pct}% {isRo ? 'complet' : 'complete'}
+            </div>
+            <div className="mt-1 text-white text-[18px] font-semibold truncate">{title}</div>
+            <div className="mt-1 text-white/80 text-[13px] leading-snug line-clamp-2">{subtitle}</div>
+          </div>
+
+          <div className="shrink-0 flex flex-col items-end gap-2">
+            <div className="px-2 py-1 rounded-full text-[10px] font-semibold text-white/90 bg-white/12">
+              {badgeText}
+            </div>
+            <button
+              type="button"
+              onClick={onContinue}
+              aria-label={isRo ? 'Redă' : 'Play'}
+              className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/14 active:bg-white/18 flex items-center justify-center"
+            >
+              <IonIcon icon={play} className="text-white text-[18px]" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function RecommendedFlowsCard({
+  flows,
+  lang,
+  onOpenFlow,
+}: {
+  flows: Flow[];
+  lang: Language;
+  onOpenFlow: (flow: Flow) => void;
+}) {
+  const isRo = lang === 'ro';
+  const title = isRo ? 'Recomandate pentru tine' : 'Recommended for you';
+  const subtitle = isRo
+    ? 'Alege un flow și începe cu o practică scurtă.'
+    : 'Pick a flow and start with a short practice.';
+
+  return (
+    <div className="w-full max-w-md mx-auto text-white">
+      <div className="px-1">
+        <div className="text-white text-[16px] font-semibold">{title}</div>
+        <div className="mt-1 text-white/75 text-[12px] leading-snug">{subtitle}</div>
+      </div>
+
+      <div className="mt-4 grid grid-cols-2 gap-3">
+        {flows.map(flow => {
+          const category = getCategoryForFlowId(flow.id);
+          const totalPractices = flow.totalPractices ?? flow.practices?.length ?? 0;
+          const totalMinutes = estimateTotalMinutes(flow);
+
+          const inProgress = pickInProgressPractice(flow);
+          const href = inProgress ? `/flows/${flow.id}/${inProgress.id}` : `/flows/${flow.id}`;
+
+          return (
+            <button
+              key={flow.id}
+              type="button"
+              onClick={() => onOpenFlow(flow)}
+              className="text-left rounded-2xl overflow-hidden shadow-lg"
+              style={{
+                backgroundImage:
+                  category?.gradientCss ??
+                  'linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(0,0,0,0.10) 100%)',
+              }}
+            >
+              <div className="p-4 bg-black/10 h-full flex flex-col">
+                <div className="min-w-0">
+                  <div className="text-white text-[14px] font-semibold leading-snug line-clamp-2">
+                    {t(flow.name, lang)}
+                  </div>
+                </div>
+
+                <div className="mt-auto pt-3 flex items-end justify-between gap-2">
+                  <span className="sr-only">{href}</span>
+                  <div className="flex-1" />
+                  <div className="flex items-end gap-2">
+                    <div className="text-white/85 text-[11px] leading-tight text-right whitespace-nowrap">
+                      {totalPractices} {isRo ? 'practici' : 'practices'} • ~{totalMinutes} min
+                    </div>
+                    <IonIcon icon={play} className="text-white text-[13px]" aria-hidden="true" />
+                  </div>
+                </div>
+              </div>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function EmptyStateCard({ lang, onBrowse }: { lang: Language; onBrowse: () => void }) {
+  const isRo = lang === 'ro';
+  return (
+    <div
+      className="w-full max-w-md mx-auto rounded-[28px] p-5 text-white shadow-xl"
+      style={{
+        backgroundColor: 'var(--fb-bg)',
+        backgroundImage:
+          'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.05) 55%, rgba(255,255,255,0.05) 100%)',
+      }}
+    >
+      <div className="text-[18px] font-semibold">{isRo ? 'Nu ai început încă niciun flow' : "You haven't started any Flow"}</div>
+      <div className="mt-2 text-white/80 text-[13px] leading-snug">
+        {isRo
+          ? 'Alege o categorie și începe un flow care ți se potrivește acum.'
+          : 'Pick a category and start a flow that matches how you feel right now.'}
+      </div>
+      <button
+        type="button"
+        onClick={onBrowse}
+        className="mt-4 inline-flex items-center justify-center w-full text-white bg-white/15 hover:bg-white/20 active:bg-white/25 shadow-sm font-medium rounded-2xl text-sm px-4 py-3 focus:outline-none transition-colors"
+      >
+        {isRo ? 'Vezi flow-urile' : 'Browse Flows'}
       </button>
-  </div>
-)
+    </div>
+  );
+}
 const Home = () => {
   const [showNotifications, setShowNotifications] = useState(false);
   const history = useHistory();
   const { user, isLoaded } = useUser();
   const lang = Store.useState(s => s.settings.language);
+  const flows = Store.useState(s => s.flows);
+  const [recommendedFlowIds, setRecommendedFlowIds] = useState<string[]>([]);
 
   const displayFirstNameFromClerk = useMemo(() => {
     if (!isLoaded || !user) return '';
@@ -111,6 +337,46 @@ const Home = () => {
     })();
   }, [displayFirstNameFromClerk]);
 
+  useEffect(() => {
+    let cancelled = false;
+    const key = 'flow_recommended_flow_ids_v1';
+
+    (async () => {
+      try {
+        const { value } = await Preferences.get({ key });
+        if (cancelled) return;
+        if (value) {
+          const parsed = JSON.parse(value);
+          if (Array.isArray(parsed) && parsed.every(v => typeof v === 'string')) {
+            setRecommendedFlowIds(parsed);
+            return;
+          }
+        }
+      } catch {
+        // ignore
+      }
+
+      // Generate once per device (temporary until onboarding form exists).
+      const ids = pickRandomDistinct(flows.map(f => f.id), 4);
+      if (cancelled) return;
+      setRecommendedFlowIds(ids);
+      try {
+        await Preferences.set({ key, value: JSON.stringify(ids) });
+      } catch {
+        // ignore
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [flows]);
+
+  const recommendedFlows = useMemo(() => {
+    const byId = new Map(flows.map(f => [f.id, f] as const));
+    return recommendedFlowIds.map(id => byId.get(id)).filter(Boolean) as Flow[];
+  }, [flows, recommendedFlowIds]);
+
   return (
     <IonPage>
       <IonHeader>
@@ -129,7 +395,70 @@ const Home = () => {
           onDidDismiss={() => setShowNotifications(false)}
         />
         <HelloUser firstName={firstName} lang={lang} />
-        <SimpleCardCTA minutes={5} />
+        {(() => {
+          const activeFlow = pickActiveFlow(flows);
+          if (!activeFlow) {
+            return (
+              <div className="flex flex-col gap-4">
+                <EmptyStateCard lang={lang} onBrowse={() => history.push('/flows')} />
+                {recommendedFlows.length ? (
+                  <RecommendedFlowsCard
+                    flows={recommendedFlows}
+                    lang={lang}
+                    onOpenFlow={(flow) => {
+                      const inProgress = pickInProgressPractice(flow);
+                      history.push(inProgress ? `/flows/${flow.id}/${inProgress.id}` : `/flows/${flow.id}`);
+                    }}
+                  />
+                ) : null}
+                <div className="mt-1">
+                  <QuickActionCard
+                    meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
+                    title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}
+                    metaIcon={bookOutline}
+                    onClick={() => history.push('/flows')}
+                  />
+                </div>
+              </div>
+            );
+          }
+
+          const inProgress = pickInProgressPractice(activeFlow);
+          const nextUnfinished = pickNextUnfinishedPractice(activeFlow);
+          const practiceForMinutes = (inProgress ?? nextUnfinished)?.id ?? null;
+
+          const href = inProgress ? `/flows/${activeFlow.id}/${inProgress.id}` : `/flows/${activeFlow.id}`;
+
+          return (
+            <div className="flex flex-col gap-4">
+              <ContinueCard
+                flow={activeFlow}
+                lang={lang}
+                flowId={activeFlow.id}
+                practiceIdForMinutes={practiceForMinutes}
+                onContinue={() => history.push(href)}
+              />
+              {recommendedFlows.length ? (
+                <RecommendedFlowsCard
+                  flows={recommendedFlows}
+                  lang={lang}
+                  onOpenFlow={(flow) => {
+                    const inP = pickInProgressPractice(flow);
+                    history.push(inP ? `/flows/${flow.id}/${inP.id}` : `/flows/${flow.id}`);
+                  }}
+                />
+              ) : null}
+              <div className="mt-1">
+                <QuickActionCard
+                  meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
+                  title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}
+                  metaIcon={bookOutline}
+                  onClick={() => history.push('/flows')}
+                />
+              </div>
+            </div>
+          );
+        })()}
       </IonContent>
     </IonPage>
   );

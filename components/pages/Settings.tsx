@@ -1,19 +1,19 @@
 import {
   IonPage,
   IonHeader,
-  IonItem,
   IonToolbar,
   IonTitle,
   IonContent,
-  IonList,
-  IonListHeader,
   IonToggle,
   IonButton,
   IonLabel,
   IonSelect,
   IonSelectOption,
+  IonButtons,
+  IonIcon,
 } from '@ionic/react';
 import { SignedIn, SignedOut, useClerk } from '@clerk/nextjs';
+import { settingsOutline } from 'ionicons/icons';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -26,6 +26,12 @@ const Settings = () => {
   const history = useHistory();
   const isRo = settings.language === 'ro';
 
+  const cardStyle: React.CSSProperties = {
+    backgroundColor: 'var(--fb-bg)',
+    backgroundImage:
+      'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.05) 55%, rgba(255,255,255,0.05) 100%)',
+  };
+
   const handleSignOut = async () => {
     // Sign out with Clerk
     await signOut();
@@ -37,83 +43,121 @@ const Settings = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle>{isRo ? 'Setări' : 'Settings'}</IonTitle>
+          <IonTitle className="text-white">{isRo ? 'Setări' : 'Settings'}</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={() => history.push('/settings')}>
+              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent>
-        <IonList>
-          <IonItem>
-            <IonToggle
-              checked={settings.enableNotifications}
-              onIonChange={e => {
-                setSettings({
-                  ...settings,
-                  enableNotifications: e.target.checked,
-                });
-              }}
-            >
-              {isRo ? 'Notificări' : 'Enable Notifications'}
-            </IonToggle>
-          </IonItem>
+      <IonContent className="ion-padding">
+        <style>{`
+          /* Settings language select: bigger, white dropdown chevron */
+          .fb-lang-select::part(icon) {
+            color: #ffffff;
+            font-size: 18px;
+            margin-inline-end: 0;
+            padding: 0;
+          }
+          .fb-lang-select::part(text) {
+            margin-inline-end: 0;
+          }
+          .fb-lang-select {
+            --padding-start: 0px;
+            --padding-end: 0px;
+            padding-inline-end: 0 !important;
+            margin-right: 0 !important;
+          }
+        `}</style>
+        <div className="w-full max-w-md mx-auto flex flex-col gap-4">
+          {/* Preferences */}
+          <div className="rounded-[20px] p-4 text-white shadow-xl" style={cardStyle}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-[14px] font-semibold text-white">{isRo ? 'Notificări' : 'Notifications'}</div>
+              <IonToggle
+                checked={settings.enableNotifications}
+                style={{
+                  // White/soft-white toggle styling
+                  '--handle-background': '#ffffff',
+                  '--handle-background-checked': '#ffffff',
+                  '--track-background': 'rgba(255,255,255,0.35)',
+                  '--track-background-checked': 'rgba(255,255,255,0.55)',
+                } as any}
+                onIonChange={e => {
+                  setSettings({
+                    ...settings,
+                    enableNotifications: e.target.checked,
+                  });
+                }}
+              />
+            </div>
 
-          <IonItem>
-            <IonLabel>{isRo ? 'Limbă' : 'Language'}</IonLabel>
-            <IonSelect
-              value={settings.language}
-              interface="popover"
-              onIonChange={(e) => {
-                const next = (e.detail.value === 'ro' ? 'ro' : 'en') as typeof settings.language;
-                setSettings({ ...settings, language: next });
-              }}
-            >
-              <IonSelectOption value="en">English</IonSelectOption>
-              <IonSelectOption value="ro">Română</IonSelectOption>
-            </IonSelect>
-          </IonItem>
-        </IonList>
+            <div className="mt-4 flex items-center gap-3">
+              <IonLabel className="text-white text-[14px] font-semibold">{isRo ? 'Limbă' : 'Language'}</IonLabel>
+              <div style={{ marginLeft: 'auto' }}>
+                <IonSelect
+                  className="fb-lang-select"
+                  value={settings.language}
+                  interface="popover"
+                  style={{
+                    '--placeholder-color': 'rgba(255,255,255,0.85)',
+                    '--color': '#fff',
+                    '--icon-color': '#fff',
+                    '--icon-opacity': '1',
+                    fontSize: '13px',
+                  } as any}
+                  onIonChange={(e) => {
+                    const next = (e.detail.value === 'ro' ? 'ro' : 'en') as typeof settings.language;
+                    setSettings({ ...settings, language: next });
+                  }}
+                >
+                  <IonSelectOption value="en">English</IonSelectOption>
+                  <IonSelectOption value="ro">Română</IonSelectOption>
+                </IonSelect>
+              </div>
+            </div>
+          </div>
 
-        {/* Account Section */}
-        <IonList>
-          <IonListHeader>{isRo ? 'Cont' : 'Account'}</IonListHeader>
-          
-          {/* Show Manage Subscription and Sign Out when user is signed in */}
-          <SignedIn>
-            <IonItem>
-              <IonButton
-                expand="block"
-                color="secondary"
-                className="w-full mb-2"
-                onClick={() => history.push(`/subscribe?return=${encodeURIComponent('/settings')}`)}
-              >
-                {isRo ? 'Abonament' : 'Manage Subscription'}
-              </IonButton>
-            </IonItem>
-            <IonItem>
-              <IonButton
-                expand="block"
-                color="danger"
-                className="w-full"
-                onClick={handleSignOut}
-              >
-                {isRo ? 'Deconectare' : 'Sign Out'}
-              </IonButton>
-            </IonItem>
-          </SignedIn>
-          
-          {/* Show Sign In button when user is NOT signed in */}
-          <SignedOut>
-            <IonItem>
-              <IonButton
-                expand="block"
-                color="primary"
-                className="w-full"
-                onClick={() => window.location.href = '/sign-in'}
-              >
-                {isRo ? 'Autentificare' : 'Sign In'}
-              </IonButton>
-            </IonItem>
-          </SignedOut>
-        </IonList>
+          {/* Account */}
+          <div className="rounded-[20px] p-4 text-white shadow-xl" style={cardStyle}>
+            <div className="text-[14px] font-semibold">{isRo ? 'Cont' : 'Account'}</div>
+
+            <SignedIn>
+              <div className="mt-3 flex flex-col gap-2">
+                <IonButton
+                  expand="block"
+                  fill="solid"
+                  style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                  onClick={() => history.push(`/subscribe?return=${encodeURIComponent('/settings')}`)}
+                >
+                  {isRo ? 'Abonament' : 'Manage Subscription'}
+                </IonButton>
+                <IonButton
+                  expand="block"
+                  fill="solid"
+                  style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                  onClick={handleSignOut}
+                >
+                  {isRo ? 'Deconectare' : 'Sign Out'}
+                </IonButton>
+              </div>
+            </SignedIn>
+
+            <SignedOut>
+              <div className="mt-3">
+                <IonButton
+                  expand="block"
+                  fill="solid"
+                  style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                  onClick={() => (window.location.href = '/sign-in')}
+                >
+                  {isRo ? 'Autentificare' : 'Sign In'}
+                </IonButton>
+              </div>
+            </SignedOut>
+          </div>
+        </div>
       </IonContent>
     </IonPage>
   );

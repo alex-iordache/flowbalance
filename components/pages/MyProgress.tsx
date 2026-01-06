@@ -11,7 +11,6 @@ import {
 import { useHistory } from 'react-router-dom';
 import { settingsOutline } from 'ionicons/icons';
 import Store from '../../store';
-import Logo from '../ui/Logo';
 import { t, type Language } from '../../data/flows';
 
 const MyProgress = () => {
@@ -32,7 +31,7 @@ const MyProgress = () => {
     <IonPage>
       <IonHeader translucent={true}>
         <IonToolbar>
-          <Logo />
+          <IonTitle className="text-white">{isRo ? 'Progresul meu' : 'My Progress'}</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={() => history.push('/settings')}>
               <IonIcon icon={settingsOutline} className="text-white text-2xl" />

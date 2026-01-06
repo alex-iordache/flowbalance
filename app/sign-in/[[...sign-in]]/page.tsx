@@ -11,6 +11,8 @@ import { IonPage, IonContent } from '@ionic/react';
  * Sign-up URL points to in-app sign-up page.
  */
 export default function SignInPage() {
+  const base =
+    typeof window !== 'undefined' ? window.location.origin : 'https://www.flowbalance.app';
 
   return (
     <IonPage>
@@ -25,8 +27,9 @@ export default function SignInPage() {
           <div className="w-full max-w-md">
             <SignIn 
               signUpUrl="/sign-up"
-              fallbackRedirectUrl="/home"
-              forceRedirectUrl="/home"
+              // Use an absolute URL to force a full navigation (more reliable in iOS WKWebView)
+              fallbackRedirectUrl={`${base}/home`}
+              forceRedirectUrl={`${base}/home`}
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

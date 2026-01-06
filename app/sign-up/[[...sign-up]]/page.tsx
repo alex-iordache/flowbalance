@@ -13,6 +13,9 @@ import { IonPage, IonContent } from '@ionic/react';
  * And Email verification code should be enabled.
  */
 export default function SignUpPage() {
+  const base =
+    typeof window !== 'undefined' ? window.location.origin : 'https://www.flowbalance.app';
+
   return (
     <IonPage>
       <IonContent scrollY={true}>
@@ -26,8 +29,9 @@ export default function SignUpPage() {
           <div className="w-full max-w-md space-y-4">
             <SignUp 
               signInUrl="/sign-in"
-              fallbackRedirectUrl="/home"
-              forceRedirectUrl="/home"
+              // Use an absolute URL to force a full navigation (more reliable in iOS WKWebView)
+              fallbackRedirectUrl={`${base}/home`}
+              forceRedirectUrl={`${base}/home`}
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

@@ -19,6 +19,7 @@ export default function DebugInfoBox({
   const [runtimeUrl, setRuntimeUrl] = useState<string>(''); // avoid SSR/CSR mismatch
   const [runtimeUserAgent, setRuntimeUserAgent] = useState<string>(''); // avoid SSR/CSR mismatch
   const [windowOpenLog, setWindowOpenLog] = useState<string>(''); // avoid SSR/CSR mismatch
+  const [navLog, setNavLog] = useState<string>(''); // avoid SSR/CSR mismatch
 
   useEffect(() => {
     // Capture runtime-only values in an effect so SSR HTML matches initial client render.
@@ -99,6 +100,13 @@ export default function DebugInfoBox({
       setWindowOpenLog('');
     }
 
+    // Capture any persisted navigation logs.
+    try {
+      const raw = localStorage.getItem('fb_nav_log_v1') || '';
+      setNavLog(raw);
+    } catch {
+      setNavLog('');
+    }
 
     // Capture console errors/warnings while mounted
     const originalError = console.error;
@@ -128,6 +136,9 @@ export default function DebugInfoBox({
       '=== WINDOW.OPEN LOG ===',
       windowOpenLog || 'No window.open log found',
       '',
+      '=== NAVIGATION LOG ===',
+      navLog || 'No navigation log found',
+      '',
       '=== ERRORS ===',
       errors.length > 0 ? errors.join('\n') : 'No errors',
       '',
@@ -137,7 +148,7 @@ export default function DebugInfoBox({
       '=== TIMESTAMP ===',
       new Date().toISOString(),
     ].join('\n');
-  }, [debugInfo, windowOpenLog, errors, warnings]);
+  }, [debugInfo, windowOpenLog, navLog, errors, warnings]);
 
   const copyToClipboard = async () => {
     try {

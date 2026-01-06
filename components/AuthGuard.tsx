@@ -35,6 +35,11 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
     if (!isLoaded) return;
     if (userId) {
+      try {
+        sessionStorage.removeItem('fb:postAuthTs');
+      } catch {
+        // ignore
+      }
       // If we came from auth return (`/home?auth=1`), clean up the URL once signed in.
       try {
         const url = new URL(window.location.href);
@@ -56,6 +61,22 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     try {
       const url = new URL(window.location.href);
       if (url.searchParams.get('auth') === '1') delayMs = 3000; // post-login settle window (iOS WKWebView)
+    } catch {
+      // ignore
+    }
+
+    // If we *just* observed a signed-in state on a previous page (SignIn/SignUp) and redirected here,
+    // give Clerk longer to rehydrate in iOS WKWebView before forcing /sign-in.
+    try {
+      const tsStr = sessionStorage.getItem('fb:postAuthTs');
+      const ts = tsStr ? Number(tsStr) : NaN;
+      if (Number.isFinite(ts)) {
+        const age = Date.now() - ts;
+        if (age >= 0 && age < 15000) {
+          delayMs = Math.max(delayMs, 6000);
+          console.log('[AuthGuard] postAuth grace window active', { ageMs: age, delayMs });
+        }
+      }
     } catch {
       // ignore
     }

@@ -45,6 +45,11 @@ export default function SignInPage() {
       if (cancelled) return;
       // Small delay to give WKWebView time to flush cookie writes.
       setTimeout(() => {
+        try {
+          sessionStorage.setItem('fb:postAuthTs', String(Date.now()));
+        } catch {
+          // ignore
+        }
         window.location.replace(`${base}/home`);
       }, 750);
     })();

@@ -44,6 +44,11 @@ export default function SignUpPage() {
 
       if (cancelled) return;
       setTimeout(() => {
+        try {
+          sessionStorage.setItem('fb:postAuthTs', String(Date.now()));
+        } catch {
+          // ignore
+        }
         window.location.replace(`${base}/home`);
       }, 750);
     })();

@@ -10,8 +10,6 @@ import AuthGuard from './AuthGuard';
 import { loadAllPersistedState } from '../store/persistence';
 import Subscribe from './pages/Subscribe';
 import DeepLinkReturnHandler from './DeepLinkReturnHandler';
-import WindowOpenLogger from './WindowOpenLogger';
-import NavigationLogger from './NavigationLogger';
 
 setupIonicReact({});
 
@@ -35,10 +33,6 @@ const AppShell = () => {
     <AuthGuard>
       <IonApp>
         <IonReactRouter>
-          {/* Temporary instrumentation: log all window.open calls to localStorage for debugging */}
-          <WindowOpenLogger />
-          {/* Temporary instrumentation: log navigation attempts (clicks + location/history) */}
-          <NavigationLogger />
           <DeepLinkReturnHandler />
           <IonRouterOutlet id="main">
             {/* Main app routes - protected by AuthGuard */}

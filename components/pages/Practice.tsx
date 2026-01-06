@@ -132,7 +132,18 @@ const Practice = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding text-white" style={themedStyle}>
+      <IonContent 
+        className="ion-padding text-white" 
+        style={{
+          ...themedStyle,
+          // Add bottom padding to account for fixed floatingCircle audio player
+          // Player height: ~70vw (max 420px) + bottom offset (74px + safe area)
+          // Add extra margin for spacing between text and player
+          paddingBottom: practice && t(practice.audioUrl, lang) 
+            ? 'calc(70vw + 120px + env(safe-area-inset-bottom))' 
+            : undefined,
+        }}
+      >
         {isActivating && !hasAccess ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
             <p className="text-white text-lg font-semibold mb-2">Activating your subscription…</p>
@@ -143,23 +154,21 @@ const Practice = () => {
         {hasAccess ? (
           <>
             {practice && t(practice.description, lang) ? (
-              <p className="text-white">{t(practice.description, lang)}</p>
+              <p className="text-white mb-6">{t(practice.description, lang)}</p>
             ) : null}
             {practice && t(practice.audioUrl, lang) ? (
-              <div className="mt-4">
-                <AudioPlayer
-                  src={getAudioSrc({
-                    audioUrlOrPath: t(practice.audioUrl, lang),
-                    flowId,
-                    practiceId,
-                  })}
-                  title={t(practice.name, lang)}
-                  subtitle={flow ? t(flow.name, lang) : undefined}
-                  variant="floatingCircle"
-                  onPlay={handleAudioPlay}
-                  onEnded={handleAudioEnded}
-                />
-              </div>
+              <AudioPlayer
+                src={getAudioSrc({
+                  audioUrlOrPath: t(practice.audioUrl, lang),
+                  flowId,
+                  practiceId,
+                })}
+                title={t(practice.name, lang)}
+                subtitle={flow ? t(flow.name, lang) : undefined}
+                variant="floatingCircle"
+                onPlay={handleAudioPlay}
+                onEnded={handleAudioEnded}
+              />
             ) : null}
           </>
         ) : null}

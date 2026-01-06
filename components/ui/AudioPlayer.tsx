@@ -261,14 +261,10 @@ export default function AudioPlayer({
 
   const floatingUi = (
     <div
-      className="fixed left-1/2 -translate-x-1/2 z-50"
+      className="flex justify-center z-50"
       style={{
-        // Position relative to tab bar: tab bar is 56px, we want minimal gap
-        // On browser: safe-area-inset-bottom is 0, so just tab bar + small gap
-        // On mobile: safe-area-inset-bottom accounts for system UI, add it
-        bottom: `calc(30px + env(safe-area-inset-bottom, 0px))`,
-        // Ensure it stays fixed even on scroll
-        position: 'fixed',
+        // 15px margin between circle and bottom tab bar
+        marginBottom: '15px',
       }}
     >
       <style>{`

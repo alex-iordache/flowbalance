@@ -141,11 +141,7 @@ const Practice = () => {
           className="flex flex-col min-h-full"
           style={{
             padding: '16px',
-            // Bottom padding to prevent overlap with fixed audio player
-            // Player max height: 420px (70vw capped), gap: 16px, tab bar: 56px
-            paddingBottom: practice && t(practice.audioUrl, lang)
-              ? 'calc(min(70vw, 420px) + 16px + 56px + env(safe-area-inset-bottom))' 
-              : 'calc(56px + env(safe-area-inset-bottom))',
+            paddingBottom: practice && t(practice.audioUrl, lang) ? '0' : '16px',
           }}
         >
           {isActivating && !hasAccess ? (
@@ -159,34 +155,35 @@ const Practice = () => {
             <>
               {practice && t(practice.description, lang) ? (
                 <div 
-                  className="text-white"
+                  className="text-white flex-1"
                   style={{
                     // Text container - scrollable if content is long
                     paddingRight: '4px',
                     lineHeight: '1.6',
+                    marginBottom: practice && t(practice.audioUrl, lang) ? '16px' : '0',
                   }}
                 >
                   <p className="text-white leading-relaxed whitespace-pre-wrap">{t(practice.description, lang)}</p>
                 </div>
               ) : null}
+              {/* Audio player at bottom with 15px margin above tab bar */}
+              {practice && t(practice.audioUrl, lang) ? (
+                <AudioPlayer
+                  src={getAudioSrc({
+                    audioUrlOrPath: t(practice.audioUrl, lang),
+                    flowId,
+                    practiceId,
+                  })}
+                  title={t(practice.name, lang)}
+                  subtitle={flow ? t(flow.name, lang) : undefined}
+                  variant="floatingCircle"
+                  onPlay={handleAudioPlay}
+                  onEnded={handleAudioEnded}
+                />
+              ) : null}
             </>
           ) : null}
         </div>
-        {/* Audio player rendered outside scroll container, fixed to bottom */}
-        {hasAccess && practice && t(practice.audioUrl, lang) ? (
-          <AudioPlayer
-            src={getAudioSrc({
-              audioUrlOrPath: t(practice.audioUrl, lang),
-              flowId,
-              practiceId,
-            })}
-            title={t(practice.name, lang)}
-            subtitle={flow ? t(flow.name, lang) : undefined}
-            variant="floatingCircle"
-            onPlay={handleAudioPlay}
-            onEnded={handleAudioEnded}
-          />
-        ) : null}
       </IonContent>
     </IonPage>
   );

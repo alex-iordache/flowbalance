@@ -1,7 +1,9 @@
 'use client';
 
 import { SignIn } from '@clerk/nextjs';
+import { useAuth } from '@clerk/nextjs';
 import { IonPage, IonContent } from '@ionic/react';
+import { useEffect } from 'react';
 
 /**
  * Sign In Page
@@ -13,6 +15,13 @@ import { IonPage, IonContent } from '@ionic/react';
 export default function SignInPage() {
   const base =
     typeof window !== 'undefined' ? window.location.origin : 'https://www.flowbalance.app';
+  const { isLoaded, userId } = useAuth();
+
+  // iOS WKWebView can fail Next RSC client navigations; once signed in, hard-navigate to /home.
+  useEffect(() => {
+    if (!isLoaded || !userId) return;
+    window.location.replace(`${base}/home`);
+  }, [isLoaded, userId, base]);
 
   return (
     <IonPage>

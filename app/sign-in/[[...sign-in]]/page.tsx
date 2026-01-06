@@ -109,9 +109,6 @@ export default function SignInPage() {
           <div className="w-full max-w-md">
             <SignIn 
               signUpUrl="/sign-up"
-              // iOS WKWebView: avoid Next.js App Router navigation (RSC fetch) during auth completion.
-              // Stay on /sign-in and let the useAuth() effect hard-redirect to /home once a session exists.
-              fallbackRedirectUrl={`${base}/sign-in`}
               appearance={{
                 elements: {
                   rootBox: "mx-auto",

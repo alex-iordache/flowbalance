@@ -31,8 +31,12 @@ export default function ClerkProviderClient({ children }: Props) {
       clerkJSUrl="https://clerk.flowbalance.app/npm/@clerk/clerk-js@5.117.0/dist/clerk.browser.js"
 
       // Global redirect defaults (avoid legacy redirectUrl).
-      signInFallbackRedirectUrl="/sign-in"
-      signUpFallbackRedirectUrl="/sign-up"
+      // IMPORTANT: Do NOT default redirects back to /sign-in or Clerk will include
+      // `redirect_url=/sign-in` in the hosted sign-in URL, creating a loop in iOS WKWebView.
+      signInFallbackRedirectUrl="/home"
+      signInForceRedirectUrl="/home"
+      signUpFallbackRedirectUrl="/home"
+      signUpForceRedirectUrl="/home"
       afterSignOutUrl="/sign-in"
 
       allowedRedirectOrigins={[

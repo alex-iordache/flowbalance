@@ -85,6 +85,7 @@ This repo uses Ionic’s router for the in-app experience, and Next routes for a
 
 - **Main app shell**: `components/AppShell.tsx`
   - Ionic routes: `/home`, `/flows`, `/progress`, `/settings`
+  - Note: `/subscribe` must be `exact` so it does **not** catch `/subscribe-web/*` return URLs on iOS.
 - **Next routes**:
   - `/sign-in` → `app/sign-in/[[...sign-in]]/page.tsx` (Clerk `<SignIn />`)
   - `/sign-up` → `app/sign-up/[[...sign-up]]/page.tsx` (Clerk `<SignUp />`)
@@ -103,6 +104,10 @@ This repo uses Ionic’s router for the in-app experience, and Next routes for a
 - Prebuilt components:
   - `@clerk/nextjs` `<SignIn />` and `<SignUp />`
   - `fallbackRedirectUrl` + `forceRedirectUrl` props (new API; replaces `afterSignInUrl` / `afterSignUpUrl`)
+
+### iOS: Subscribe / payments (system browser)
+- If iOS logs `WebKitNamespace::Ignoring messageHandlers() request for non app-bound domain`, Capacitor plugins that rely on the JS↔native bridge may not fire.
+- The most reliable pattern is to make the **Subscribe button a direct** `href` with `target="_blank"` to `/subscribe-web?...` (see `components/pages/Subscribe.tsx`), and treat Capacitor `Browser/AppLauncher` as optional enhancements.
 
 ### Official docs to reference first
 - Redirect URLs: `https://clerk.com/docs/guides/development/customize-redirect-urls`

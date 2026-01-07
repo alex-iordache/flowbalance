@@ -22,10 +22,18 @@ export default function DeepLinkReturnHandler() {
         handle = await CapacitorApp.addListener('appUrlOpen', ({ url }) => {
           try {
             const u = new URL(url);
-            if (u.protocol !== 'com.flowapp.app:' || u.hostname !== 'sso-callback') return;
+            // Accept both:
+            // - custom scheme deep links: com.flowapp.app://sso-callback?...
+            // - universal link fallbacks: https://www.flowbalance.app/subscribe-web/return?...
+            const isCustomScheme = u.protocol === 'com.flowapp.app:' && u.hostname === 'sso-callback';
+            const isUniversalReturn =
+              (u.protocol === 'https:' || u.protocol === 'http:') &&
+              (u.hostname === 'www.flowbalance.app' || u.hostname === 'flowbalance.app') &&
+              u.pathname.startsWith('/subscribe-web/return');
+            if (!isCustomScheme && !isUniversalReturn) return;
 
             const returnTo = sanitizeReturnTo(u.searchParams.get('return'));
-            const subscribed = u.searchParams.get('subscribed');
+            const subscribed = isUniversalReturn ? '1' : u.searchParams.get('subscribed');
 
             // If we just completed a subscription, give Clerk a moment to sync entitlements.
             if (subscribed === '1') {

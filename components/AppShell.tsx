@@ -53,7 +53,8 @@ const AppShell = () => {
             <Route path="/flows" component={Tabs} />
             <Route path="/settings" component={Tabs} />
             <Route path="/progress" component={Tabs} />
-            <Route path="/subscribe" component={Subscribe} />
+            {/* IMPORTANT: keep this exact so it does not catch `/subscribe-web/*` deep-link returns */}
+            <Route path="/subscribe" component={Subscribe} exact={true} />
 
             {/* Root route - redirects to home */}
             <Route path="/" exact={true}>

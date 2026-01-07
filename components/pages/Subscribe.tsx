@@ -12,7 +12,7 @@ import {
   IonToggle,
 } from '@ionic/react';
 import { settingsOutline } from 'ionicons/icons';
-import { SignedIn, SignedOut } from '@clerk/nextjs';
+import { SignedIn, SignedOut, useAuth } from '@clerk/nextjs';
 import { usePlans } from '@clerk/nextjs/experimental';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
@@ -21,14 +21,15 @@ import Store from '../../store';
 
 export default function Subscribe() {
   const history = useHistory();
+  const { isLoaded, userId } = useAuth();
   const lang = Store.useState(s => s.settings.language);
   const isRo = lang === 'ro';
   // Match Clerk pricing-table UX: default is "Billed annually"
   const [billing, setBilling] = useState<'month' | 'annual'>('annual');
   const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
   const [returnTo, setReturnTo] = useState<string>('/home');
-  const [opening, setOpening] = useState(false);
-  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
+  const [ticket, setTicket] = useState<string | null>(null);
+  const [ticketLoading, setTicketLoading] = useState(false);
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
@@ -40,6 +41,48 @@ export default function Subscribe() {
     const r = params.get('return');
     if (r && r.startsWith('/')) setReturnTo(r);
   }, []);
+
+  useEffect(() => {
+    // Prefetch a Clerk sign-in ticket so the Subscribe button can be a direct <a href target="_blank">
+    // (works even when iOS blocks Capacitor messageHandlers for non app-bound domains).
+    if (!isLoaded) return;
+    if (!userId) return;
+    let cancelled = false;
+    const ctrl = new AbortController();
+
+    setTicketLoading(true);
+    setTicket(null);
+
+    window
+      .fetch('/api/create-sign-in-token', { signal: ctrl.signal })
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return;
+        setTicket(typeof data?.token === 'string' ? data.token : null);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setTicket(null);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setTicketLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+    };
+  }, [isLoaded, userId]);
+
+  const checkoutUrl = useMemo(() => {
+    const base = `${getWebBaseUrl()}/subscribe-web`;
+    const common = `minimal=1&period=${billing}&return=${encodeURIComponent(returnTo)}`;
+    if (ticket) {
+      return `${base}?autocheckout=1&${common}&__clerk_ticket=${encodeURIComponent(ticket)}`;
+    }
+    return `${base}?${common}`;
+  }, [billing, returnTo, ticket]);
 
   const proPlan = useMemo(() => {
     const list = Array.isArray(plans) ? plans : [];
@@ -94,40 +137,6 @@ export default function Subscribe() {
     };
   }, [proPlan, billing]);
 
-  const openCheckout = async () => {
-    setOpening(true);
-    setFallbackUrl(null);
-    try {
-      // Never let a stalled network request make the button feel "dead" on iOS.
-      const ctrl = new AbortController();
-      const t = window.setTimeout(() => ctrl.abort(), 5000);
-      const response = await fetch('/api/create-sign-in-token', { signal: ctrl.signal });
-      const data = await response.json();
-      window.clearTimeout(t);
-      const { openExternalUrl } = await import('../../helpers/openExternal');
-
-      const base = `${getWebBaseUrl()}/subscribe-web`;
-      if (data?.token) {
-        const url = `${base}?autocheckout=1&minimal=1&period=${billing}&return=${encodeURIComponent(returnTo)}&__clerk_ticket=${data.token}`;
-        setFallbackUrl(url);
-        await openExternalUrl(url);
-      } else {
-        const url = `${base}?return=${encodeURIComponent(returnTo)}`;
-        setFallbackUrl(url);
-        await openExternalUrl(url);
-      }
-    } catch (e) {
-      console.error('Error opening checkout:', e);
-      const { openExternalUrl } = await import('../../helpers/openExternal');
-      const url = `${getWebBaseUrl()}/subscribe-web?return=${encodeURIComponent(returnTo)}`;
-      setFallbackUrl(url);
-      await openExternalUrl(url);
-    } finally {
-      // If iOS blocks the Capacitor bridge (app-bound domain issues), the user needs a manual way out.
-      window.setTimeout(() => setOpening(false), 700);
-    }
-  };
-
   return (
     <IonPage>
       <IonHeader>
@@ -143,10 +152,11 @@ export default function Subscribe() {
 
       <IonContent fullscreen>
         <div
-          className="flex flex-col items-center justify-center min-h-full bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
+          className="flex flex-col items-center justify-center min-h-full p-4"
           style={{
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
+            background: 'var(--fb-bg)',
           }}
         >
           <div className="w-full max-w-md">
@@ -208,25 +218,19 @@ export default function Subscribe() {
 
               <div className="p-6 border-t border-gray-200">
                 <SignedIn>
-                  <IonButton expand="block" color="primary" onClick={openCheckout} disabled={opening}>
-                    {opening ? 'Opening…' : 'Subscribe'}
+                  <IonButton
+                    expand="block"
+                    color="primary"
+                    href={checkoutUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    disabled={ticketLoading}
+                  >
+                    {ticketLoading ? 'Preparing…' : 'Subscribe'}
                   </IonButton>
                   <p className="text-center text-xs text-gray-600 mt-3">
                     Opens in browser to complete payment
                   </p>
-                  {fallbackUrl ? (
-                    <p className="text-center text-xs text-gray-600 mt-2">
-                      If nothing opens, tap:{' '}
-                      <a
-                        href={fallbackUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="underline"
-                      >
-                        Open checkout
-                      </a>
-                    </p>
-                  ) : null}
                 </SignedIn>
 
                 <SignedOut>

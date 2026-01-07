@@ -229,6 +229,14 @@ export default function Subscribe() {
     if (!isLoaded) return;
     if (!userId) return;
     if (!hasFullAccess) return;
+    // Dismiss any in-app checkout browser that might still be visible.
+    try {
+      if (Capacitor.isNativePlatform()) {
+        void import('@capacitor/browser').then(({ Browser }) => Browser.close()).catch(() => {});
+      }
+    } catch {
+      // ignore
+    }
     setPaymentPending(false);
     setWaitingForPayment(false);
     history.replace(returnTo);

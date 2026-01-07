@@ -34,72 +34,16 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       console.log('[AuthGuard] debug log failed', e);
     }
 
+    // IMPORTANT (iOS debugging):
+    // Do NOT auto-redirect to /sign-in from here.
+    // We only *render* a SignedOut overlay (with a manual button) so we don't get surprise kicks.
     if (!isLoaded) return;
-    if (userId) {
-      try {
-        localStorage.removeItem('fb:postAuthTs');
-        localStorage.removeItem('fb:postAuthUserId');
-        localStorage.removeItem('fb:postAuthFrom');
-        console.log('[AuthGuard] cleared fb:postAuth* (localStorage)');
-      } catch (e) {
-        console.log('[AuthGuard] clearing fb:postAuth* failed', e);
-      }
-      // If we came from auth return (`/home?auth=1`), clean up the URL once signed in.
-      try {
-        const url = new URL(window.location.href);
-        if (url.searchParams.get('auth') === '1') {
-          url.searchParams.delete('auth');
-          window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
-        }
-      } catch {
-        // ignore
-      }
-      return;
-    }
-
-    // If signed out, redirect to /sign-in — but give a small grace period on auth return.
+    if (userId) return;
     const pathname = window.location.pathname || '/';
     if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')) return;
-
-    let delayMs = 300; // normal
-    try {
-      const url = new URL(window.location.href);
-      if (url.searchParams.get('auth') === '1') delayMs = 12000; // post-login settle window (iOS WKWebView)
-    } catch (e) {
-      console.log('[AuthGuard] URL parse failed for auth=1 check', e);
-    }
-
-    // If we *just* observed a signed-in state on a previous page (SignIn/SignUp) and redirected here,
-    // give Clerk longer to rehydrate in iOS WKWebView before forcing /sign-in.
-    try {
-      const tsStr = localStorage.getItem('fb:postAuthTs');
-      const ts = tsStr ? Number(tsStr) : NaN;
-      if (Number.isFinite(ts)) {
-        const age = Date.now() - ts;
-        if (age >= 0 && age < 15000) {
-          // iOS: allow plenty of time for Clerk to rehydrate session after a full reload.
-          delayMs = Math.max(delayMs, 12000);
-          console.log('[AuthGuard] postAuth grace window active', {
-            ageMs: age,
-            delayMs,
-            from: localStorage.getItem('fb:postAuthFrom'),
-            uid: localStorage.getItem('fb:postAuthUserId'),
-          });
-        }
-      } else {
-        console.log('[AuthGuard] no postAuthTs in localStorage');
-      }
-    } catch (e) {
-      console.log('[AuthGuard] reading fb:postAuthTs failed', e);
-    }
-
-    console.log('[AuthGuard] signed out; scheduling redirect', { delayMs, pathname });
-    const t = window.setTimeout(() => {
-      // Effect will be cleaned up if userId becomes available.
-      console.log('[AuthGuard] redirect timer fired; sending to /sign-in');
-      window.location.replace('/sign-in');
-    }, delayMs);
-    return () => window.clearTimeout(t);
+    console.log('[AuthGuard] signed out on a protected route; NOT auto-redirecting (manual CTA only)', {
+      pathname,
+    });
   }, [isLoaded, userId]);
 
   return (
@@ -127,7 +71,28 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                 <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600">
                   <div className="text-center text-white">
                     <IonSpinner name="crescent" className="w-16 h-16 mb-4" />
-                    <h2 className="text-2xl font-bold">Redirecting to sign in...</h2>
+                    <h2 className="text-2xl font-bold">Session required</h2>
+                    <p className="text-sm opacity-90 mt-2">
+                      If you were just signed in and got kicked out, Clerk likely lost the session in the WebView.
+                    </p>
+                    <div className="mt-5 flex flex-col gap-3">
+                      <button
+                        className="w-full bg-white/20 hover:bg-white/25 text-white py-3 rounded-xl font-semibold"
+                        onClick={() => {
+                          window.location.href = '/sign-in';
+                        }}
+                      >
+                        Go to Sign in
+                      </button>
+                      <button
+                        className="w-full bg-white/10 hover:bg-white/15 text-white py-3 rounded-xl font-semibold"
+                        onClick={() => {
+                          window.location.reload();
+                        }}
+                      >
+                        Reload app
+                      </button>
+                    </div>
                   </div>
                 </div>
               </IonContent>

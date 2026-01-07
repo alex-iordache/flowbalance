@@ -32,6 +32,13 @@ const AppShell = () => {
     loadAllPersistedState();
   }, []);
 
+  useEffect(() => {
+    // Prevent iOS "page shake" / white flashes during Ionic transitions by ensuring the
+    // document body itself matches the app background and does not scroll behind the webview.
+    document.body.classList.add('fb-in-app');
+    return () => document.body.classList.remove('fb-in-app');
+  }, []);
+
   return (
     <AuthGuard>
       <IonApp>

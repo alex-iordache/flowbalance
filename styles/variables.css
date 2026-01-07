@@ -91,7 +91,8 @@ http://ionicframework.com/docs/theming/ */
 
 /* Seamless Ionic chrome (no borders between header/content/footer) */
 ion-content {
-  --background: var(--fb-bg);
+  --background: var(--fb-bg) !important;
+  background: var(--fb-bg) !important;
 }
 ion-header,
 ion-toolbar {
@@ -129,9 +130,11 @@ ion-toolbar::after {
 ion-header ion-toolbar::part(border),
 ion-tab-bar::part(border) {
   opacity: 0;
+  display: none !important;
 }
 ion-tab-bar {
-  --background: var(--fb-bg);
+  --background: var(--fb-bg) !important;
+  background: var(--fb-bg) !important;
   --border: 0;
   --border-color: transparent;
   box-shadow: none;

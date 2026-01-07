@@ -43,6 +43,15 @@ body {
   overflow: auto;
 }
 
+/* When running the Ionic app shell, do not allow the document to scroll behind the app.
+ * This avoids iOS "shake" and prevents white flashes from the default body background
+ * during page transitions.
+ */
+body.fb-in-app {
+  overflow: hidden;
+  background: var(--fb-bg);
+}
+
 /* Hide scrollbars everywhere (keep scrolling enabled) */
 html,
 body {

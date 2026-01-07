@@ -48,9 +48,24 @@ ion-content::part(scroll)::-webkit-scrollbar {
   display: none;
 }
 
-/* Keep the Capacitor/Ionic app shell constrained to the viewport */
+/* Keep the Capacitor/Ionic app shell constrained to the viewport.
+ *
+ * iOS WKWebView can report an unstable `100vh` during/after keyboard + navigation
+ * (especially right after auth flows). Prefer dynamic viewport units when available.
+ */
+html,
+body {
+  height: 100%;
+}
+
 ion-app {
+  /* Fallback */
   height: 100vh;
+  /* iOS 15+/modern browsers: correct visible viewport */
+  height: 100dvh;
+  /* iOS Safari/WKWebView fallback */
+  height: -webkit-fill-available;
+
   width: 100vw;
   overflow: hidden;
 }

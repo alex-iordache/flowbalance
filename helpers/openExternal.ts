@@ -8,8 +8,26 @@ import { Capacitor } from '@capacitor/core';
  */
 export async function openExternalUrl(url: string) {
   if (Capacitor.isNativePlatform()) {
-    const { AppLauncher } = await import('@capacitor/app-launcher');
-    await AppLauncher.openUrl({ url });
+    // Prefer opening the real system browser (Safari/Chrome) for payments.
+    // On some iOS builds, `AppLauncher.openUrl` can fail silently; fall back to `Browser.open`.
+    try {
+      const { AppLauncher } = await import('@capacitor/app-launcher');
+      await AppLauncher.openUrl({ url });
+      return;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.warn('[openExternalUrl] AppLauncher.openUrl failed; falling back to Browser.open', e);
+      try {
+        const { Browser } = await import('@capacitor/browser');
+        await Browser.open({ url });
+        return;
+      } catch (e2) {
+        // eslint-disable-next-line no-console
+        console.error('[openExternalUrl] Browser.open also failed', e2);
+        // Last-resort fallback (may open inside the WebView; better than doing nothing).
+        window.location.href = url;
+      }
+    }
   } else {
     window.open(url, '_blank', 'noopener,noreferrer');
   }

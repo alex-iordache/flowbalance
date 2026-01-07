@@ -94,8 +94,12 @@ export default function Subscribe() {
 
   const openCheckout = async () => {
     try {
-      const response = await fetch('/api/create-sign-in-token');
+      // Never let a stalled network request make the button feel "dead" on iOS.
+      const ctrl = new AbortController();
+      const t = window.setTimeout(() => ctrl.abort(), 5000);
+      const response = await fetch('/api/create-sign-in-token', { signal: ctrl.signal });
       const data = await response.json();
+      window.clearTimeout(t);
       const { openExternalUrl } = await import('../../helpers/openExternal');
 
       const base = `${getWebBaseUrl()}/subscribe-web`;

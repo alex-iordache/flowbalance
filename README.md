@@ -480,7 +480,7 @@ Code references:
 - API route: `app/api/audio/route.ts`
 - R2 signer/fetch: `lib/r2.ts`
 
-## Git hygiene (don’t commit these)
+## Git hygiene (don’t commit these) 
 
 Ensure `.gitignore` contains:
 

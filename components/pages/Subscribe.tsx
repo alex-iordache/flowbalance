@@ -16,6 +16,7 @@ import { settingsOutline } from 'ionicons/icons';
 import { SignedIn, SignedOut, useAuth } from '@clerk/nextjs';
 import { usePlans } from '@clerk/nextjs/experimental';
 import React, { useEffect, useMemo, useState } from 'react';
+import { App as CapacitorApp } from '@capacitor/app';
 import { useHistory } from 'react-router-dom';
 import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import Store from '../../store';
@@ -126,13 +127,30 @@ export default function Subscribe() {
 
     document.addEventListener('visibilitychange', maybeShow);
     window.addEventListener('focus', maybeShow);
+    // Capacitor-native resume signal (more reliable than focus/visibility on iOS).
+    const removeAppState = CapacitorApp.addListener('appStateChange', (s) => {
+      if (s.isActive) maybeShow();
+    });
     maybeShow();
 
     return () => {
       document.removeEventListener('visibilitychange', maybeShow);
       window.removeEventListener('focus', maybeShow);
+      void removeAppState.then(h => h.remove()).catch(() => {});
     };
   }, []);
+
+  const openCheckout = () => {
+    // IMPORTANT: don't rely on IonButton `href` events to run before navigation in iOS.
+    // We must persist "pending" *first*, then open Safari within the same user gesture.
+    setPaymentPending(true);
+
+    const w = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+    if (!w) {
+      // Popup blocked or prevented; fall back to same-window navigation.
+      window.location.href = checkoutUrl;
+    }
+  };
 
   useEffect(() => {
     // If we already have access, immediately return to the screen that sent us to the paywall.
@@ -301,12 +319,8 @@ export default function Subscribe() {
                   <IonButton
                     expand="block"
                     color="primary"
-                    href={checkoutUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     disabled={ticketLoading}
-                    onPointerDown={() => setPaymentPending(true)}
-                    onClick={() => setPaymentPending(true)}
+                    onClick={openCheckout}
                   >
                     {ticketLoading ? 'Preparing…' : 'Subscribe'}
                   </IonButton>

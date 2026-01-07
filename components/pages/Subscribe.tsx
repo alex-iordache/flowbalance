@@ -116,25 +116,7 @@ export default function Subscribe() {
   const [ticketLoading, setTicketLoading] = useState(false);
   const [waitingForPayment, setWaitingForPayment] = useState<boolean>(false);
   const [safariOpenError, setSafariOpenError] = useState<string | null>(null);
-  const [debugLines, setDebugLines] = useState<string[]>([]);
   const [manualCheckoutUrl, setManualCheckoutUrl] = useState<string | null>(null);
-
-  const debugLog = (label: string, data?: unknown) => {
-    const ts = new Date().toISOString();
-    const payload = (() => {
-      if (data == null) return '';
-      try {
-        if (typeof data === 'string') return data;
-        return JSON.stringify(data);
-      } catch {
-        return String(data);
-      }
-    })();
-    const line = payload ? `[${ts}] ${label} ${payload}` : `[${ts}] ${label}`;
-    setDebugLines(prev => [...prev.slice(-199), line]);
-    // eslint-disable-next-line no-console
-    console.log('[Subscribe]', line);
-  };
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
@@ -157,7 +139,6 @@ export default function Subscribe() {
 
     setTicketLoading(true);
     setTicket(null);
-    debugLog('ticket prefetch start');
 
     window
       .fetch('/api/create-sign-in-token', { signal: ctrl.signal })
@@ -165,17 +146,14 @@ export default function Subscribe() {
       .then(data => {
         if (cancelled) return;
         setTicket(typeof data?.token === 'string' ? data.token : null);
-        debugLog('ticket prefetch ok', { hasToken: typeof data?.token === 'string' });
       })
       .catch(() => {
         if (cancelled) return;
         setTicket(null);
-        debugLog('ticket prefetch failed');
       })
       .finally(() => {
         if (cancelled) return;
         setTicketLoading(false);
-        debugLog('ticket prefetch done');
       });
 
     return () => {
@@ -269,73 +247,47 @@ export default function Subscribe() {
     // - blocked Capacitor bridge injection
     setPaymentPending(true);
     setPaymentOpenedNow();
-    debugLog('openCheckout click', {
-      platform: (() => {
-        try {
-          return Capacitor.getPlatform();
-        } catch {
-          return 'unknown';
-        }
-      })(),
-      checkoutUrl,
-      hasTicket: !!ticket,
-      returnTo,
-    });
-
-    // Prefer platform-specific native open:
-    // - iOS: `Browser.open()` (SFSafariViewController; uses Safari Keychain/autofill)
-    // - Android: `AppLauncher.openUrl()` if available
+    let platform: string = 'unknown';
     try {
-      const platform = (() => {
-        try {
-          return Capacitor.getPlatform();
-        } catch {
-          return 'unknown';
-        }
-      })();
+      platform = Capacitor.getPlatform();
+    } catch {
+      platform = 'unknown';
+    }
 
+    try {
       if (platform === 'ios') {
         const { Browser } = await import('@capacitor/browser');
-        debugLog('Browser.open start');
         await Browser.open({ url: checkoutUrl });
-        debugLog('Browser.open ok');
         return;
       }
 
       if (platform === 'android') {
         const { AppLauncher } = await import('@capacitor/app-launcher');
-        debugLog('AppLauncher.openUrl start');
         await AppLauncher.openUrl({ url: checkoutUrl });
-        debugLog('AppLauncher.openUrl ok');
         return;
       }
-    } catch (e) {
-      debugLog('native open failed', {
-        message: (e as any)?.message,
-        name: (e as any)?.name,
-        code: (e as any)?.code,
-      });
+    } catch {
+      // Native open failed — do not fall back to opening inside the in-app WebView.
+      setManualCheckoutUrl(checkoutUrl);
+      setSafariOpenError(
+        isRo
+          ? 'Nu am putut deschide checkout-ul. Copiază link-ul și deschide-l în Safari.'
+          : 'Could not open checkout. Copy the link and open it in Safari.',
+      );
+      return;
     }
 
-    // Fallback: try a new tab/window (works on web; may be blocked in iOS app).
+    // Web: open a new tab (safe)
     try {
       const w = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-      if (w) {
-        debugLog('window.open ok');
-        return;
+      if (!w) {
+        setManualCheckoutUrl(checkoutUrl);
+        setSafariOpenError(isRo ? 'Popup blocat. Copiază link-ul și deschide-l manual.' : 'Popup blocked. Copy the link and open it manually.');
       }
-      debugLog('window.open blocked');
-    } catch (e) {
-      debugLog('window.open threw', { message: (e as any)?.message });
+    } catch {
+      setManualCheckoutUrl(checkoutUrl);
+      setSafariOpenError(isRo ? 'Nu am putut deschide checkout-ul.' : 'Could not open checkout.');
     }
-
-    // Last resort: keep the user on the page and provide a manual link (copyable).
-    setManualCheckoutUrl(checkoutUrl);
-    setSafariOpenError(
-      isRo
-        ? 'Nu am putut deschide checkout-ul. Copiază link-ul de mai jos și deschide-l în Safari.'
-        : 'Could not open checkout. Copy the link below and open it in Safari.',
-    );
   };
 
   useEffect(() => {
@@ -513,6 +465,38 @@ export default function Subscribe() {
                   <p className="text-center text-xs text-gray-600 mt-3">
                     Opens in browser to complete payment
                   </p>
+                  {manualCheckoutUrl ? (
+                    <div className="mt-3">
+                      <IonButton
+                        expand="block"
+                        fill="solid"
+                        style={{ '--background': 'rgba(0,0,0,0.08)', '--color': '#111' } as any}
+                        onClick={async () => {
+                          try {
+                            await navigator.clipboard.writeText(manualCheckoutUrl);
+                            setSafariOpenError(isRo ? 'Link copiat.' : 'Link copied.');
+                          } catch {
+                            try {
+                              const ta = document.createElement('textarea');
+                              ta.value = manualCheckoutUrl;
+                              ta.style.position = 'fixed';
+                              ta.style.left = '-9999px';
+                              document.body.appendChild(ta);
+                              ta.focus();
+                              ta.select();
+                              document.execCommand('copy');
+                              document.body.removeChild(ta);
+                              setSafariOpenError(isRo ? 'Link copiat.' : 'Link copied.');
+                            } catch {
+                              setSafariOpenError(isRo ? 'Copy failed.' : 'Copy failed.');
+                            }
+                          }
+                        }}
+                      >
+                        {isRo ? 'Copiază link checkout' : 'Copy checkout link'}
+                      </IonButton>
+                    </div>
+                  ) : null}
                 </SignedIn>
 
                 <SignedOut>
@@ -522,92 +506,6 @@ export default function Subscribe() {
                 </SignedOut>
               </div>
             </div>
-        </div>
-
-        {/* Debug box (temporary): helps diagnose iOS AppLauncher failures */}
-        <div className="px-4 pb-10">
-          <div
-            className="rounded-2xl p-4 text-white"
-            style={{
-              backgroundColor: 'rgba(0,0,0,0.18)',
-              border: '1px solid rgba(255,255,255,0.18)',
-            }}
-          >
-            <div className="flex items-center justify-between gap-3">
-              <div className="text-sm font-semibold">Debug (checkout)</div>
-              <div className="flex items-center gap-2">
-                <IonButton
-                  size="small"
-                  fill="solid"
-                  style={{ '--background': 'rgba(255,255,255,0.14)', '--color': '#fff' } as any}
-                  onClick={async () => {
-                    const text = debugLines.join('\n');
-                    try {
-                      await navigator.clipboard.writeText(text);
-                      setSafariOpenError(isRo ? 'Copiat.' : 'Copied.');
-                    } catch {
-                      try {
-                        const ta = document.createElement('textarea');
-                        ta.value = text;
-                        ta.style.position = 'fixed';
-                        ta.style.left = '-9999px';
-                        document.body.appendChild(ta);
-                        ta.focus();
-                        ta.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(ta);
-                        setSafariOpenError(isRo ? 'Copiat.' : 'Copied.');
-                      } catch {
-                        setSafariOpenError(isRo ? 'Copy failed.' : 'Copy failed.');
-                      }
-                    }
-                  }}
-                >
-                  {isRo ? 'Copiază' : 'Copy'}
-                </IonButton>
-                <IonButton
-                  size="small"
-                  fill="clear"
-                  style={{ '--color': 'rgba(255,255,255,0.9)' } as any}
-                  onClick={() => setDebugLines([])}
-                >
-                  {isRo ? 'Șterge' : 'Clear'}
-                </IonButton>
-              </div>
-            </div>
-            <div className="mt-3 text-xs text-white/80 space-y-1">
-              <div>
-                <span className="font-semibold">native</span>: {String(Capacitor.isNativePlatform())}
-              </div>
-              <div>
-                <span className="font-semibold">isLoaded</span>: {String(isLoaded)}{' '}
-                <span className="font-semibold">userId</span>: {userId ? 'yes' : 'no'}{' '}
-                <span className="font-semibold">ticket</span>: {ticket ? 'yes' : 'no'}
-              </div>
-              <div className="break-all">
-                <span className="font-semibold">checkoutUrl</span>: {checkoutUrl}
-              </div>
-            </div>
-            <div
-              className="mt-3 rounded-xl p-3 text-[11px] leading-4"
-              style={{
-                backgroundColor: 'rgba(0,0,0,0.26)',
-                maxHeight: 160,
-                overflow: 'auto',
-                fontFamily:
-                  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace',
-              }}
-            >
-              {debugLines.length ? debugLines.join('\n') : (isRo ? 'Nicio intrare încă.' : 'No entries yet.')}
-            </div>
-
-            {manualCheckoutUrl ? (
-              <div className="mt-3 text-xs text-white/90">
-                <div className="font-semibold">{isRo ? 'Link checkout' : 'Checkout link'}</div>
-                <div className="break-all mt-1">{manualCheckoutUrl}</div>
-              </div>
-            ) : null}
-          </div>
         </div>
 
         {waitingForPayment ? (

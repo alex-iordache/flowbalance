@@ -8,7 +8,6 @@ import { useEffect } from 'react';
 import Tabs from './pages/Tabs';
 import AuthGuard from './AuthGuard';
 import { loadAllPersistedState } from '../store/persistence';
-import Subscribe from './pages/Subscribe';
 import DeepLinkReturnHandler from './DeepLinkReturnHandler';
 import HardwareBackHandler from './HardwareBackHandler';
 import CategoryThemeSync from './CategoryThemeSync';
@@ -53,8 +52,8 @@ const AppShell = () => {
             <Route path="/flows" component={Tabs} />
             <Route path="/settings" component={Tabs} />
             <Route path="/progress" component={Tabs} />
-            {/* IMPORTANT: keep this exact so it does not catch `/subscribe-web/*` deep-link returns */}
-            <Route path="/subscribe" component={Subscribe} exact={true} />
+            {/* IMPORTANT: keep this exact so it does not catch `/subscribe-web/*` return URLs on iOS */}
+            <Route path="/subscribe" component={Tabs} exact={true} />
 
             {/* Root route - redirects to home */}
             <Route path="/" exact={true}>

@@ -108,6 +108,7 @@ This repo uses Ionic’s router for the in-app experience, and Next routes for a
 ### iOS: Subscribe / payments (system browser)
 - If iOS logs `WebKitNamespace::Ignoring messageHandlers() request for non app-bound domain`, Capacitor plugins that rely on the JS↔native bridge may not fire.
 - The most reliable pattern is to make the **Subscribe button a direct** `href` with `target="_blank"` to `/subscribe-web?...` (see `components/pages/Subscribe.tsx`), and treat Capacitor `Browser/AppLauncher` as optional enhancements.
+- Because Safari → App return is not always delivered as a deep-link callback, the in-app `/subscribe` screen shows a **“Waiting for payment confirmation…”** overlay and polls Clerk every ~2s until the `pro_user` plan activates, then returns to the `return=` route.
 
 ### Official docs to reference first
 - Redirect URLs: `https://clerk.com/docs/guides/development/customize-redirect-urls`

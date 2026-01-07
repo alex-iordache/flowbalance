@@ -7,6 +7,7 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
+  IonSpinner,
   IonTitle,
   IonToolbar,
   IonToggle,
@@ -19,9 +20,19 @@ import { useHistory } from 'react-router-dom';
 import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import Store from '../../store';
 
+const PAYMENT_PENDING_KEY = 'flow_payment_pending_v1';
+
+function getPaymentPending(): boolean {
+  try {
+    return sessionStorage.getItem(PAYMENT_PENDING_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 export default function Subscribe() {
   const history = useHistory();
-  const { isLoaded, userId } = useAuth();
+  const { isLoaded, userId, orgId, has } = useAuth();
   const lang = Store.useState(s => s.settings.language);
   const isRo = lang === 'ro';
   // Match Clerk pricing-table UX: default is "Billed annually"
@@ -30,6 +41,7 @@ export default function Subscribe() {
   const [returnTo, setReturnTo] = useState<string>('/home');
   const [ticket, setTicket] = useState<string | null>(null);
   const [ticketLoading, setTicketLoading] = useState(false);
+  const [waitingForPayment, setWaitingForPayment] = useState<boolean>(getPaymentPending());
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
@@ -74,6 +86,54 @@ export default function Subscribe() {
       ctrl.abort();
     };
   }, [isLoaded, userId]);
+
+  const hasFullAccess = useMemo(() => {
+    if (!userId) return false;
+    if (orgId) return true;
+    return has?.({ plan: 'pro_user' }) ?? false;
+  }, [userId, orgId, has]);
+
+  useEffect(() => {
+    // Keep the pending marker persisted so returning from Safari (without a deep link callback)
+    // still shows the overlay and keeps polling until the subscription activates.
+    try {
+      if (waitingForPayment) {
+        sessionStorage.setItem(PAYMENT_PENDING_KEY, '1');
+      } else {
+        sessionStorage.removeItem(PAYMENT_PENDING_KEY);
+      }
+    } catch {
+      // ignore
+    }
+  }, [waitingForPayment]);
+
+  useEffect(() => {
+    // If we already have access, immediately return to the screen that sent us to the paywall.
+    if (!waitingForPayment) return;
+    if (!isLoaded) return;
+    if (!userId) return;
+    if (!hasFullAccess) return;
+    setWaitingForPayment(false);
+    history.replace(returnTo);
+  }, [waitingForPayment, isLoaded, userId, hasFullAccess, history, returnTo]);
+
+  useEffect(() => {
+    if (!waitingForPayment) return;
+    if (!isLoaded) return;
+    if (!userId) return;
+
+    // Poll every 2s for subscription activation.
+    const interval = window.setInterval(() => {
+      try {
+        const w = window as unknown as { Clerk?: { session?: { reload?: () => Promise<unknown> } } };
+        void w.Clerk?.session?.reload?.();
+      } catch {
+        // ignore
+      }
+    }, 2000);
+
+    return () => window.clearInterval(interval);
+  }, [waitingForPayment, isLoaded, userId]);
 
   const checkoutUrl = useMemo(() => {
     const base = `${getWebBaseUrl()}/subscribe-web`;
@@ -150,16 +210,8 @@ export default function Subscribe() {
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen>
-        <div
-          className="flex flex-col items-center justify-center min-h-full p-4"
-          style={{
-            paddingTop: 'env(safe-area-inset-top)',
-            paddingBottom: 'env(safe-area-inset-bottom)',
-            background: 'var(--fb-bg)',
-          }}
-        >
-          <div className="w-full max-w-md">
+      <IonContent style={{ '--background': 'var(--fb-bg)' } as any}>
+        <div className="w-full max-w-md mx-auto pt-3 pb-24 px-4" style={{ background: 'var(--fb-bg)' }}>
             <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
               <div className="p-4">
                 <h2 className="font-bold text-gray-900">Flow Pro</h2>
@@ -225,6 +277,7 @@ export default function Subscribe() {
                     target="_blank"
                     rel="noopener noreferrer"
                     disabled={ticketLoading}
+                    onClick={() => setWaitingForPayment(true)}
                   >
                     {ticketLoading ? 'Preparing…' : 'Subscribe'}
                   </IonButton>
@@ -240,8 +293,45 @@ export default function Subscribe() {
                 </SignedOut>
               </div>
             </div>
-          </div>
         </div>
+
+        {waitingForPayment ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
+            <div
+              className="w-full max-w-sm rounded-2xl p-5 text-white"
+              style={{
+                backgroundColor: 'rgba(125, 99, 255, 0.92)',
+                boxShadow: 'inset 0 10px 22px rgba(0,0,0,0.14), inset 0 -10px 22px rgba(0,0,0,0.14)',
+                backdropFilter: 'blur(10px)',
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <IonSpinner name="crescent" className="text-white" />
+                <div className="font-semibold">
+                  {isRo ? 'Așteptăm confirmarea plății…' : 'Waiting for payment confirmation…'}
+                </div>
+              </div>
+              <div className="text-sm text-white/85 mt-2">
+                {isRo
+                  ? 'Poate dura câteva secunde. Te întoarcem automat în aplicație când abonamentul se activează.'
+                  : 'This can take a few seconds. We’ll return you automatically once your subscription activates.'}
+              </div>
+              <div className="mt-4">
+                <IonButton
+                  expand="block"
+                  fill="solid"
+                  style={{ '--background': 'rgba(255,255,255,0.14)', '--color': '#fff' } as any}
+                  onClick={() => {
+                    setWaitingForPayment(false);
+                    history.replace(returnTo);
+                  }}
+                >
+                  {isRo ? 'Anulează' : 'Cancel'}
+                </IonButton>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </IonContent>
     </IonPage>
   );

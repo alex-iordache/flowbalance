@@ -10,30 +10,13 @@ export interface RootState {
   
 export const createAppSelector = createSelector.withTypes<RootState>()
 
-export const selectHomeItems = createAppSelector(
-    [
-      state => state.homeItems
-    ],
-    homeItems => homeItems
-  )
+// NOTE: Don't use identity result functions with `createSelector`.
+// Reselect warns in dev because `resultFn(x) => x` provides no transformation and can
+// lead to confusing memoization behavior.
+export const selectHomeItems = (state: RootState) => state.homeItems
 
-export const selectLists = createAppSelector(
-    [
-        state => state.lists
-    ],
-    lists => lists
-)
+export const selectLists = (state: RootState) => state.lists
 
-export const selectNotifications = createAppSelector(
-    [
-        state => state.notifications
-    ],
-    notifications => notifications
-)
+export const selectNotifications = (state: RootState) => state.notifications
 
-export const selectSettings = createAppSelector(
-    [
-        state => state.settings
-    ],
-    settings => settings
-)
+export const selectSettings = (state: RootState) => state.settings

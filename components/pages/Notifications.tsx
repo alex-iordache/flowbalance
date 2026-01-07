@@ -56,11 +56,6 @@ const Notifications = ({
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Notifications</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         <IonList>
           {notifications.map((notification, i) => (
             <NotificationItem notification={notification} key={i} />

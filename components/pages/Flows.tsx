@@ -75,7 +75,7 @@ const Flows = () => {
   const isRo = lang === 'ro';
   return (
     <IonPage>
-      <IonHeader translucent={true}>
+      <IonHeader>
         <IonToolbar>
           <IonTitle className="text-white">{isRo ? 'Flows' : 'Flows'}</IonTitle>
           <IonButtons slot="end">
@@ -86,11 +86,6 @@ const Flows = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">{isRo ? 'Flows' : 'Flows'}</IonTitle>
-          </IonToolbar>
-        </IonHeader>
         <CategoryList flows={flows} lang={lang} />
         </IonContent>
     </IonPage>

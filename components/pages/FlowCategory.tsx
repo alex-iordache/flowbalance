@@ -56,7 +56,7 @@ export default function FlowCategory() {
 
   return (
     <IonPage>
-      <IonHeader translucent={true}>
+      <IonHeader>
         <IonToolbar>
           <IonTitle className="text-white">{category ? t(category.title, lang) : 'Category'}</IonTitle>
           <IonButtons slot="end">
@@ -68,12 +68,6 @@ export default function FlowCategory() {
       </IonHeader>
 
       <IonContent fullscreen={true}>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">{category ? t(category.title, lang) : 'Category'}</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-
         <div className="flex flex-col gap-4 p-4 w-full max-w-2xl mx-auto">
           {categoryFlows.map(flow => (
             <FlowRow key={flow.id} flow={flow} lang={lang} />

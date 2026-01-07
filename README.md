@@ -317,11 +317,27 @@ This section documents the full context so a future agent can re-apply the fixes
   - Clerk’s sign-in UI contains form fields; during the email/code flow, the keyboard opens/closes and WKWebView may end up stuck at a non-1.0 zoom scale.
   - Native logs confirmed this:
     - `zoomScale=1.2315...` around `keyboardWillHide` on `/sign-in`.
+  - **Important nuance (the real “gotcha”)**:
+    - Even after we forced `scrollView.zoomScale` and `webView.pageZoom` to `1.0`, the UI could still appear zoomed.
+    - The smoking gun was **JS-side VisualViewport**:
+      - Immediately after keyboard close, `window.visualViewport.scale` jumped (e.g. `1.566...`) and `visualViewport.width` shrank, while native `zoomScale/pageZoom` stayed at `1.0`.
+    - That means the “zoom” was happening at the **browser viewport level**, not the scrollView zoom level.
 
 - **Fixes applied**:
   - **Prevent auto-zoom** by forcing Clerk inputs to use `>= 16px` font size via Clerk `appearance`:
     - In `app/sign-in/[[...sign-in]]/page.tsx` and `app/sign-up/[[...sign-up]]/page.tsx`:
       - `appearance.elements.formFieldInput = "text-[16px]"`
+  - **Lock viewport scaling globally (definitive fix)**:
+    - In `app/layout.tsx` we set:
+      - `minimumScale: 1`
+      - `maximumScale: 1`
+      - `userScalable: false`
+    - This prevents iOS from applying the post-keyboard VisualViewport scale jump.
+  - **iOS-only CSS hardening**:
+    - In `styles/global.css`:
+      - `-webkit-text-size-adjust: 100%`
+      - `input, textarea, select { font-size: 16px; }`
+    - This prevents iOS focus-driven zoom even when a third-party UI (Clerk) renders an input that isn’t covered by our component-level styling.
   - **Native fallback** (debug/robustness):
     - `ios/App/App/DebugBridgeViewController.swift` implements `normalizeZoomIfNeeded()` which resets `scrollView.zoomScale` back to `1.0` on:
       - `keyboardWillHide`

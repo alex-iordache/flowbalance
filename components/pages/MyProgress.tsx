@@ -29,7 +29,7 @@ const MyProgress = () => {
 
   return (
     <IonPage>
-      <IonHeader translucent={true}>
+      <IonHeader>
         <IonToolbar>
           <IonTitle className="text-white">{isRo ? 'Progresul meu' : 'My Progress'}</IonTitle>
           <IonButtons slot="end">
@@ -40,12 +40,6 @@ const MyProgress = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large" className="text-white">{isRo ? 'Progresul meu' : 'My Progress'}</IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        
         {startedFlows.length === 0 ? (
           <div className="flex flex-col items-center justify-center min-h-[50vh] text-center">
             <p className="text-white text-lg mb-4">{isRo ? 'Nu ai început încă niciun flow' : 'No flows started yet'}</p>

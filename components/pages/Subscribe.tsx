@@ -111,10 +111,28 @@ export default function Subscribe() {
   }, [userId, orgId, has]);
 
   useEffect(() => {
-    // Keep the pending marker persisted so returning from Safari (without a deep link callback)
-    // still shows the overlay and keeps polling until the subscription activates.
-    setPaymentPending(waitingForPayment);
-  }, [waitingForPayment]);
+    // Show the overlay when returning to the app from Safari:
+    // - iOS may not deliver the deep-link callback reliably
+    // - we rely on a persisted "pending" marker instead
+    const maybeShow = () => {
+      try {
+        if (document.visibilityState === 'visible' && getPaymentPending()) {
+          setWaitingForPayment(true);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    document.addEventListener('visibilitychange', maybeShow);
+    window.addEventListener('focus', maybeShow);
+    maybeShow();
+
+    return () => {
+      document.removeEventListener('visibilitychange', maybeShow);
+      window.removeEventListener('focus', maybeShow);
+    };
+  }, []);
 
   useEffect(() => {
     // If we already have access, immediately return to the screen that sent us to the paywall.
@@ -122,6 +140,7 @@ export default function Subscribe() {
     if (!isLoaded) return;
     if (!userId) return;
     if (!hasFullAccess) return;
+    setPaymentPending(false);
     setWaitingForPayment(false);
     history.replace(returnTo);
   }, [waitingForPayment, isLoaded, userId, hasFullAccess, history, returnTo]);
@@ -286,9 +305,8 @@ export default function Subscribe() {
                     target="_blank"
                     rel="noopener noreferrer"
                     disabled={ticketLoading}
-                    // Use pointer-down so we persist the overlay state *before* navigating to Safari.
-                    onPointerDown={() => setWaitingForPayment(true)}
-                    onClick={() => setWaitingForPayment(true)}
+                    onPointerDown={() => setPaymentPending(true)}
+                    onClick={() => setPaymentPending(true)}
                   >
                     {ticketLoading ? 'Preparing…' : 'Subscribe'}
                   </IonButton>
@@ -333,6 +351,7 @@ export default function Subscribe() {
                   fill="solid"
                   style={{ '--background': 'rgba(255,255,255,0.14)', '--color': '#fff' } as any}
                   onClick={() => {
+                    setPaymentPending(false);
                     setWaitingForPayment(false);
                     history.replace(returnTo);
                   }}

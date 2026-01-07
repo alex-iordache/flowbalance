@@ -23,19 +23,25 @@ export default function ClerkProviderClient({ children }: Props) {
        * - For Clerk's internal auth-step navigations (same-origin /sign-in/*), only mutate history (no network).
        * - Do NOT auto-navigate to /home from Clerk; we keep the user on the Signed-in page and require a tap.
        */
-      routerPush={(to: string) => {
+      routerPush={function (
+        to: string,
+        meta?:
+          | {
+              __internal_metadata?: { routing?: string; navigationType?: string };
+              windowNavigate?: (to: URL | string) => void;
+            }
+          | undefined,
+      ) {
         try {
           const url = new URL(to, window.location.origin);
-          console.log('[ClerkNav] push requested', url.toString());
+          console.log('[ClerkNav] push requested', {
+            to: url.toString(),
+            meta: meta?.__internal_metadata ?? null,
+          });
 
-          const isHostedClerk =
-            url.hostname === 'accounts.flowbalance.app' ||
-            url.hostname.endsWith('.clerk.com') ||
-            url.hostname.endsWith('.clerk.accounts.dev') ||
-            url.hostname.endsWith('.accounts.dev');
-
-          if (isHostedClerk) {
-            console.log('[ClerkNav] BLOCKED hosted navigation', url.toString());
+          if (meta?.__internal_metadata?.navigationType === 'window') {
+            // This is the cross-origin hop that creates the redirect chain (accounts.*).
+            console.log('[ClerkNav] BLOCKED window navigation (cross-origin)', url.toString());
             return;
           }
 
@@ -59,19 +65,24 @@ export default function ClerkProviderClient({ children }: Props) {
           window.location.assign(to);
         }
       }}
-      routerReplace={(to: string) => {
+      routerReplace={function (
+        to: string,
+        meta?:
+          | {
+              __internal_metadata?: { routing?: string; navigationType?: string };
+              windowNavigate?: (to: URL | string) => void;
+            }
+          | undefined,
+      ) {
         try {
           const url = new URL(to, window.location.origin);
-          console.log('[ClerkNav] replace requested', url.toString());
+          console.log('[ClerkNav] replace requested', {
+            to: url.toString(),
+            meta: meta?.__internal_metadata ?? null,
+          });
 
-          const isHostedClerk =
-            url.hostname === 'accounts.flowbalance.app' ||
-            url.hostname.endsWith('.clerk.com') ||
-            url.hostname.endsWith('.clerk.accounts.dev') ||
-            url.hostname.endsWith('.accounts.dev');
-
-          if (isHostedClerk) {
-            console.log('[ClerkNav] BLOCKED hosted navigation', url.toString());
+          if (meta?.__internal_metadata?.navigationType === 'window') {
+            console.log('[ClerkNav] BLOCKED window navigation (cross-origin)', url.toString());
             return;
           }
 
@@ -101,13 +112,19 @@ export default function ClerkProviderClient({ children }: Props) {
       // Prefer first-party Clerk custom domain for WKWebView cookie/session reliability.
       clerkJSUrl="https://clerk.flowbalance.app/npm/@clerk/clerk-js@5.117.0/dist/clerk.browser.js"
 
-      // Global redirect defaults (avoid legacy redirectUrl).
-      // Step 1 for debugging iOS: keep post-auth navigation on the auth page itself.
-      // We then render a "Signed in" screen (and NOT <SignIn/>) when userId exists.
-      signInFallbackRedirectUrl="/sign-in?done=1"
-      signInForceRedirectUrl="/sign-in?done=1"
-      signUpFallbackRedirectUrl="/sign-up?done=1"
-      signUpForceRedirectUrl="/sign-up?done=1"
+      /**
+       * IMPORTANT:
+       * We do NOT set signIn/signUp *Force/Fallback* redirect URLs here.
+       *
+       * Those props are exactly what end up as:
+       *   sign_in_force_redirect_url=... and redirect_url=...
+       * in the hosted `accounts.*` URL, which is the redirect chain you pasted.
+       *
+       * For step-by-step iOS debugging, we instead:
+       * - block cross-origin ("window") navigations in routerPush/routerReplace
+       * - block auto navigation to /home
+       * - render a "Signed in" screen on /sign-in when userId exists
+       */
       afterSignOutUrl="/sign-in"
 
       allowedRedirectOrigins={[

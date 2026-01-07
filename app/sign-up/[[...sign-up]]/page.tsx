@@ -80,6 +80,7 @@ export default function SignUpPage() {
               </div>
             ) : (
               <SignUp 
+                routing="virtual"
                 signInUrl="/sign-in"
                 appearance={{
                   elements: {

@@ -84,6 +84,52 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         }
     }
 
+    private func evalViewportJS(reason: String) {
+        guard let wb = self.webView else { return }
+        let js = """
+        (function () {
+          try {
+            var vv = window.visualViewport;
+            var meta = document.querySelector('meta[name="viewport"]');
+            return JSON.stringify({
+              href: String(location.href),
+              innerWidth: window.innerWidth,
+              innerHeight: window.innerHeight,
+              devicePixelRatio: window.devicePixelRatio,
+              screen: { width: screen.width, height: screen.height },
+              docEl: {
+                clientWidth: document.documentElement.clientWidth,
+                clientHeight: document.documentElement.clientHeight,
+                scrollWidth: document.documentElement.scrollWidth,
+                scrollHeight: document.documentElement.scrollHeight
+              },
+              body: { clientHeight: document.body && document.body.clientHeight, scrollHeight: document.body && document.body.scrollHeight },
+              visualViewport: vv ? {
+                width: vv.width, height: vv.height, scale: vv.scale,
+                offsetTop: vv.offsetTop, offsetLeft: vv.offsetLeft, pageTop: vv.pageTop, pageLeft: vv.pageLeft
+              } : null,
+              viewportMeta: meta ? meta.getAttribute('content') : null
+            });
+          } catch (e) {
+            return JSON.stringify({ error: String(e) });
+          }
+        })();
+        """
+        wb.evaluateJavaScript(js) { result, error in
+            #if DEBUG
+            if let error = error {
+                print("[NativeViewportJS] \(reason) ERROR \(error.localizedDescription)")
+                return
+            }
+            if let s = result as? String {
+                print("[NativeViewportJS] \(reason) \(s)")
+            } else {
+                print("[NativeViewportJS] \(reason) (non-string result)")
+            }
+            #endif
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -120,6 +166,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         normalizeZoomIfNeeded(reason: "viewDidAppear")
         normalizeOffsetIfNeeded(reason: "viewDidAppear")
         normalizeScrollInsets(reason: "viewDidAppear")
+        evalViewportJS(reason: "viewDidAppear")
 
         #if DEBUG
         logViewport(reason: "viewDidAppear")
@@ -162,6 +209,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         #if DEBUG
         logViewport(reason: "didStartProvisionalNavigation")
         #endif
+        evalViewportJS(reason: "didStartProvisionalNavigation")
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -171,6 +219,11 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         #if DEBUG
         logViewport(reason: "didFinishNavigation")
         #endif
+        evalViewportJS(reason: "didFinishNavigation")
+        // Follow-up after layout settles
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+            self?.evalViewportJS(reason: "didFinishNavigation+350ms")
+        }
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -195,6 +248,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         normalizeOffsetIfNeeded(reason: "keyboardWillShow")
         normalizeScrollInsets(reason: "keyboardWillShow")
         logViewport(reason: "keyboardWillShow")
+        evalViewportJS(reason: "keyboardWillShow")
     }
 
     @objc private func onKeyboardWillHide(_ note: Notification) {
@@ -202,6 +256,10 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         normalizeOffsetIfNeeded(reason: "keyboardWillHide")
         normalizeScrollInsets(reason: "keyboardWillHide")
         logViewport(reason: "keyboardWillHide")
+        evalViewportJS(reason: "keyboardWillHide")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { [weak self] in
+            self?.evalViewportJS(reason: "keyboardWillHide+350ms")
+        }
     }
     #endif
 

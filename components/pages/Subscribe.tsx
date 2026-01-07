@@ -231,10 +231,28 @@ export default function Subscribe() {
     const removeAppState = CapacitorApp.addListener('appStateChange', (s) => {
       if (s.isActive) maybeShow();
     });
+
+    // When using `Browser.open()` on iOS (SFSafariViewController), the app may not "resume",
+    // so listen for Browser close.
+    const removeBrowserFinished = (async () => {
+      try {
+        const platform = Capacitor.getPlatform();
+        if (platform !== 'ios') return null;
+        const { Browser } = await import('@capacitor/browser');
+        return await Browser.addListener('browserFinished', () => {
+          maybeShow();
+        });
+      } catch {
+        return null;
+      }
+    })();
     return () => {
       document.removeEventListener('visibilitychange', maybeShow);
       window.removeEventListener('focus', maybeShow);
       void removeAppState.then(h => h.remove()).catch(() => {});
+      void removeBrowserFinished
+        .then(h => h?.remove?.())
+        .catch(() => {});
     };
   }, []);
 
@@ -264,16 +282,35 @@ export default function Subscribe() {
       returnTo,
     });
 
-    // Always try native Safari first (if available). Do NOT rely on `isNativePlatform()` since
-    // iOS WebKit restrictions can make platform detection flaky even when plugins work.
+    // Prefer platform-specific native open:
+    // - iOS: `Browser.open()` (SFSafariViewController; uses Safari Keychain/autofill)
+    // - Android: `AppLauncher.openUrl()` if available
     try {
-      const { AppLauncher } = await import('@capacitor/app-launcher');
-      debugLog('AppLauncher.openUrl start');
-      await AppLauncher.openUrl({ url: checkoutUrl });
-      debugLog('AppLauncher.openUrl ok');
-      return;
+      const platform = (() => {
+        try {
+          return Capacitor.getPlatform();
+        } catch {
+          return 'unknown';
+        }
+      })();
+
+      if (platform === 'ios') {
+        const { Browser } = await import('@capacitor/browser');
+        debugLog('Browser.open start');
+        await Browser.open({ url: checkoutUrl });
+        debugLog('Browser.open ok');
+        return;
+      }
+
+      if (platform === 'android') {
+        const { AppLauncher } = await import('@capacitor/app-launcher');
+        debugLog('AppLauncher.openUrl start');
+        await AppLauncher.openUrl({ url: checkoutUrl });
+        debugLog('AppLauncher.openUrl ok');
+        return;
+      }
     } catch (e) {
-      debugLog('AppLauncher.openUrl failed', {
+      debugLog('native open failed', {
         message: (e as any)?.message,
         name: (e as any)?.name,
         code: (e as any)?.code,

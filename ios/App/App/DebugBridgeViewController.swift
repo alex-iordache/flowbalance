@@ -57,6 +57,33 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         }
     }
 
+    private func normalizeScrollInsets(reason: String) {
+        guard let sv = self.webView?.scrollView else { return }
+        // When the keyboard opens/closes, WKWebView can end up with stale insets/adjustments
+        // which makes the page appear shifted or "bigger than screen".
+        if #available(iOS 11.0, *) {
+            if sv.contentInsetAdjustmentBehavior != .never {
+                sv.contentInsetAdjustmentBehavior = .never
+                #if DEBUG
+                print("[NativeViewport] normalizeScrollInsets(\(reason)) set contentInsetAdjustmentBehavior=.never")
+                #endif
+            }
+        }
+        if sv.contentInset != .zero || sv.scrollIndicatorInsets != .zero {
+            sv.contentInset = .zero
+            sv.scrollIndicatorInsets = .zero
+            #if DEBUG
+            print("[NativeViewport] normalizeScrollInsets(\(reason)) reset contentInset/scrollIndicatorInsets to .zero")
+            #endif
+        }
+        if sv.isScrollEnabled == false {
+            sv.isScrollEnabled = true
+            #if DEBUG
+            print("[NativeViewport] normalizeScrollInsets(\(reason)) set isScrollEnabled=true")
+            #endif
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -84,6 +111,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         super.viewDidAppear(animated)
         normalizeZoomIfNeeded(reason: "viewDidAppear")
         normalizeOffsetIfNeeded(reason: "viewDidAppear")
+        normalizeScrollInsets(reason: "viewDidAppear")
 
         #if DEBUG
         logViewport(reason: "viewDidAppear")
@@ -107,6 +135,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         super.viewDidLayoutSubviews()
         normalizeZoomIfNeeded(reason: "viewDidLayoutSubviews")
         normalizeOffsetIfNeeded(reason: "viewDidLayoutSubviews")
+        normalizeScrollInsets(reason: "viewDidLayoutSubviews")
         #if DEBUG
         logViewport(reason: "viewDidLayoutSubviews")
         #endif
@@ -130,6 +159,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         normalizeZoomIfNeeded(reason: "didFinishNavigation")
         normalizeOffsetIfNeeded(reason: "didFinishNavigation")
+        normalizeScrollInsets(reason: "didFinishNavigation")
         #if DEBUG
         logViewport(reason: "didFinishNavigation")
         #endif
@@ -159,6 +189,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
     @objc private func onKeyboardWillHide(_ note: Notification) {
         normalizeZoomIfNeeded(reason: "keyboardWillHide")
         normalizeOffsetIfNeeded(reason: "keyboardWillHide")
+        normalizeScrollInsets(reason: "keyboardWillHide")
         logViewport(reason: "keyboardWillHide")
     }
     #endif
@@ -188,6 +219,12 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         let contentOffset = sv?.contentOffset ?? .zero
         let scrollFrame = sv?.frame ?? .zero
         let scrollBounds = sv?.bounds ?? .zero
+        let insetBehavior: String = {
+            if #available(iOS 11.0, *) {
+                return String(describing: sv?.contentInsetAdjustmentBehavior.rawValue ?? -1)
+            }
+            return "(n/a)"
+        }()
 
         let zoom = sv?.zoomScale ?? 1.0
         var pageZoom: CGFloat? = nil
@@ -203,7 +240,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         print("[NativeViewport] host=\(host) limitsNavigationsToAppBoundDomains=\(limitsAppBound)")
         print("[NativeViewport] view.bounds=\(viewBounds) safeArea=\(safe)")
         print("[NativeViewport] scrollEnabled=\(isScrollEnabled) zoomScale=\(zoom) pageZoom=\(pageZoom.map { String(describing: $0) } ?? "(n/a)") bounces=\(bounces) alwaysBounceVertical=\(alwaysBounceV)")
-        print("[NativeViewport] scroll.frame=\(scrollFrame) scroll.bounds=\(scrollBounds) contentOffset=\(contentOffset)")
+        print("[NativeViewport] scroll.frame=\(scrollFrame) scroll.bounds=\(scrollBounds) contentOffset=\(contentOffset) insetBehavior=\(insetBehavior)")
         print("[NativeViewport] contentSize=\(contentSize) contentInset=\(contentInset) adjustedInset=\(adjustedInset)")
     }
     #endif

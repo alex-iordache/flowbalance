@@ -23,6 +23,8 @@ import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import Store from '../../store';
 
 const PAYMENT_PENDING_KEY = 'flow_payment_pending_v1';
+const PAYMENT_OPENED_AT_KEY = 'flow_payment_opened_at_v1';
+const PAYMENT_PENDING_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
 function getPaymentPending(): boolean {
   try {
@@ -35,6 +37,27 @@ function getPaymentPending(): boolean {
   }
 }
 
+function getPaymentOpenedAt(): number | null {
+  try {
+    const raw = localStorage.getItem(PAYMENT_OPENED_AT_KEY) || sessionStorage.getItem(PAYMENT_OPENED_AT_KEY);
+    if (!raw) return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  } catch {
+    return null;
+  }
+}
+
+function setPaymentOpenedNow() {
+  const now = Date.now();
+  try {
+    localStorage.setItem(PAYMENT_OPENED_AT_KEY, String(now));
+    sessionStorage.setItem(PAYMENT_OPENED_AT_KEY, String(now));
+  } catch {
+    // ignore
+  }
+}
+
 function setPaymentPending(next: boolean) {
   try {
     if (next) {
@@ -43,6 +66,8 @@ function setPaymentPending(next: boolean) {
     } else {
       localStorage.removeItem(PAYMENT_PENDING_KEY);
       sessionStorage.removeItem(PAYMENT_PENDING_KEY);
+      localStorage.removeItem(PAYMENT_OPENED_AT_KEY);
+      sessionStorage.removeItem(PAYMENT_OPENED_AT_KEY);
     }
   } catch {
     // ignore
@@ -60,7 +85,7 @@ export default function Subscribe() {
   const [returnTo, setReturnTo] = useState<string>('/home');
   const [ticket, setTicket] = useState<string | null>(null);
   const [ticketLoading, setTicketLoading] = useState(false);
-  const [waitingForPayment, setWaitingForPayment] = useState<boolean>(getPaymentPending());
+  const [waitingForPayment, setWaitingForPayment] = useState<boolean>(false);
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
@@ -113,14 +138,35 @@ export default function Subscribe() {
   }, [userId, orgId, has]);
 
   useEffect(() => {
+    // Cleanup: if we have a stale pending flag (e.g. app crashed mid-checkout),
+    // never block the page on next visit.
+    const pending = getPaymentPending();
+    if (!pending) return;
+    const openedAt = getPaymentOpenedAt();
+    if (!openedAt) {
+      setPaymentPending(false);
+      return;
+    }
+    if (Date.now() - openedAt > PAYMENT_PENDING_TTL_MS) {
+      setPaymentPending(false);
+    }
+  }, []);
+
+  useEffect(() => {
     // Show the overlay when returning to the app from Safari:
     // - iOS may not deliver the deep-link callback reliably
     // - we rely on a persisted "pending" marker instead
     const maybeShow = () => {
       try {
-        if (document.visibilityState === 'visible' && getPaymentPending()) {
-          setWaitingForPayment(true);
+        if (document.visibilityState !== 'visible') return;
+        if (!getPaymentPending()) return;
+        const openedAt = getPaymentOpenedAt();
+        if (!openedAt) return;
+        if (Date.now() - openedAt > PAYMENT_PENDING_TTL_MS) {
+          setPaymentPending(false);
+          return;
         }
+        setWaitingForPayment(true);
       } catch {
         // ignore
       }
@@ -145,8 +191,6 @@ export default function Subscribe() {
         return null;
       }
     })();
-    maybeShow();
-
     return () => {
       document.removeEventListener('visibilitychange', maybeShow);
       window.removeEventListener('focus', maybeShow);
@@ -163,17 +207,12 @@ export default function Subscribe() {
     // - "non app-bound domain" spam
     // - blocked Capacitor bridge injection
     setPaymentPending(true);
+    setPaymentOpenedNow();
 
     try {
       if (Capacitor.isNativePlatform()) {
         const { Browser } = await import('@capacitor/browser');
         await Browser.open({ url: checkoutUrl });
-        // Show the overlay after opening so the user sees "Waiting..." immediately
-        // when they dismiss the browser and return to the app.
-        // (Browser.open doesn't necessarily background the app, so resume events might not fire.)
-        window.setTimeout(() => {
-          if (getPaymentPending()) setWaitingForPayment(true);
-        }, 250);
         return;
       }
     } catch {

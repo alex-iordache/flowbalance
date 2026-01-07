@@ -7,6 +7,7 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
+  IonToast,
   IonSpinner,
   IonTitle,
   IonToolbar,
@@ -86,6 +87,7 @@ export default function Subscribe() {
   const [ticket, setTicket] = useState<string | null>(null);
   const [ticketLoading, setTicketLoading] = useState(false);
   const [waitingForPayment, setWaitingForPayment] = useState<boolean>(false);
+  const [safariOpenError, setSafariOpenError] = useState<string | null>(null);
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
@@ -178,26 +180,10 @@ export default function Subscribe() {
     const removeAppState = CapacitorApp.addListener('appStateChange', (s) => {
       if (s.isActive) maybeShow();
     });
-    // If checkout is opened via `@capacitor/browser` (SFSafariViewController), the app may
-    // remain "active" and App resume events won't fire. Instead, listen for browser close.
-    const removeBrowserFinished = (async () => {
-      try {
-        if (!Capacitor.isNativePlatform()) return null;
-        const { Browser } = await import('@capacitor/browser');
-        return await Browser.addListener('browserFinished', () => {
-          maybeShow();
-        });
-      } catch {
-        return null;
-      }
-    })();
     return () => {
       document.removeEventListener('visibilitychange', maybeShow);
       window.removeEventListener('focus', maybeShow);
       void removeAppState.then(h => h.remove()).catch(() => {});
-      void removeBrowserFinished
-        .then(h => h?.remove?.())
-        .catch(() => {});
     };
   }, []);
 
@@ -211,22 +197,22 @@ export default function Subscribe() {
 
     try {
       if (Capacitor.isNativePlatform()) {
-        // Use the real Safari app (not SFSafariViewController) to avoid WKWebView app-bound restrictions
-        // and any subframe/script-injection blocks during Stripe/Clerk checkout.
-        try {
-          const { AppLauncher } = await import('@capacitor/app-launcher');
-          await AppLauncher.openUrl({ url: checkoutUrl });
-          return;
-        } catch {
-          // fallback to in-app browser if AppLauncher isn't available
-        }
-
-        const { Browser } = await import('@capacitor/browser');
-        await Browser.open({ url: checkoutUrl });
+        // Safari-only on iOS: do NOT fall back to in-app browser/webview, because App-Bound Domains
+        // + Stripe/Clerk subframes can spam "non app-bound domain" logs and break navigation.
+        const { AppLauncher } = await import('@capacitor/app-launcher');
+        await AppLauncher.openUrl({ url: checkoutUrl });
         return;
       }
     } catch {
-      // ignore; fall back below
+      // If Safari cannot be opened, do not try to open checkout inside the WebView on native.
+      if (Capacitor.isNativePlatform()) {
+        setSafariOpenError(
+          isRo
+            ? 'Nu am putut deschide Safari pentru plată. Te rog încearcă din nou.'
+            : 'Could not open Safari for checkout. Please try again.',
+        );
+        return;
+      }
     }
 
     const w = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
@@ -239,14 +225,6 @@ export default function Subscribe() {
     if (!isLoaded) return;
     if (!userId) return;
     if (!hasFullAccess) return;
-    // Dismiss any in-app checkout browser that might still be visible.
-    try {
-      if (Capacitor.isNativePlatform()) {
-        void import('@capacitor/browser').then(({ Browser }) => Browser.close()).catch(() => {});
-      }
-    } catch {
-      // ignore
-    }
     setPaymentPending(false);
     setWaitingForPayment(false);
     history.replace(returnTo);
@@ -465,6 +443,15 @@ export default function Subscribe() {
             </div>
           </div>
         ) : null}
+
+        <IonToast
+          isOpen={!!safariOpenError}
+          message={safariOpenError ?? ''}
+          duration={2600}
+          onDidDismiss={() => setSafariOpenError(null)}
+          position="top"
+          color="dark"
+        />
       </IonContent>
     </IonPage>
   );

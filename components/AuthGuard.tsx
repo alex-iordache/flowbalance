@@ -18,20 +18,24 @@ interface AuthGuardProps {
  * - Shows app content if authenticated
  */
 export default function AuthGuard({ children }: AuthGuardProps) {
-  const { isLoaded, userId } = useAuth();
+  const { isLoaded, userId, isSignedIn } = useAuth();
 
   useEffect(() => {
     // Behavior:
     // - If signed out on "/", go to /sign-in so the user sees the auth UI.
     // - If signed out on any protected route, also go to /sign-in (we debug session loss via probes).
     if (!isLoaded) return;
+    // IMPORTANT:
+    // `userId` can be transiently null during session restore / app resume (especially after Safari checkout).
+    // Only treat the user as truly signed out when Clerk explicitly reports `isSignedIn === false`.
     if (userId) return;
+    if (isSignedIn !== false) return;
     const path =
       typeof window !== 'undefined' ? window.location.pathname + window.location.search : '';
     if (path.startsWith('/sign-in') || path.startsWith('/sign-up')) return;
     const redirectUrl = encodeURIComponent(path || '/home');
     window.location.replace(`/sign-in?redirect_url=${redirectUrl}`);
-  }, [isLoaded, userId]);
+  }, [isLoaded, userId, isSignedIn]);
 
   return (
     <>

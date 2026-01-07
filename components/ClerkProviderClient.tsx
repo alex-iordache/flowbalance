@@ -17,37 +17,83 @@ type Props = {
 export default function ClerkProviderClient({ children }: Props) {
   return (
     <ClerkProvider
-      // Force Clerk to use hard navigations instead of Next router navigations.
+      /**
+       * Step-by-step iOS debugging:
+       * - Do NOT allow Clerk to hard-navigate to hosted pages (accounts.*) because it creates a redirect chain.
+       * - For Clerk's internal auth-step navigations (same-origin /sign-in/*), only mutate history (no network).
+       * - Do NOT auto-navigate to /home from Clerk; we keep the user on the Signed-in page and require a tap.
+       */
       routerPush={(to: string) => {
         try {
-          // If Clerk is navigating to home after auth, mark it so AuthGuard can wait for hydration.
           const url = new URL(to, window.location.origin);
-          if (url.pathname === '/home') {
-            if (!url.searchParams.has('auth')) url.searchParams.set('auth', '1');
-            localStorage.setItem('fb:postAuthTs', String(Date.now()));
-            localStorage.setItem('fb:postAuthFrom', 'clerk-routerPush');
+          console.log('[ClerkNav] push requested', url.toString());
+
+          const isHostedClerk =
+            url.hostname === 'accounts.flowbalance.app' ||
+            url.hostname.endsWith('.clerk.com') ||
+            url.hostname.endsWith('.clerk.accounts.dev') ||
+            url.hostname.endsWith('.accounts.dev');
+
+          if (isHostedClerk) {
+            console.log('[ClerkNav] BLOCKED hosted navigation', url.toString());
+            return;
           }
+
+          if (url.pathname === '/home') {
+            console.log('[ClerkNav] BLOCKED auto navigation to /home (step-by-step debug)');
+            return;
+          }
+
+          if (
+            url.origin === window.location.origin &&
+            (url.pathname.startsWith('/sign-in') || url.pathname.startsWith('/sign-up'))
+          ) {
+            window.history.pushState({}, '', `${url.pathname}${url.search}${url.hash}`);
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            return;
+          }
+
           window.location.assign(url.toString());
-          return;
-        } catch {
-          // ignore
+        } catch (e) {
+          console.log('[ClerkNav] push failed to parse URL, falling back', { to, e });
+          window.location.assign(to);
         }
-        window.location.assign(to);
       }}
       routerReplace={(to: string) => {
         try {
           const url = new URL(to, window.location.origin);
-          if (url.pathname === '/home') {
-            if (!url.searchParams.has('auth')) url.searchParams.set('auth', '1');
-            localStorage.setItem('fb:postAuthTs', String(Date.now()));
-            localStorage.setItem('fb:postAuthFrom', 'clerk-routerReplace');
+          console.log('[ClerkNav] replace requested', url.toString());
+
+          const isHostedClerk =
+            url.hostname === 'accounts.flowbalance.app' ||
+            url.hostname.endsWith('.clerk.com') ||
+            url.hostname.endsWith('.clerk.accounts.dev') ||
+            url.hostname.endsWith('.accounts.dev');
+
+          if (isHostedClerk) {
+            console.log('[ClerkNav] BLOCKED hosted navigation', url.toString());
+            return;
           }
+
+          if (url.pathname === '/home') {
+            console.log('[ClerkNav] BLOCKED auto navigation to /home (step-by-step debug)');
+            return;
+          }
+
+          if (
+            url.origin === window.location.origin &&
+            (url.pathname.startsWith('/sign-in') || url.pathname.startsWith('/sign-up'))
+          ) {
+            window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+            window.dispatchEvent(new PopStateEvent('popstate'));
+            return;
+          }
+
           window.location.replace(url.toString());
-          return;
-        } catch {
-          // ignore
+        } catch (e) {
+          console.log('[ClerkNav] replace failed to parse URL, falling back', { to, e });
+          window.location.replace(to);
         }
-        window.location.replace(to);
       }}
       routerDebug={true}
 

@@ -91,6 +91,14 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         // Attach navigation delegate early for URL + load lifecycle signal.
         self.webView?.navigationDelegate = self
 
+        // Hard-disable all webview zooming. iOS can auto-zoom focused inputs (<16px font)
+        // and sometimes gets stuck briefly in a zoomed state.
+        if let sv = self.webView?.scrollView {
+            sv.minimumZoomScale = 1.0
+            sv.maximumZoomScale = 1.0
+            sv.pinchGestureRecognizer?.isEnabled = false
+        }
+
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(onKeyboardWillShow(_:)),
@@ -183,6 +191,9 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
 
     #if DEBUG
     @objc private func onKeyboardWillShow(_ note: Notification) {
+        normalizeZoomIfNeeded(reason: "keyboardWillShow")
+        normalizeOffsetIfNeeded(reason: "keyboardWillShow")
+        normalizeScrollInsets(reason: "keyboardWillShow")
         logViewport(reason: "keyboardWillShow")
     }
 

@@ -1,0 +1,11 @@
+
+[main 8e4c4b3] AuthGuard: redirect signed-out root '/' to /sign-in; keep manual overl
+[main 8e4c4b3] AuthGuard: redirect signed-out root '/' to /sign-in; keep manual overlay for protected routes
+ 1 file changed, 17 insertions(+), 6 deletions(-)
+Counting objects: 4, done.
+Delta compression using up to 10 threads.
+Compressing objects: 100% (4/4), done.
+Writing objects: 100% (4/4), 782 bytes | 782.00 KiB/s, done.
+Total 4 (delta 3), reused 0 (delta 0)
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+To https://github.com/alex-iordache/flowbalance.git

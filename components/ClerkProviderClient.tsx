@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
+import AuthCookieProbe from './AuthCookieProbe';
 
 type Props = {
   children: React.ReactNode;
@@ -137,6 +138,7 @@ export default function ClerkProviderClient({ children }: Props) {
         'ionic://localhost',
       ]}
     >
+      <AuthCookieProbe />
       {children}
     </ClerkProvider>
   );

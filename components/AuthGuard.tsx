@@ -34,21 +34,17 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       console.log('[AuthGuard] debug log failed', e);
     }
 
-    // IMPORTANT (iOS debugging):
-    // - On first app load (usually "/"), we *do* redirect to /sign-in so users see the auth UI.
-    // - On protected routes, we do NOT auto-redirect; we render a SignedOut overlay with manual CTA.
+    // Behavior:
+    // - If signed out on "/", go to /sign-in so the user sees the auth UI.
+    // - If signed out on any protected route, also go to /sign-in (we debug session loss via probes).
     if (!isLoaded) return;
     if (userId) return;
-    const pathname = window.location.pathname || '/';
-    if (pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up')) return;
-    if (pathname === '/') {
-      console.log('[AuthGuard] signed out on "/" -> redirecting to /sign-in');
-      window.location.replace('/sign-in');
-      return;
-    }
-    console.log('[AuthGuard] signed out on a protected route; NOT auto-redirecting (manual CTA only)', {
-      pathname,
-    });
+    const path =
+      typeof window !== 'undefined' ? window.location.pathname + window.location.search : '';
+    if (path.startsWith('/sign-in') || path.startsWith('/sign-up')) return;
+    const returnTo = encodeURIComponent(path || '/home');
+    console.log('[AuthGuard] signed out -> redirecting to /sign-in', { returnTo, path });
+    window.location.replace(`/sign-in?return=${returnTo}`);
   }, [isLoaded, userId]);
 
   return (
@@ -76,34 +72,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                 <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600">
                   <div className="text-center text-white">
                     <IonSpinner name="crescent" className="w-16 h-16 mb-4" />
-                    <h2 className="text-2xl font-bold">
-                      {typeof window !== 'undefined' && window.location.pathname === '/'
-                        ? 'Opening sign in…'
-                        : 'Session required'}
-                    </h2>
-                    {typeof window !== 'undefined' && window.location.pathname === '/' ? null : (
-                      <p className="text-sm opacity-90 mt-2">
-                        If you were just signed in and got kicked out, Clerk likely lost the session in the WebView.
-                      </p>
-                    )}
-                    <div className="mt-5 flex flex-col gap-3">
-                      <button
-                        className="w-full bg-white/20 hover:bg-white/25 text-white py-3 rounded-xl font-semibold"
-                        onClick={() => {
-                          window.location.href = '/sign-in';
-                        }}
-                      >
-                        Go to Sign in
-                      </button>
-                      <button
-                        className="w-full bg-white/10 hover:bg-white/15 text-white py-3 rounded-xl font-semibold"
-                        onClick={() => {
-                          window.location.reload();
-                        }}
-                      >
-                        Reload app
-                      </button>
-                    </div>
+                    <h2 className="text-2xl font-bold">Opening sign in…</h2>
                   </div>
                 </div>
               </IonContent>

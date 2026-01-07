@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { ClerkProvider } from '@clerk/nextjs';
-import AuthCookieProbe from './AuthCookieProbe';
 
 type Props = {
   children: React.ReactNode;
@@ -19,10 +18,9 @@ export default function ClerkProviderClient({ children }: Props) {
   return (
     <ClerkProvider
       /**
-       * Step-by-step iOS debugging:
-       * - Do NOT allow Clerk to hard-navigate to hosted pages (accounts.*) because it creates a redirect chain.
+       * iOS WKWebView stability:
+       * - Do NOT allow cross-origin hosted hops (accounts.*) inside the WebView.
        * - For Clerk's internal auth-step navigations (same-origin /sign-in/*), only mutate history (no network).
-       * - Do NOT auto-navigate to /home from Clerk; we keep the user on the Signed-in page and require a tap.
        */
       routerPush={function (
         to: string,
@@ -35,19 +33,8 @@ export default function ClerkProviderClient({ children }: Props) {
       ) {
         try {
           const url = new URL(to, window.location.origin);
-          console.log('[ClerkNav] push requested', {
-            to: url.toString(),
-            meta: meta?.__internal_metadata ?? null,
-          });
-
           if (meta?.__internal_metadata?.navigationType === 'window') {
             // This is the cross-origin hop that creates the redirect chain (accounts.*).
-            console.log('[ClerkNav] BLOCKED window navigation (cross-origin)', url.toString());
-            return;
-          }
-
-          if (url.pathname === '/home') {
-            console.log('[ClerkNav] BLOCKED auto navigation to /home (step-by-step debug)');
             return;
           }
 
@@ -62,7 +49,6 @@ export default function ClerkProviderClient({ children }: Props) {
 
           window.location.assign(url.toString());
         } catch (e) {
-          console.log('[ClerkNav] push failed to parse URL, falling back', { to, e });
           window.location.assign(to);
         }
       }}
@@ -77,18 +63,7 @@ export default function ClerkProviderClient({ children }: Props) {
       ) {
         try {
           const url = new URL(to, window.location.origin);
-          console.log('[ClerkNav] replace requested', {
-            to: url.toString(),
-            meta: meta?.__internal_metadata ?? null,
-          });
-
           if (meta?.__internal_metadata?.navigationType === 'window') {
-            console.log('[ClerkNav] BLOCKED window navigation (cross-origin)', url.toString());
-            return;
-          }
-
-          if (url.pathname === '/home') {
-            console.log('[ClerkNav] BLOCKED auto navigation to /home (step-by-step debug)');
             return;
           }
 
@@ -103,11 +78,10 @@ export default function ClerkProviderClient({ children }: Props) {
 
           window.location.replace(url.toString());
         } catch (e) {
-          console.log('[ClerkNav] replace failed to parse URL, falling back', { to, e });
           window.location.replace(to);
         }
       }}
-      routerDebug={true}
+      routerDebug={false}
 
       clerkJSVersion="5.117.0"
       // Prefer first-party Clerk custom domain for WKWebView cookie/session reliability.
@@ -138,7 +112,6 @@ export default function ClerkProviderClient({ children }: Props) {
         'ionic://localhost',
       ]}
     >
-      <AuthCookieProbe />
       {children}
     </ClerkProvider>
   );

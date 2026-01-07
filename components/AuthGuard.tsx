@@ -21,19 +21,6 @@ export default function AuthGuard({ children }: AuthGuardProps) {
   const { isLoaded, userId } = useAuth();
 
   useEffect(() => {
-    try {
-      // Helpful for debugging WebView auth issues (iOS): shows whether Clerk ever sees a session.
-      console.log('[AuthGuard]', {
-        ts: new Date().toISOString(),
-        isLoaded,
-        userId: userId ?? null,
-        path: typeof window !== 'undefined' ? window.location.pathname + window.location.search : '',
-      });
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.log('[AuthGuard] debug log failed', e);
-    }
-
     // Behavior:
     // - If signed out on "/", go to /sign-in so the user sees the auth UI.
     // - If signed out on any protected route, also go to /sign-in (we debug session loss via probes).
@@ -42,9 +29,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     const path =
       typeof window !== 'undefined' ? window.location.pathname + window.location.search : '';
     if (path.startsWith('/sign-in') || path.startsWith('/sign-up')) return;
-    const returnTo = encodeURIComponent(path || '/home');
-    console.log('[AuthGuard] signed out -> redirecting to /sign-in', { returnTo, path });
-    window.location.replace(`/sign-in?return=${returnTo}`);
+    const redirectUrl = encodeURIComponent(path || '/home');
+    window.location.replace(`/sign-in?redirect_url=${redirectUrl}`);
   }, [isLoaded, userId]);
 
   return (

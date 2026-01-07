@@ -57,12 +57,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>WKAppBoundDomains</key>
-	<array>
-		<string>www.flowbalance.app</string>
-		<string>flowbalance.app</string>
-		<string>accounts.flowbalance.app</string>
-		<string>clerk.flowbalance.app</string>
-	</array>
 </dict>
 </plist>

@@ -211,6 +211,16 @@ export default function Subscribe() {
 
     try {
       if (Capacitor.isNativePlatform()) {
+        // Use the real Safari app (not SFSafariViewController) to avoid WKWebView app-bound restrictions
+        // and any subframe/script-injection blocks during Stripe/Clerk checkout.
+        try {
+          const { AppLauncher } = await import('@capacitor/app-launcher');
+          await AppLauncher.openUrl({ url: checkoutUrl });
+          return;
+        } catch {
+          // fallback to in-app browser if AppLauncher isn't available
+        }
+
         const { Browser } = await import('@capacitor/browser');
         await Browser.open({ url: checkoutUrl });
         return;

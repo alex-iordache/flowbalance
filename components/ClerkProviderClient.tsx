@@ -19,9 +19,34 @@ export default function ClerkProviderClient({ children }: Props) {
     <ClerkProvider
       // Force Clerk to use hard navigations instead of Next router navigations.
       routerPush={(to: string) => {
+        try {
+          // If Clerk is navigating to home after auth, mark it so AuthGuard can wait for hydration.
+          const url = new URL(to, window.location.origin);
+          if (url.pathname === '/home') {
+            if (!url.searchParams.has('auth')) url.searchParams.set('auth', '1');
+            localStorage.setItem('fb:postAuthTs', String(Date.now()));
+            localStorage.setItem('fb:postAuthFrom', 'clerk-routerPush');
+          }
+          window.location.assign(url.toString());
+          return;
+        } catch {
+          // ignore
+        }
         window.location.assign(to);
       }}
       routerReplace={(to: string) => {
+        try {
+          const url = new URL(to, window.location.origin);
+          if (url.pathname === '/home') {
+            if (!url.searchParams.has('auth')) url.searchParams.set('auth', '1');
+            localStorage.setItem('fb:postAuthTs', String(Date.now()));
+            localStorage.setItem('fb:postAuthFrom', 'clerk-routerReplace');
+          }
+          window.location.replace(url.toString());
+          return;
+        } catch {
+          // ignore
+        }
         window.location.replace(to);
       }}
       routerDebug={true}
@@ -31,12 +56,12 @@ export default function ClerkProviderClient({ children }: Props) {
       clerkJSUrl="https://clerk.flowbalance.app/npm/@clerk/clerk-js@5.117.0/dist/clerk.browser.js"
 
       // Global redirect defaults (avoid legacy redirectUrl).
-      // IMPORTANT: Do NOT default redirects back to /sign-in or Clerk will include
-      // `redirect_url=/sign-in` in the hosted sign-in URL, creating a loop in iOS WKWebView.
-      signInFallbackRedirectUrl="/home"
-      signInForceRedirectUrl="/home"
-      signUpFallbackRedirectUrl="/home"
-      signUpForceRedirectUrl="/home"
+      // Step 1 for debugging iOS: keep post-auth navigation on the auth page itself.
+      // We then render a "Signed in" screen (and NOT <SignIn/>) when userId exists.
+      signInFallbackRedirectUrl="/sign-in?done=1"
+      signInForceRedirectUrl="/sign-in?done=1"
+      signUpFallbackRedirectUrl="/sign-up?done=1"
+      signUpForceRedirectUrl="/sign-up?done=1"
       afterSignOutUrl="/sign-in"
 
       allowedRedirectOrigins={[

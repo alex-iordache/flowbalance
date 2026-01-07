@@ -19,7 +19,7 @@ const FB_IOS_AUTH_DEBUG_BUILD = 'ios-auth-debug-v3';
 export default function SignUpPage() {
   const base =
     typeof window !== 'undefined' ? window.location.origin : 'https://www.flowbalance.app';
-  const { isLoaded, userId, getToken } = useAuth();
+  const { isLoaded, userId } = useAuth();
 
   useEffect(() => {
     console.log('[SignUpPage] build', FB_IOS_AUTH_DEBUG_BUILD);
@@ -36,45 +36,7 @@ export default function SignUpPage() {
     } catch {
       // ignore
     }
-    if (!isLoaded || !userId) return;
-
-    let cancelled = false;
-    (async () => {
-      try {
-        console.log('[SignUpPage] userId observed; waiting for getToken() before redirect');
-        await getToken();
-        console.log('[SignUpPage] getToken() ok; preparing redirect to /home', {
-          userId,
-          base,
-        });
-      } catch (err) {
-        console.log('[SignUpPage] getToken() failed; redirecting to /home anyway', err);
-      }
-
-      if (cancelled) return;
-      try {
-        localStorage.setItem('fb:postAuthTs', String(Date.now()));
-        localStorage.setItem('fb:postAuthUserId', String(userId));
-        localStorage.setItem('fb:postAuthFrom', 'sign-up');
-        console.log('[SignUpPage] fb:postAuth* set in localStorage');
-      } catch (e) {
-        console.log('[SignUpPage] fb:postAuth* localStorage set failed', e);
-      }
-
-      try {
-        console.log('[SignUpPage] navigating to /home immediately', {
-          from: window.location.href,
-          to: `${base}/home`,
-        });
-      } catch {
-        // ignore
-      }
-      window.location.href = `${base}/home`;
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+    // Do NOT navigate from here. We let Clerk complete its own redirect to /home?auth=1.
   }, [isLoaded, userId, base]);
 
   useEffect(() => {
@@ -103,17 +65,32 @@ export default function SignUpPage() {
           }}
         >
           <div className="w-full max-w-md space-y-4">
-            <SignUp 
-              signInUrl="/sign-in"
-              appearance={{
-                elements: {
-                  rootBox: "mx-auto",
-                  card: "shadow-xl",
-                  formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
-                  footerActionLink: "text-purple-600 hover:text-purple-700"
-                }
-              }}
-            />
+            {isLoaded && userId ? (
+              <div className="bg-white/15 backdrop-blur rounded-2xl p-6 text-white">
+                <div className="text-xl font-semibold">Signed up / signed in</div>
+                <div className="text-sm opacity-90 mt-2 break-all">User: {userId}</div>
+                <button
+                  className="mt-5 w-full bg-white/20 hover:bg-white/25 text-white py-3 rounded-xl font-semibold"
+                  onClick={() => {
+                    window.location.href = `${base}/home`;
+                  }}
+                >
+                  Continue to Home
+                </button>
+              </div>
+            ) : (
+              <SignUp 
+                signInUrl="/sign-in"
+                appearance={{
+                  elements: {
+                    rootBox: "mx-auto",
+                    card: "shadow-xl",
+                    formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
+                    footerActionLink: "text-purple-600 hover:text-purple-700"
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       </IonContent>

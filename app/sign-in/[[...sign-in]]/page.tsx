@@ -17,7 +17,7 @@ const FB_IOS_AUTH_DEBUG_BUILD = 'ios-auth-debug-v3';
 export default function SignInPage() {
   const base =
     typeof window !== 'undefined' ? window.location.origin : 'https://www.flowbalance.app';
-  const { isLoaded, userId, getToken } = useAuth();
+  const { isLoaded, userId } = useAuth();
 
   // Build stamp so we can confirm which bundle is running on-device.
   useEffect(() => {
@@ -35,50 +35,7 @@ export default function SignInPage() {
     } catch {
       // ignore
     }
-    if (!isLoaded || !userId) return;
-
-    // In iOS WKWebView we can briefly see userId before the session cookie/token is persisted.
-    // Force a token fetch (which requires an active session) and only then navigate to /home.
-    let cancelled = false;
-    (async () => {
-      try {
-        console.log('[SignInPage] userId observed; waiting for getToken() before redirect');
-        await getToken();
-        console.log('[SignInPage] getToken() ok; preparing redirect to /home', {
-          userId,
-          base,
-        });
-      } catch (err) {
-        console.log('[SignInPage] getToken() failed; redirecting to /home anyway', err);
-      }
-
-      if (cancelled) return;
-      // Persist marker in localStorage so it survives any WebView reloads.
-      try {
-        localStorage.setItem('fb:postAuthTs', String(Date.now()));
-        localStorage.setItem('fb:postAuthUserId', String(userId));
-        localStorage.setItem('fb:postAuthFrom', 'sign-in');
-        console.log('[SignInPage] fb:postAuth* set in localStorage');
-      } catch (e) {
-        console.log('[SignInPage] fb:postAuth* localStorage set failed', e);
-      }
-
-      // Redirect immediately: Next may trigger a fallback full reload after RSC fetch failures,
-      // which can cancel timers before they fire in WKWebView.
-      try {
-        console.log('[SignInPage] navigating to /home immediately', {
-          from: window.location.href,
-          to: `${base}/home`,
-        });
-      } catch {
-        // ignore
-      }
-      window.location.href = `${base}/home`;
-    })();
-
-    return () => {
-      cancelled = true;
-    };
+    // Do NOT navigate from here. We let Clerk complete its own redirect to /home?auth=1.
   }, [isLoaded, userId, base]);
 
   useEffect(() => {
@@ -107,17 +64,33 @@ export default function SignInPage() {
           }}
         >
           <div className="w-full max-w-md">
-            <SignIn 
-              signUpUrl="/sign-up"
-              appearance={{
-                elements: {
-                  rootBox: "mx-auto",
-                  card: "shadow-xl",
-                  formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
-                  footerActionLink: "text-purple-600 hover:text-purple-700"
-                }
-              }}
-            />
+            {isLoaded && userId ? (
+              <div className="bg-white/15 backdrop-blur rounded-2xl p-6 text-white">
+                <div className="text-xl font-semibold">Signed in</div>
+                <div className="text-sm opacity-90 mt-2 break-all">User: {userId}</div>
+                <button
+                  className="mt-5 w-full bg-white/20 hover:bg-white/25 text-white py-3 rounded-xl font-semibold"
+                  onClick={() => {
+                    // Intentionally user-driven navigation (no automatic redirect).
+                    window.location.href = `${base}/home`;
+                  }}
+                >
+                  Continue to Home
+                </button>
+              </div>
+            ) : (
+              <SignIn 
+                signUpUrl="/sign-up"
+                appearance={{
+                  elements: {
+                    rootBox: "mx-auto",
+                    card: "shadow-xl",
+                    formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
+                    footerActionLink: "text-purple-600 hover:text-purple-700"
+                  }
+                }}
+              />
+            )}
           </div>
         </div>
       </IonContent>

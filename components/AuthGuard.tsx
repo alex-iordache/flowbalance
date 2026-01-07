@@ -64,7 +64,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     let delayMs = 300; // normal
     try {
       const url = new URL(window.location.href);
-      if (url.searchParams.get('auth') === '1') delayMs = 3000; // post-login settle window (iOS WKWebView)
+      if (url.searchParams.get('auth') === '1') delayMs = 12000; // post-login settle window (iOS WKWebView)
     } catch (e) {
       console.log('[AuthGuard] URL parse failed for auth=1 check', e);
     }

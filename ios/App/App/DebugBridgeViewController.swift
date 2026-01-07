@@ -18,6 +18,19 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
     private var tickCount: Int = 0
     #endif
 
+    private func normalizeZoomIfNeeded(reason: String) {
+        guard let sv = self.webView?.scrollView else { return }
+        // If iOS auto-zoomed due to focused input (font-size < 16px), it can get stuck.
+        // Force it back to 1.0 to restore correct layout + scrolling.
+        let z = sv.zoomScale
+        if z > 1.02 || z < 0.98 {
+            sv.setZoomScale(1.0, animated: false)
+            #if DEBUG
+            print("[NativeViewport] normalizeZoomIfNeeded(\(reason)) from zoomScale=\(z) -> 1.0")
+            #endif
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -43,6 +56,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        normalizeZoomIfNeeded(reason: "viewDidAppear")
 
         #if DEBUG
         logViewport(reason: "viewDidAppear")
@@ -64,6 +78,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
+        normalizeZoomIfNeeded(reason: "viewDidLayoutSubviews")
         #if DEBUG
         logViewport(reason: "viewDidLayoutSubviews")
         #endif
@@ -85,6 +100,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        normalizeZoomIfNeeded(reason: "didFinishNavigation")
         #if DEBUG
         logViewport(reason: "didFinishNavigation")
         #endif
@@ -112,6 +128,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
     }
 
     @objc private func onKeyboardWillHide(_ note: Notification) {
+        normalizeZoomIfNeeded(reason: "keyboardWillHide")
         logViewport(reason: "keyboardWillHide")
     }
     #endif

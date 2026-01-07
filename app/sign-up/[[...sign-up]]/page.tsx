@@ -31,6 +31,9 @@ export default function SignUpPage() {
                 elements: {
                   rootBox: "mx-auto",
                   card: "shadow-xl",
+                  // iOS Safari/WKWebView zooms the page when focusing inputs with font-size < 16px.
+                  // Force 16px to prevent the post-keyboard "stuck zoom" bug on first sign-up/sign-in.
+                  formFieldInput: "text-[16px]",
                   formButtonPrimary: "bg-purple-600 hover:bg-purple-700",
                   footerActionLink: "text-purple-600 hover:text-purple-700"
                 }

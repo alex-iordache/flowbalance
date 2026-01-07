@@ -88,6 +88,24 @@ export default function Subscribe() {
   const [ticketLoading, setTicketLoading] = useState(false);
   const [waitingForPayment, setWaitingForPayment] = useState<boolean>(false);
   const [safariOpenError, setSafariOpenError] = useState<string | null>(null);
+  const [debugLines, setDebugLines] = useState<string[]>([]);
+
+  const debugLog = (label: string, data?: unknown) => {
+    const ts = new Date().toISOString();
+    const payload = (() => {
+      if (data == null) return '';
+      try {
+        if (typeof data === 'string') return data;
+        return JSON.stringify(data);
+      } catch {
+        return String(data);
+      }
+    })();
+    const line = payload ? `[${ts}] ${label} ${payload}` : `[${ts}] ${label}`;
+    setDebugLines(prev => [...prev.slice(-199), line]);
+    // eslint-disable-next-line no-console
+    console.log('[Subscribe]', line);
+  };
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
@@ -110,6 +128,7 @@ export default function Subscribe() {
 
     setTicketLoading(true);
     setTicket(null);
+    debugLog('ticket prefetch start');
 
     window
       .fetch('/api/create-sign-in-token', { signal: ctrl.signal })
@@ -117,14 +136,17 @@ export default function Subscribe() {
       .then(data => {
         if (cancelled) return;
         setTicket(typeof data?.token === 'string' ? data.token : null);
+        debugLog('ticket prefetch ok', { hasToken: typeof data?.token === 'string' });
       })
       .catch(() => {
         if (cancelled) return;
         setTicket(null);
+        debugLog('ticket prefetch failed');
       })
       .finally(() => {
         if (cancelled) return;
         setTicketLoading(false);
+        debugLog('ticket prefetch done');
       });
 
     return () => {
@@ -194,18 +216,31 @@ export default function Subscribe() {
     // - blocked Capacitor bridge injection
     setPaymentPending(true);
     setPaymentOpenedNow();
+    debugLog('openCheckout click', {
+      isNative: Capacitor.isNativePlatform(),
+      checkoutUrl,
+      hasTicket: !!ticket,
+      returnTo,
+    });
 
     try {
       if (Capacitor.isNativePlatform()) {
         // Safari-only on iOS: do NOT fall back to in-app browser/webview, because App-Bound Domains
         // + Stripe/Clerk subframes can spam "non app-bound domain" logs and break navigation.
         const { AppLauncher } = await import('@capacitor/app-launcher');
+        debugLog('AppLauncher.openUrl start');
         await AppLauncher.openUrl({ url: checkoutUrl });
+        debugLog('AppLauncher.openUrl ok');
         return;
       }
-    } catch {
+    } catch (e) {
       // If Safari cannot be opened, do not try to open checkout inside the WebView on native.
       if (Capacitor.isNativePlatform()) {
+        debugLog('AppLauncher.openUrl failed', {
+          message: (e as any)?.message,
+          name: (e as any)?.name,
+          code: (e as any)?.code,
+        });
         setSafariOpenError(
           isRo
             ? 'Nu am putut deschide Safari pentru plată. Te rog încearcă din nou.'
@@ -403,6 +438,85 @@ export default function Subscribe() {
                 </SignedOut>
               </div>
             </div>
+        </div>
+
+        {/* Debug box (temporary): helps diagnose iOS AppLauncher failures */}
+        <div className="px-4 pb-10">
+          <div
+            className="rounded-2xl p-4 text-white"
+            style={{
+              backgroundColor: 'rgba(0,0,0,0.18)',
+              border: '1px solid rgba(255,255,255,0.18)',
+            }}
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm font-semibold">Debug (checkout)</div>
+              <div className="flex items-center gap-2">
+                <IonButton
+                  size="small"
+                  fill="solid"
+                  style={{ '--background': 'rgba(255,255,255,0.14)', '--color': '#fff' } as any}
+                  onClick={async () => {
+                    const text = debugLines.join('\n');
+                    try {
+                      await navigator.clipboard.writeText(text);
+                      setSafariOpenError(isRo ? 'Copiat.' : 'Copied.');
+                    } catch {
+                      try {
+                        const ta = document.createElement('textarea');
+                        ta.value = text;
+                        ta.style.position = 'fixed';
+                        ta.style.left = '-9999px';
+                        document.body.appendChild(ta);
+                        ta.focus();
+                        ta.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(ta);
+                        setSafariOpenError(isRo ? 'Copiat.' : 'Copied.');
+                      } catch {
+                        setSafariOpenError(isRo ? 'Copy failed.' : 'Copy failed.');
+                      }
+                    }
+                  }}
+                >
+                  {isRo ? 'Copiază' : 'Copy'}
+                </IonButton>
+                <IonButton
+                  size="small"
+                  fill="clear"
+                  style={{ '--color': 'rgba(255,255,255,0.9)' } as any}
+                  onClick={() => setDebugLines([])}
+                >
+                  {isRo ? 'Șterge' : 'Clear'}
+                </IonButton>
+              </div>
+            </div>
+            <div className="mt-3 text-xs text-white/80 space-y-1">
+              <div>
+                <span className="font-semibold">native</span>: {String(Capacitor.isNativePlatform())}
+              </div>
+              <div>
+                <span className="font-semibold">isLoaded</span>: {String(isLoaded)}{' '}
+                <span className="font-semibold">userId</span>: {userId ? 'yes' : 'no'}{' '}
+                <span className="font-semibold">ticket</span>: {ticket ? 'yes' : 'no'}
+              </div>
+              <div className="break-all">
+                <span className="font-semibold">checkoutUrl</span>: {checkoutUrl}
+              </div>
+            </div>
+            <div
+              className="mt-3 rounded-xl p-3 text-[11px] leading-4"
+              style={{
+                backgroundColor: 'rgba(0,0,0,0.26)',
+                maxHeight: 160,
+                overflow: 'auto',
+                fontFamily:
+                  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace',
+              }}
+            >
+              {debugLines.length ? debugLines.join('\n') : (isRo ? 'Nicio intrare încă.' : 'No entries yet.')}
+            </div>
+          </div>
         </div>
 
         {waitingForPayment ? (

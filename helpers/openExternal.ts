@@ -24,6 +24,12 @@ export async function openExternalUrl(url: string) {
       } catch (e2) {
         // eslint-disable-next-line no-console
         console.error('[openExternalUrl] Browser.open also failed', e2);
+        try {
+          // Try a plain window.open as a last-ditch attempt to trigger "open in Safari"
+          // behavior on some WebView configs.
+          window.open(url, '_blank', 'noopener,noreferrer');
+          return;
+        } catch {}
         // Last-resort fallback (may open inside the WebView; better than doing nothing).
         window.location.href = url;
       }

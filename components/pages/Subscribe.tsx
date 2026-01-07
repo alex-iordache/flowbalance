@@ -27,6 +27,8 @@ export default function Subscribe() {
   const [billing, setBilling] = useState<'month' | 'annual'>('annual');
   const { data: plans, isLoading: plansLoading } = usePlans({ for: 'user', pageSize: 10 });
   const [returnTo, setReturnTo] = useState<string>('/home');
+  const [opening, setOpening] = useState(false);
+  const [fallbackUrl, setFallbackUrl] = useState<string | null>(null);
 
   useEffect(() => {
     // Allow deep-linking into annual/monthly from other screens
@@ -93,6 +95,8 @@ export default function Subscribe() {
   }, [proPlan, billing]);
 
   const openCheckout = async () => {
+    setOpening(true);
+    setFallbackUrl(null);
     try {
       // Never let a stalled network request make the button feel "dead" on iOS.
       const ctrl = new AbortController();
@@ -104,16 +108,23 @@ export default function Subscribe() {
 
       const base = `${getWebBaseUrl()}/subscribe-web`;
       if (data?.token) {
-        await openExternalUrl(
-          `${base}?autocheckout=1&minimal=1&period=${billing}&return=${encodeURIComponent(returnTo)}&__clerk_ticket=${data.token}`,
-        );
+        const url = `${base}?autocheckout=1&minimal=1&period=${billing}&return=${encodeURIComponent(returnTo)}&__clerk_ticket=${data.token}`;
+        setFallbackUrl(url);
+        await openExternalUrl(url);
       } else {
-        await openExternalUrl(`${base}?return=${encodeURIComponent(returnTo)}`);
+        const url = `${base}?return=${encodeURIComponent(returnTo)}`;
+        setFallbackUrl(url);
+        await openExternalUrl(url);
       }
     } catch (e) {
       console.error('Error opening checkout:', e);
       const { openExternalUrl } = await import('../../helpers/openExternal');
-      await openExternalUrl(`${getWebBaseUrl()}/subscribe-web?return=${encodeURIComponent(returnTo)}`);
+      const url = `${getWebBaseUrl()}/subscribe-web?return=${encodeURIComponent(returnTo)}`;
+      setFallbackUrl(url);
+      await openExternalUrl(url);
+    } finally {
+      // If iOS blocks the Capacitor bridge (app-bound domain issues), the user needs a manual way out.
+      window.setTimeout(() => setOpening(false), 700);
     }
   };
 
@@ -197,12 +208,25 @@ export default function Subscribe() {
 
               <div className="p-6 border-t border-gray-200">
                 <SignedIn>
-                  <IonButton expand="block" color="primary" onClick={openCheckout}>
-                    Subscribe
+                  <IonButton expand="block" color="primary" onClick={openCheckout} disabled={opening}>
+                    {opening ? 'Opening…' : 'Subscribe'}
                   </IonButton>
                   <p className="text-center text-xs text-gray-600 mt-3">
                     Opens in browser to complete payment
                   </p>
+                  {fallbackUrl ? (
+                    <p className="text-center text-xs text-gray-600 mt-2">
+                      If nothing opens, tap:{' '}
+                      <a
+                        href={fallbackUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="underline"
+                      >
+                        Open checkout
+                      </a>
+                    </p>
+                  ) : null}
                 </SignedIn>
 
                 <SignedOut>

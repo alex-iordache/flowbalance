@@ -75,6 +75,34 @@ function setPaymentPending(next: boolean) {
   }
 }
 
+function sanitizeReturnTo(raw: string | null): string {
+  if (!raw) return '/home';
+  if (!raw.startsWith('/')) return '/home';
+  if (raw.startsWith('//')) return '/home';
+  return raw;
+}
+
+function unwrapReturnTo(raw: string): string {
+  // If we somehow got a return=/subscribe?return=... chain, unwrap it back to the original target.
+  // Cap iterations to avoid loops.
+  let current = raw;
+  for (let i = 0; i < 3; i += 1) {
+    if (!current.startsWith('/subscribe')) break;
+    const qIndex = current.indexOf('?');
+    if (qIndex === -1) break;
+    const qs = current.slice(qIndex + 1);
+    const params = new URLSearchParams(qs);
+    const nested = params.get('return');
+    if (!nested) break;
+    try {
+      current = decodeURIComponent(nested);
+    } catch {
+      current = nested;
+    }
+  }
+  return current;
+}
+
 export default function Subscribe() {
   const history = useHistory();
   const { isLoaded, userId, orgId, has } = useAuth();
@@ -116,7 +144,7 @@ export default function Subscribe() {
     if (p === 'annual' || p === 'year' || p === 'yearly') setBilling('annual');
 
     const r = params.get('return');
-    if (r && r.startsWith('/')) setReturnTo(r);
+    if (r) setReturnTo(sanitizeReturnTo(unwrapReturnTo(r)));
   }, []);
 
   useEffect(() => {
@@ -224,51 +252,53 @@ export default function Subscribe() {
     setPaymentPending(true);
     setPaymentOpenedNow();
     debugLog('openCheckout click', {
-      isNative: Capacitor.isNativePlatform(),
+      platform: (() => {
+        try {
+          return Capacitor.getPlatform();
+        } catch {
+          return 'unknown';
+        }
+      })(),
       checkoutUrl,
       hasTicket: !!ticket,
       returnTo,
     });
 
+    // Always try native Safari first (if available). Do NOT rely on `isNativePlatform()` since
+    // iOS WebKit restrictions can make platform detection flaky even when plugins work.
     try {
-      if (Capacitor.isNativePlatform()) {
-        // Safari-only on iOS: do NOT fall back to in-app browser/webview, because App-Bound Domains
-        // + Stripe/Clerk subframes can spam "non app-bound domain" logs and break navigation.
-        const { AppLauncher } = await import('@capacitor/app-launcher');
-        debugLog('AppLauncher.openUrl start');
-        await AppLauncher.openUrl({ url: checkoutUrl });
-        debugLog('AppLauncher.openUrl ok');
-        return;
-      }
+      const { AppLauncher } = await import('@capacitor/app-launcher');
+      debugLog('AppLauncher.openUrl start');
+      await AppLauncher.openUrl({ url: checkoutUrl });
+      debugLog('AppLauncher.openUrl ok');
+      return;
     } catch (e) {
-      // If Safari cannot be opened, do not try to open checkout inside the WebView on native.
-      if (Capacitor.isNativePlatform()) {
-        debugLog('AppLauncher.openUrl failed', {
-          message: (e as any)?.message,
-          name: (e as any)?.name,
-          code: (e as any)?.code,
-        });
-        setSafariOpenError(
-          isRo
-            ? 'Nu am putut deschide Safari pentru plată. Te rog încearcă din nou.'
-            : 'Could not open Safari for checkout. Please try again.',
-        );
-        setManualCheckoutUrl(checkoutUrl);
-        return;
-      }
+      debugLog('AppLauncher.openUrl failed', {
+        message: (e as any)?.message,
+        name: (e as any)?.name,
+        code: (e as any)?.code,
+      });
     }
 
-    // Web-only fallback (never navigate inside native WebView).
+    // Fallback: try a new tab/window (should work on web; on iOS app it may be blocked).
     try {
       const w = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-      if (!w) {
-        setManualCheckoutUrl(checkoutUrl);
-        setSafariOpenError(isRo ? 'Nu s-a putut deschide o fereastră nouă.' : 'Popup blocked.');
+      if (w) {
+        debugLog('window.open ok');
+        return;
       }
-    } catch {
-      setManualCheckoutUrl(checkoutUrl);
-      setSafariOpenError(isRo ? 'Nu s-a putut deschide checkout-ul.' : 'Could not open checkout.');
+      debugLog('window.open blocked');
+    } catch (e) {
+      debugLog('window.open threw', { message: (e as any)?.message });
     }
+
+    // Last resort: keep the user on the page and provide a manual link (copyable).
+    setManualCheckoutUrl(checkoutUrl);
+    setSafariOpenError(
+      isRo
+        ? 'Nu am putut deschide checkout-ul. Copiază link-ul de mai jos și deschide-l în Safari.'
+        : 'Could not open checkout. Copy the link below and open it in Safari.',
+    );
   };
 
   useEffect(() => {
@@ -510,7 +540,14 @@ export default function Subscribe() {
             </div>
             <div className="mt-3 text-xs text-white/80 space-y-1">
               <div>
-                <span className="font-semibold">native</span>: {String(Capacitor.isNativePlatform())}
+                <span className="font-semibold">platform</span>:{' '}
+                {(() => {
+                  try {
+                    return Capacitor.getPlatform();
+                  } catch {
+                    return 'unknown';
+                  }
+                })()}
               </div>
               <div>
                 <span className="font-semibold">isLoaded</span>: {String(isLoaded)}{' '}

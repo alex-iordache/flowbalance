@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next';
-import Script from 'next/script';
 import ClerkProviderClient from '../components/ClerkProviderClient';
 
 import 'tailwindcss/tailwind.css';
@@ -47,17 +46,6 @@ export default function RootLayout({
         <body suppressHydrationWarning>
           {children}
         </body>
-        
-        <Script
-          type="module"
-          src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.esm.js"
-          strategy="lazyOnload"
-        />
-        <Script
-          noModule
-          src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.js"
-          strategy="lazyOnload"
-        />
       </html>
     </ClerkProviderClient>
   );

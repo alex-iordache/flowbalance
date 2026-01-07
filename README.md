@@ -357,8 +357,9 @@ This section documents the full context so a future agent can re-apply the fixes
 - **Auth loop**:
   - Check `components/ClerkProviderClient.tsx` for any forced redirect props or env vars that point back to `/sign-in`.
   - Ensure `routing="virtual"` is still set on `<SignIn/>` and `<SignUp/>`.
-  - We intentionally do **not** use `WKAppBoundDomains` (it can break Stripe/Clerk checkout if any third-party
-    subframes/scripts are loaded and may block Capacitor bridge injection with "non app-bound domain" logs).
+  - We use `WKAppBoundDomains` for better iOS WKWebView stability/cookie persistence.
+    **Important**: keep Stripe/checkout in the system browser (Safari) so third‑party subframes/scripts never load
+    inside the app WebView (otherwise you’ll see "non app-bound domain" spam).
 
 - **Session persistence**:
   - Confirm `CapacitorCookies.enabled = true` and `CapacitorHttp.enabled = false`.

@@ -29,6 +29,19 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
             print("[NativeViewport] normalizeZoomIfNeeded(\(reason)) from zoomScale=\(z) -> 1.0")
             #endif
         }
+
+        // Newer iOS versions can also apply page zoom without affecting scrollView.zoomScale.
+        if #available(iOS 14.0, *) {
+            if let wb = self.webView {
+                let pz = wb.pageZoom
+                if pz > 1.02 || pz < 0.98 {
+                    wb.pageZoom = 1.0
+                    #if DEBUG
+                    print("[NativeViewport] normalizeZoomIfNeeded(\(reason)) from pageZoom=\(pz) -> 1.0")
+                    #endif
+                }
+            }
+        }
     }
 
     private func normalizeOffsetIfNeeded(reason: String) {
@@ -177,6 +190,10 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         let scrollBounds = sv?.bounds ?? .zero
 
         let zoom = sv?.zoomScale ?? 1.0
+        var pageZoom: Double? = nil
+        if #available(iOS 14.0, *) {
+            pageZoom = wb?.pageZoom
+        }
         let isScrollEnabled = sv?.isScrollEnabled ?? false
         let alwaysBounceV = sv?.alwaysBounceVertical ?? false
         let bounces = sv?.bounces ?? false
@@ -185,7 +202,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         print("[NativeViewport] url=\(urlString)")
         print("[NativeViewport] host=\(host) limitsNavigationsToAppBoundDomains=\(limitsAppBound)")
         print("[NativeViewport] view.bounds=\(viewBounds) safeArea=\(safe)")
-        print("[NativeViewport] scrollEnabled=\(isScrollEnabled) zoomScale=\(zoom) bounces=\(bounces) alwaysBounceVertical=\(alwaysBounceV)")
+        print("[NativeViewport] scrollEnabled=\(isScrollEnabled) zoomScale=\(zoom) pageZoom=\(pageZoom.map { String($0) } ?? "(n/a)") bounces=\(bounces) alwaysBounceVertical=\(alwaysBounceV)")
         print("[NativeViewport] scroll.frame=\(scrollFrame) scroll.bounds=\(scrollBounds) contentOffset=\(contentOffset)")
         print("[NativeViewport] contentSize=\(contentSize) contentInset=\(contentInset) adjustedInset=\(adjustedInset)")
     }

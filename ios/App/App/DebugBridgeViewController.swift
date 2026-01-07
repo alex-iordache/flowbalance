@@ -190,7 +190,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         let scrollBounds = sv?.bounds ?? .zero
 
         let zoom = sv?.zoomScale ?? 1.0
-        var pageZoom: Double? = nil
+        var pageZoom: CGFloat? = nil
         if #available(iOS 14.0, *) {
             pageZoom = wb?.pageZoom
         }
@@ -202,7 +202,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         print("[NativeViewport] url=\(urlString)")
         print("[NativeViewport] host=\(host) limitsNavigationsToAppBoundDomains=\(limitsAppBound)")
         print("[NativeViewport] view.bounds=\(viewBounds) safeArea=\(safe)")
-        print("[NativeViewport] scrollEnabled=\(isScrollEnabled) zoomScale=\(zoom) pageZoom=\(pageZoom.map { String($0) } ?? "(n/a)") bounces=\(bounces) alwaysBounceVertical=\(alwaysBounceV)")
+        print("[NativeViewport] scrollEnabled=\(isScrollEnabled) zoomScale=\(zoom) pageZoom=\(pageZoom.map { String(describing: $0) } ?? "(n/a)") bounces=\(bounces) alwaysBounceVertical=\(alwaysBounceV)")
         print("[NativeViewport] scroll.frame=\(scrollFrame) scroll.bounds=\(scrollBounds) contentOffset=\(contentOffset)")
         print("[NativeViewport] contentSize=\(contentSize) contentInset=\(contentInset) adjustedInset=\(adjustedInset)")
     }

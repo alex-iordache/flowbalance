@@ -31,6 +31,19 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         }
     }
 
+    private func normalizeOffsetIfNeeded(reason: String) {
+        guard let sv = self.webView?.scrollView else { return }
+        // After keyboard transitions / auth navigations, WKWebView can keep a stale contentOffset
+        // which makes the page appear shifted (not aligned to top-left).
+        let off = sv.contentOffset
+        if abs(off.x) > 0.5 || abs(off.y) > 0.5 {
+            sv.setContentOffset(.zero, animated: false)
+            #if DEBUG
+            print("[NativeViewport] normalizeOffsetIfNeeded(\(reason)) from contentOffset=\(off) -> .zero")
+            #endif
+        }
+    }
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -57,6 +70,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         normalizeZoomIfNeeded(reason: "viewDidAppear")
+        normalizeOffsetIfNeeded(reason: "viewDidAppear")
 
         #if DEBUG
         logViewport(reason: "viewDidAppear")
@@ -79,6 +93,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         normalizeZoomIfNeeded(reason: "viewDidLayoutSubviews")
+        normalizeOffsetIfNeeded(reason: "viewDidLayoutSubviews")
         #if DEBUG
         logViewport(reason: "viewDidLayoutSubviews")
         #endif
@@ -101,6 +116,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         normalizeZoomIfNeeded(reason: "didFinishNavigation")
+        normalizeOffsetIfNeeded(reason: "didFinishNavigation")
         #if DEBUG
         logViewport(reason: "didFinishNavigation")
         #endif
@@ -129,6 +145,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
 
     @objc private func onKeyboardWillHide(_ note: Notification) {
         normalizeZoomIfNeeded(reason: "keyboardWillHide")
+        normalizeOffsetIfNeeded(reason: "keyboardWillHide")
         logViewport(reason: "keyboardWillHide")
     }
     #endif
@@ -155,6 +172,9 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         let contentSize = sv?.contentSize ?? .zero
         let contentInset = sv?.contentInset ?? .zero
         let adjustedInset = sv?.adjustedContentInset ?? .zero
+        let contentOffset = sv?.contentOffset ?? .zero
+        let scrollFrame = sv?.frame ?? .zero
+        let scrollBounds = sv?.bounds ?? .zero
 
         let zoom = sv?.zoomScale ?? 1.0
         let isScrollEnabled = sv?.isScrollEnabled ?? false
@@ -166,6 +186,7 @@ class DebugBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
         print("[NativeViewport] host=\(host) limitsNavigationsToAppBoundDomains=\(limitsAppBound)")
         print("[NativeViewport] view.bounds=\(viewBounds) safeArea=\(safe)")
         print("[NativeViewport] scrollEnabled=\(isScrollEnabled) zoomScale=\(zoom) bounces=\(bounces) alwaysBounceVertical=\(alwaysBounceV)")
+        print("[NativeViewport] scroll.frame=\(scrollFrame) scroll.bounds=\(scrollBounds) contentOffset=\(contentOffset)")
         print("[NativeViewport] contentSize=\(contentSize) contentInset=\(contentInset) adjustedInset=\(adjustedInset)")
     }
     #endif

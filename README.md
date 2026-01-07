@@ -251,6 +251,100 @@ Don’t render `window.location`, `navigator.userAgent`, etc. directly into JSX 
 ### Ionic SSR warnings
 Sometimes `<ion-*>` elements can warn about extra `class` attributes during hydration. Avoid putting Tailwind `className` directly on Ionic web components when it causes warnings; put styling on wrappers.
 
+### iOS WKWebView gotchas (Clerk auth, cookies, and "stuck zoom")
+
+This project runs inside a **Capacitor WKWebView** on iOS and uses **Clerk** for auth. There are two iOS-only classes of issues that can look unrelated but are both WebView quirks:
+
+- **Auth redirect loops / non-persistent sessions** after email-code sign-in
+- **First sign-in “zoomed UI / wrong scale / no scroll until relaunch”** (WKWebView got stuck zoomed after keyboard closes)
+
+This section documents the full context so a future agent can re-apply the fixes quickly.
+
+#### 1) iOS auth redirect loop after email-code sign-in
+
+- **Symptoms**:
+  - User enters email + code, briefly sees success, then gets sent back to `/sign-in`.
+  - Logs show Clerk navigating through a **hosted** URL on `accounts.flowbalance.app` with a long query string including `redirect_url` and `*_force_redirect_url`.
+  - WKWebView often logs `NSURLErrorDomain -999` because a navigation cancels another navigation mid-flight.
+
+- **Root cause A (self-inflicted redirect chain)**:
+  - We accidentally configured Clerk to **force redirect back to sign-in**:
+    - `signInForceRedirectUrl="/sign-in?done=1"`
+    - `signUpForceRedirectUrl="/sign-up?done=1"`
+  - Clerk turns those into the `sign_in_force_redirect_url=...` and `sign_up_force_redirect_url=...` parameters used in the hosted `accounts.*` navigation, creating a loop back to sign-in.
+  - Clerk also preserves the previous page in `redirect_url`, so combining `redirect_url` + force redirects can create multi-hop chains.
+  - Clerk docs explain this behavior and how `forceRedirectUrl` / `fallbackRedirectUrl` interact with `redirect_url`:
+    - [`https://clerk.com/docs/guides/development/customize-redirect-urls`](https://clerk.com/docs/guides/development/customize-redirect-urls)
+
+- **Root cause B (iOS cookie restrictions causing “session drops”)**:
+  - On iOS 14+, cookie behavior is stricter (especially around cross-site / multi-domain auth).
+  - We saw sessions drop ~10–15 seconds after entering the app because Clerk couldn’t persist or rehydrate cookies reliably.
+
+- **Fixes applied** (high level):
+  - **Do not set** sign-in/sign-up force redirects to `/sign-in?...`:
+    - `components/ClerkProviderClient.tsx` intentionally does **not** set `signInForceRedirectUrl` / `signUpForceRedirectUrl` / fallbacks.
+  - **Avoid URL mutations inside WKWebView**:
+    - Set Clerk components to `routing="virtual"`:
+      - `app/sign-in/[[...sign-in]]/page.tsx`
+      - `app/sign-up/[[...sign-up]]/page.tsx`
+  - **Block cross-origin hosted hops inside the WebView**:
+    - In `components/ClerkProviderClient.tsx`, `routerPush/routerReplace` block Clerk navigations marked as `navigationType: "window"` (those are cross-origin hops, e.g. `accounts.flowbalance.app`).
+  - **Improve iOS cookie support**:
+    - Enable Capacitor cookie patching:
+      - `CapacitorCookies.enabled = true` (in `capacitor.config.json` and platform copies)
+    - Keep native HTTP patching disabled (to avoid split cookie jars):
+      - `CapacitorHttp.enabled = false`
+    - Add `WKAppBoundDomains` in `ios/App/App/Info.plist` including:
+      - `www.flowbalance.app`
+      - `flowbalance.app`
+      - `accounts.flowbalance.app`
+      - `clerk.flowbalance.app`
+
+- **Important configuration note**:
+  - Do **not** set `server.iosScheme` to `https`. Capacitor’s config schema warns that iOS scheme can’t be set to schemes WKWebView already handles. We removed `iosScheme: "https"` from all configs.
+  - Capacitor config schema reference:
+    - [`https://capacitorjs.com/docs/config`](https://capacitorjs.com/docs/config)
+
+#### 2) iOS “stuck zoom” after first sign-in (UI looks bigger than screen)
+
+- **Symptoms**:
+  - Immediately after first sign-in, the app renders “zoomed” (as if the UI is larger than the device).
+  - Scrolling feels wrong because the page is in a zoomed/offset viewport state.
+  - If you kill the app and reopen, it renders correctly.
+
+- **Root cause**:
+  - iOS Safari/WKWebView **auto-zooms** when focusing an `<input>` with `font-size < 16px`.
+  - Clerk’s sign-in UI contains form fields; during the email/code flow, the keyboard opens/closes and WKWebView may end up stuck at a non-1.0 zoom scale.
+  - Native logs confirmed this:
+    - `zoomScale=1.2315...` around `keyboardWillHide` on `/sign-in`.
+
+- **Fixes applied**:
+  - **Prevent auto-zoom** by forcing Clerk inputs to use `>= 16px` font size via Clerk `appearance`:
+    - In `app/sign-in/[[...sign-in]]/page.tsx` and `app/sign-up/[[...sign-up]]/page.tsx`:
+      - `appearance.elements.formFieldInput = "text-[16px]"`
+  - **Native fallback** (debug/robustness):
+    - `ios/App/App/DebugBridgeViewController.swift` implements `normalizeZoomIfNeeded()` which resets `scrollView.zoomScale` back to `1.0` on:
+      - `keyboardWillHide`
+      - `viewDidLayoutSubviews`
+      - `viewDidAppear`
+      - `didFinishNavigation`
+    - This was added because JS console logs can be blocked by “non app-bound domain” restrictions, so native logging is more reliable in Xcode.
+
+#### 3) Debugging checklist (if this ever regresses)
+
+- **Auth loop**:
+  - Check `components/ClerkProviderClient.tsx` for any forced redirect props or env vars that point back to `/sign-in`.
+  - Ensure `routing="virtual"` is still set on `<SignIn/>` and `<SignUp/>`.
+  - Confirm iOS `WKAppBoundDomains` includes the exact domains used by the WebView.
+
+- **Session persistence**:
+  - Confirm `CapacitorCookies.enabled = true` and `CapacitorHttp.enabled = false`.
+  - Confirm iOS `WKAppBoundDomains` is present in `ios/App/App/Info.plist`.
+
+- **Stuck zoom**:
+  - Look for non-1.0 `zoomScale` around keyboard events in the `[NativeViewport]` logs.
+  - Ensure Clerk input font size override remains at 16px.
+
 ---
 
 ## Debugging utilities

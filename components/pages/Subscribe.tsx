@@ -89,6 +89,7 @@ export default function Subscribe() {
   const [waitingForPayment, setWaitingForPayment] = useState<boolean>(false);
   const [safariOpenError, setSafariOpenError] = useState<string | null>(null);
   const [debugLines, setDebugLines] = useState<string[]>([]);
+  const [manualCheckoutUrl, setManualCheckoutUrl] = useState<string | null>(null);
 
   const debugLog = (label: string, data?: unknown) => {
     const ts = new Date().toISOString();
@@ -209,7 +210,13 @@ export default function Subscribe() {
     };
   }, []);
 
-  const openCheckout = async () => {
+  const openCheckout = async (ev?: any) => {
+    try {
+      ev?.preventDefault?.();
+      ev?.stopPropagation?.();
+    } catch {
+      // ignore
+    }
     // We must persist "pending" *first*, then open the checkout outside the WebView.
     // Opening the Stripe/checkout page inside WKWebView triggers:
     // - "non app-bound domain" spam
@@ -246,12 +253,22 @@ export default function Subscribe() {
             ? 'Nu am putut deschide Safari pentru plată. Te rog încearcă din nou.'
             : 'Could not open Safari for checkout. Please try again.',
         );
+        setManualCheckoutUrl(checkoutUrl);
         return;
       }
     }
 
-    const w = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-    if (!w) window.location.href = checkoutUrl;
+    // Web-only fallback (never navigate inside native WebView).
+    try {
+      const w = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+      if (!w) {
+        setManualCheckoutUrl(checkoutUrl);
+        setSafariOpenError(isRo ? 'Nu s-a putut deschide o fereastră nouă.' : 'Popup blocked.');
+      }
+    } catch {
+      setManualCheckoutUrl(checkoutUrl);
+      setSafariOpenError(isRo ? 'Nu s-a putut deschide checkout-ul.' : 'Could not open checkout.');
+    }
   };
 
   useEffect(() => {
@@ -422,7 +439,7 @@ export default function Subscribe() {
                     expand="block"
                     color="primary"
                     disabled={ticketLoading}
-                    onClick={openCheckout}
+                    onClick={(e) => void openCheckout(e)}
                   >
                     {ticketLoading ? 'Preparing…' : 'Subscribe'}
                   </IonButton>
@@ -516,6 +533,13 @@ export default function Subscribe() {
             >
               {debugLines.length ? debugLines.join('\n') : (isRo ? 'Nicio intrare încă.' : 'No entries yet.')}
             </div>
+
+            {manualCheckoutUrl ? (
+              <div className="mt-3 text-xs text-white/90">
+                <div className="font-semibold">{isRo ? 'Link checkout' : 'Checkout link'}</div>
+                <div className="break-all mt-1">{manualCheckoutUrl}</div>
+              </div>
+            ) : null}
           </div>
         </div>
 

@@ -119,7 +119,7 @@ export default function Subscribe() {
         <IonToolbar>
           <IonTitle className="text-white">{isRo ? 'Abonament Flow Pro' : 'Subscribe to Flow Pro'}</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => history.push('/settings')}>
+            <IonButton routerLink="/settings" routerDirection="none">
               <IonIcon icon={settingsOutline} className="text-white text-2xl" />
             </IonButton>
           </IonButtons>

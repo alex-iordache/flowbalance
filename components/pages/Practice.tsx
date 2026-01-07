@@ -119,7 +119,7 @@ const Practice = () => {
             {!hasAccess && <IonIcon icon={lockClosedOutline} className="ml-2" />}
           </IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => history.push('/settings')}>
+            <IonButton routerLink="/settings" routerDirection="none">
               <IonIcon icon={settingsOutline} className="text-white text-2xl" />
             </IonButton>
           </IonButtons>

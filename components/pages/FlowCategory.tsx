@@ -60,7 +60,7 @@ export default function FlowCategory() {
         <IonToolbar>
           <IonTitle className="text-white">{category ? t(category.title, lang) : 'Category'}</IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={() => history.push('/settings')}>
+            <IonButton routerLink="/settings" routerDirection="none">
               <IonIcon icon={settingsOutline} className="text-white text-2xl" />
             </IonButton>
           </IonButtons>

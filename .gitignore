@@ -40,6 +40,10 @@ tsconfig.tsbuildinfo
 # local tooling (do not commit)
 .tools
 
+# accidental debug output files
+tsc
+nextjs-tailwind-ionic-capacitor-starter@*
+
 # local npm cache (do not commit)
 .npm-cache/
 

@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Povești de claritate", en: "Insight Stories" },
   intro: { ro: "Povești care scot la lumină tipare pe care nu le vedeai.", en: "Stories that reveal patterns you couldn’t see before." },
   description: { ro: "Claritatea apare când te oprești din împins și începi să observi. Poveștile de aici invită realizări subtile despre obiceiuri, relații și felul în care îți vorbești. Folosește-le când te simți blocat și vrei un „aha” blând, nu un reset dur.", en: "Insight arrives when you stop pushing and start noticing. These stories invite subtle realizations about habits, relationships, and the way you speak to yourself. Use them when you feel stuck and want a gentle “aha” rather than a hard reset." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

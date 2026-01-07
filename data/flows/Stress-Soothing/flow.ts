@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Liniștirea stresului", en: "Stress Soothing" },
   intro: { ro: "Coboară din modul de stres către un calm mai stabil.", en: "Downshift from stress mode into a calmer baseline." },
   description: { ro: "Stresul strânge corpul și îți îngustează gândirea. Pe parcursul a 12 zile, exersezi eliberarea micro-tensiunii, stabilizarea respirației și închiderea ciclurilor de stres, ca să te simți mai puțin „în alertă.” Folosește-l după muncă, după conflicte sau oricând simți presiune constantă.", en: "Stress tightens the body and narrows your thinking. Across 12 days, you’ll practice releasing micro-tension, steadying breath, and finishing stress cycles so you feel less “on edge.” Use it after work, after conflict, or anytime you notice constant pressure." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

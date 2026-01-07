@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Calmează-ți sistemul nervos", en: "Calm Your Nervous System" },
   intro: { ro: "Antrenează-ți sistemul nervos să recunoască din nou siguranța.", en: "Train your nervous system to recognize safety again." },
   description: { ro: "Acest flow este o reconfigurare blândă: ritm de respirație, semnale din corp și atenție care te învață reglarea. Vei construi un „setare implicită” mai calmă care se vede în conversații, somn și decizii. Repetă zilele care îți plac—consecvența bate intensitatea aici.", en: "This flow is a gentle re-patterning: breath pacing, body cues, and attention that teaches regulation. You’ll build a calmer “default setting” that shows up in conversations, sleep, and decision-making. Repeat the days you love—consistency beats intensity here." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

@@ -33,7 +33,7 @@ function slugify(input) {
 }
 
 const PRACTICES_COUNT = 12;
-const IMAGE_PATH = '/img/flow-bg.jpg';
+const IMAGE_PATH = '/img/flow-bg.png';
 
 /**
  * All flow names + translations, in the app order.

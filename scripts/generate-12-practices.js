@@ -258,7 +258,7 @@ async function main() {
         goalEn: flow.goal.en,
         goalRo: flow.goal.ro,
         practicesCount,
-        imagePath: '/img/flow-bg.jpg',
+        imagePath: '/img/flow-bg.png',
       }),
       'utf8',
     );

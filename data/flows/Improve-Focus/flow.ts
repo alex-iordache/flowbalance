@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Îmbunătățește concentrarea", en: "Improve Focus" },
   intro: { ro: "Întărește atenția ca pe un mușchi—calm și consecvent.", en: "Strengthen attention like a muscle—calmly and consistently." },
   description: { ro: "Concentrarea scade când mintea e împrăștiată sau supra-stimulată. Practicile de aici antrenează atenția pe un singur punct, reduc „switching”-ul mental și te aduc înapoi când rătăcești. Folosește-l înainte de lucru profund, studiu sau când te simți tras în zece direcții.", en: "Focus fades when your mind is scattered or overstimulated. These practices train single-point attention, reduce mental switching, and bring you back when you drift. Use it before deep work, studying, or whenever you feel pulled in ten directions." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Povești de reflecție", en: "Reflection Stories" },
   intro: { ro: "Povești care te ajută să te oprești și să privești înăuntru.", en: "Stories that help you pause and look inward." },
   description: { ro: "Reflecția te schimbă fără să te forțeze. Poveștile de aici creează spațiu pentru întrebări, sens și auto-observare sinceră. Folosește-le când vrei să procesezi evenimente, emoții sau decizii cu mai multă profunzime și mai puțin zgomot.", en: "Reflection changes you without forcing you. These stories create space for questions, meaning, and honest self-observation. Use them when you want to process life events, emotions, or decisions with more depth and less noise." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

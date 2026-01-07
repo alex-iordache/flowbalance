@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Mindset în competiții", en: "Mindset During Competitions" },
   intro: { ro: "Intră în competiție cu prezență, nu cu panică.", en: "Compete with presence, not panic." },
   description: { ro: "Competiția amplifică totul: emoții, așteptări și dialog interior. Practicile de aici te ajută să canalizezi adrenalina în focus, să revii după greșeli și să rămâi „în banda ta.” E grozav cu o zi înainte de eveniment, în dimineața lui sau imediat după.", en: "Competition amplifies everything: nerves, expectations, and self-talk. These practices help you channel adrenaline into focus, recover after errors, and stay in your lane. Great the day before an event, on the morning of, or right after." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Revigorare zilnică a inimii", en: "Daily Heart Lift" },
   intro: { ro: "O mică ridicare zilnică pentru dispoziție și conexiune.", en: "A small daily lift for mood and connection." },
   description: { ro: "Unele zile nu au nevoie de un „deep dive”—au nevoie de un lift. Practicile scurte de aici aduc căldură, perspectivă și un strop de optimism fără să nege realitatea. Folosește-l ca ritual zilnic pentru a-ți reseta tonul emoțional.", en: "Some days don’t need a deep dive—they need a lift. These short practices bring warmth, perspective, and a touch of optimism without denying reality. Use it as a daily ritual to reset your emotional tone." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

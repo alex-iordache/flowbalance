@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Mindset pozitiv", en: "Positive Mindset" },
   intro: { ro: "Construiește o minte care caută sprijin, nu amenințări.", en: "Build a mind that looks for support, not threats." },
   description: { ro: "Pozitiv nu înseamnă fals—înseamnă flexibil. Acest flow te antrenează să observi ce funcționează, să reîncadrezi obstacolele și să creezi o voce interioară mai blândă. Folosește-l dimineața sau când te simți pesimist, dur cu tine sau descurajat.", en: "Positive doesn’t mean fake—it means flexible. This flow trains you to notice what’s working, reframe setbacks, and create a kinder inner voice. Use it in the morning or whenever you feel pessimistic, harsh, or discouraged." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

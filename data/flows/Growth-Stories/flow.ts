@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Povești de creștere", en: "Growth Stories" },
   intro: { ro: "Un impuls narativ către următorul tău nivel.", en: "A narrative push toward your next level." },
   description: { ro: "Creșterea e rar liniară—iar poveștile îți amintesc asta. Narațiunile de aici susțin reziliența, curajul și disponibilitatea de a învăța din disconfort. Folosește-le când ai nevoie de perspectivă nouă, un strop de energie sau o reamintire că înaintezi.", en: "Growth is rarely linear—and stories remind you of that. These narratives support resilience, courage, and the willingness to learn from discomfort. Use them when you need a fresh perspective, a spark, or a reminder that you’re moving forward." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Încredere în vorbitul în public", en: "Public Speaking Confidence" },
   intro: { ro: "Vorbește clar, cu un corp calm.", en: "Speak clearly while your body stays calm." },
   description: { ro: "Vorbitul în public nu e doar o abilitate; e un antrenament pentru sistemul nervos. Acest flow reduce tensiunea din gât și piept, stabilizează respirația și te ajută să rămâi ancorat când ești văzut. Folosește-l înainte de prezentări sau pentru a construi treptat confort.", en: "Public speaking isn’t just a skill; it’s nervous system training. This flow reduces throat and chest tension, steadies breath, and helps you feel grounded while being seen. Use it before presentations or to practice gradually building comfort." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

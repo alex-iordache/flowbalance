@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Afirmații din inimă", en: "Heartful Affirmations" },
   intro: { ro: "Afirmații care se simt reale—pentru că pornesc din corp.", en: "Affirmations that feel real—because they start in the body." },
   description: { ro: "Cuvintele funcționează când sistemul nervos le poate primi. Acest flow combină ancorarea cu afirmații din inimă, ca să internalizezi sprijinul, nu doar să îl repeți. Folosește-l dimineața, înainte de provocări sau când ai nevoie de întărire blândă.", en: "Words work when your nervous system can receive them. This flow pairs grounding with heart-centered statements so you can internalize support instead of just repeating it. Use it in the morning, before challenges, or when you need gentle reinforcement." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

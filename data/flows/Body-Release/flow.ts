@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Eliberare corporală", en: "Body Release" },
   intro: { ro: "Lasă corpul să încheie ce a început stresul.", en: "Let the body complete what stress started." },
   description: { ro: "Tensiunea este adesea stres neîncheiat, stocat în mușchi și respirație. Acest flow te ghidează prin eliberare blândă—maxilar, umeri, abdomen—ca sistemul tău să se liniștească. Folosește-l după stat mult pe scaun, după conflicte sau când te simți încordat fără să știi de ce.", en: "Tension is often unfinished stress stored in muscles and breath. This flow guides you through gentle release—jaw, shoulders, belly—so your system can settle. Use it after long sitting, after conflict, or when you feel tight without knowing why." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

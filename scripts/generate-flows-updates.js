@@ -146,7 +146,7 @@ async function main() {
         id,
         position,
         displayName,
-        imagePath: '/img/flow-bg.jpg',
+        imagePath: '/img/flow-bg.png',
       }),
       'utf8',
     );

@@ -20,7 +20,7 @@ const flow: Flow = {
   name: { ro: "Resetarea sistemului nervos", en: "Nervous System Reset" },
   intro: { ro: "Un reset complet când te simți dereglat și blocat.", en: "A full reset when you feel dysregulated and stuck." },
   description: { ro: "Uneori nu ai nevoie de mai mult gândit—ai nevoie de un reset. Acest flow te ajută să îți schimbi starea prin respirație, senzații și coborârea activării, ca sistemul tău să repornească din calm. Folosește-l după zile intense, vârfuri emoționale sau când te simți „off” fără un motiv clar.", en: "Sometimes you don’t need more thinking—you need a reset. This flow helps you shift state through breath, sensation, and down-regulation so your system can restart from calm. Use it after intense days, emotional spikes, or when you feel “off” for no clear reason." },
-  image: { ro: "/img/flow-bg.jpg", en: "/img/flow-bg.jpg" },
+  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
 
   started: false,
   finished: false,

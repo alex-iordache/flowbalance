@@ -23,6 +23,21 @@ body {
   width: 100%;
 }
 
+/* iOS/WKWebView hardening:
+ * - Prevent iOS text auto-adjust from causing unexpected layout changes
+ * - Prevent the iOS "focus input => page zoom" behavior by ensuring >=16px inputs
+ */
+@supports (-webkit-touch-callout: none) {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
 /* Allow scrolling on normal web pages (auth, subscribe-web, etc.) */
 body {
   overflow: auto;

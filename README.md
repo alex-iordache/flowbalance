@@ -491,4 +491,4 @@ Ensure `.gitignore` contains:
 android/keystore.properties
 ```
 
-## adding this just to be erased later - for a new commit
+<!-- (intentionally left blank) -->

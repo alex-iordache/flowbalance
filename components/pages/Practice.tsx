@@ -112,7 +112,7 @@ const Practice = () => {
 
   return (
     <IonPage>
-      <IonHeader translucent={true}>
+      <IonHeader>
         <IonToolbar>
           <IonTitle className="text-white">
             {getDisplayName()}

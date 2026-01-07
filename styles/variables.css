@@ -96,7 +96,9 @@ ion-content {
 ion-header,
 ion-toolbar {
   /* Make header seamless with body */
-  --background: var(--fb-bg);
+  --background: var(--fb-bg) !important;
+  --ion-toolbar-background: var(--fb-bg) !important;
+  background: var(--fb-bg) !important;
   /* Ensure title + buttons are white (Tailwind classes don't always penetrate Ionic shadow parts) */
   --color: rgba(255, 255, 255, 0.98);
   --padding-start: var(--fb-side-pad);

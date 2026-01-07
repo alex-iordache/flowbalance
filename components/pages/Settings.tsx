@@ -9,11 +9,8 @@ import {
   IonLabel,
   IonSelect,
   IonSelectOption,
-  IonButtons,
-  IonIcon,
 } from '@ionic/react';
 import { SignedIn, SignedOut, useClerk } from '@clerk/nextjs';
-import { settingsOutline } from 'ionicons/icons';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -44,11 +41,6 @@ const Settings = () => {
       <IonHeader>
         <IonToolbar>
           <IonTitle className="text-white">{isRo ? 'Setări' : 'Settings'}</IonTitle>
-          <IonButtons slot="end">
-            <IonButton onClick={() => history.push('/settings')}>
-              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
-            </IonButton>
-          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent className="ion-padding">

@@ -44,7 +44,7 @@ export default function RootLayout({
   return (
     <ClerkProviderClient>
       <html lang="en" suppressHydrationWarning>
-        <body>
+        <body suppressHydrationWarning>
           {children}
         </body>
         

@@ -17,10 +17,11 @@ export default function SignUpPage() {
     <IonPage>
       <IonContent scrollY={true}>
         <div 
-          className="flex flex-col items-center justify-center min-h-full bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
+          className="flex flex-col items-center justify-center min-h-full p-4"
           style={{
             paddingTop: 'env(safe-area-inset-top)',
             paddingBottom: 'env(safe-area-inset-bottom)',
+            background: 'var(--fb-bg)',
           }}
         >
           <div className="w-full max-w-md space-y-4">

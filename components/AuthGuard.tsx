@@ -39,7 +39,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         <IonApp>
           <IonPage>
             <IonContent>
-              <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600">
+              <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--fb-bg)' }}>
                 <div className="text-center text-white">
                   <IonSpinner name="crescent" className="w-16 h-16 mb-4" />
                   <h2 className="text-2xl font-bold">Loading Flow...</h2>
@@ -55,7 +55,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
           <IonApp>
             <IonPage>
               <IonContent>
-                <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600">
+                <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--fb-bg)' }}>
                   <div className="text-center text-white">
                     <IonSpinner name="crescent" className="w-16 h-16 mb-4" />
                     <h2 className="text-2xl font-bold">Opening sign in…</h2>

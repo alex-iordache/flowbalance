@@ -109,7 +109,7 @@ const FlowDetail = () => {
   
   return (
     <IonPage>
-      <IonHeader translucent={true}>
+      <IonHeader>
         <IonToolbar>
           <IonTitle className="text-white">{flow ? t(flow.title, lang) : ''}</IonTitle>
           <IonButtons slot="end">

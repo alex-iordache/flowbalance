@@ -24,7 +24,7 @@ export default function PostSignupRedirect() {
   }, [isLoaded, userId]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-400 via-red-500 to-purple-600">
+    <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--fb-bg)' }}>
       <div className="text-center text-white">
         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
         <h2 className="text-2xl font-bold">Welcome! Redirecting...</h2>

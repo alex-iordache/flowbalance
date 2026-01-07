@@ -17,6 +17,7 @@ import { SignedIn, SignedOut, useAuth } from '@clerk/nextjs';
 import { usePlans } from '@clerk/nextjs/experimental';
 import React, { useEffect, useMemo, useState } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 import { useHistory } from 'react-router-dom';
 import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import Store from '../../store';
@@ -131,25 +132,56 @@ export default function Subscribe() {
     const removeAppState = CapacitorApp.addListener('appStateChange', (s) => {
       if (s.isActive) maybeShow();
     });
+    // If checkout is opened via `@capacitor/browser` (SFSafariViewController), the app may
+    // remain "active" and App resume events won't fire. Instead, listen for browser close.
+    const removeBrowserFinished = (async () => {
+      try {
+        if (!Capacitor.isNativePlatform()) return null;
+        const { Browser } = await import('@capacitor/browser');
+        return await Browser.addListener('browserFinished', () => {
+          maybeShow();
+        });
+      } catch {
+        return null;
+      }
+    })();
     maybeShow();
 
     return () => {
       document.removeEventListener('visibilitychange', maybeShow);
       window.removeEventListener('focus', maybeShow);
       void removeAppState.then(h => h.remove()).catch(() => {});
+      void removeBrowserFinished
+        .then(h => h?.remove?.())
+        .catch(() => {});
     };
   }, []);
 
-  const openCheckout = () => {
-    // IMPORTANT: don't rely on IonButton `href` events to run before navigation in iOS.
-    // We must persist "pending" *first*, then open Safari within the same user gesture.
+  const openCheckout = async () => {
+    // We must persist "pending" *first*, then open the checkout outside the WebView.
+    // Opening the Stripe/checkout page inside WKWebView triggers:
+    // - "non app-bound domain" spam
+    // - blocked Capacitor bridge injection
     setPaymentPending(true);
 
-    const w = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
-    if (!w) {
-      // Popup blocked or prevented; fall back to same-window navigation.
-      window.location.href = checkoutUrl;
+    try {
+      if (Capacitor.isNativePlatform()) {
+        const { Browser } = await import('@capacitor/browser');
+        await Browser.open({ url: checkoutUrl });
+        // Show the overlay after opening so the user sees "Waiting..." immediately
+        // when they dismiss the browser and return to the app.
+        // (Browser.open doesn't necessarily background the app, so resume events might not fire.)
+        window.setTimeout(() => {
+          if (getPaymentPending()) setWaitingForPayment(true);
+        }, 250);
+        return;
+      }
+    } catch {
+      // ignore; fall back below
     }
+
+    const w = window.open(checkoutUrl, '_blank', 'noopener,noreferrer');
+    if (!w) window.location.href = checkoutUrl;
   };
 
   useEffect(() => {

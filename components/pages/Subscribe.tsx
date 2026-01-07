@@ -24,9 +24,26 @@ const PAYMENT_PENDING_KEY = 'flow_payment_pending_v1';
 
 function getPaymentPending(): boolean {
   try {
+    // Prefer localStorage so it survives the Safari hop + app resume on iOS.
+    if (localStorage.getItem(PAYMENT_PENDING_KEY) === '1') return true;
+    // Back-compat: if a previous build wrote to sessionStorage.
     return sessionStorage.getItem(PAYMENT_PENDING_KEY) === '1';
   } catch {
     return false;
+  }
+}
+
+function setPaymentPending(next: boolean) {
+  try {
+    if (next) {
+      localStorage.setItem(PAYMENT_PENDING_KEY, '1');
+      sessionStorage.setItem(PAYMENT_PENDING_KEY, '1');
+    } else {
+      localStorage.removeItem(PAYMENT_PENDING_KEY);
+      sessionStorage.removeItem(PAYMENT_PENDING_KEY);
+    }
+  } catch {
+    // ignore
   }
 }
 
@@ -96,15 +113,7 @@ export default function Subscribe() {
   useEffect(() => {
     // Keep the pending marker persisted so returning from Safari (without a deep link callback)
     // still shows the overlay and keeps polling until the subscription activates.
-    try {
-      if (waitingForPayment) {
-        sessionStorage.setItem(PAYMENT_PENDING_KEY, '1');
-      } else {
-        sessionStorage.removeItem(PAYMENT_PENDING_KEY);
-      }
-    } catch {
-      // ignore
-    }
+    setPaymentPending(waitingForPayment);
   }, [waitingForPayment]);
 
   useEffect(() => {
@@ -277,6 +286,8 @@ export default function Subscribe() {
                     target="_blank"
                     rel="noopener noreferrer"
                     disabled={ticketLoading}
+                    // Use pointer-down so we persist the overlay state *before* navigating to Safari.
+                    onPointerDown={() => setWaitingForPayment(true)}
                     onClick={() => setWaitingForPayment(true)}
                   >
                     {ticketLoading ? 'Preparing…' : 'Subscribe'}

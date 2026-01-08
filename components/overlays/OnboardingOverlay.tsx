@@ -156,12 +156,12 @@ export default function OnboardingOverlay() {
     const t1 = window.setTimeout(() => {
       if (cancelled) return;
       setSplashFading(true);
-    }, 650);
+    }, 2650);
     const t2 = window.setTimeout(() => {
       if (cancelled) return;
       hideOverlay();
       history.push('/home');
-    }, 1150);
+    }, 3150);
     return () => {
       cancelled = true;
       window.clearTimeout(t1);
@@ -270,23 +270,24 @@ export default function OnboardingOverlay() {
         ].join(' ')}
       >
         <div className="w-full max-w-md text-center">
-          <div className="text-white text-[24px] font-semibold">{headline}</div>
-          <div className="mt-2 text-white/75 text-[13px] leading-snug">{copy}</div>
+          <div className="text-white text-[28px] font-semibold">{headline}</div>
+          <div className="mt-3 text-white/80 text-[15px] leading-snug">{copy}</div>
         </div>
       </div>
     );
   };
+
+  if (step === 'splash') {
+    // Fullscreen centered message (no top chrome), then fade away to reveal Home.
+    return <div className="h-full w-full overflow-hidden">{renderSplash()}</div>;
+  }
 
   return (
     <div className="h-full w-full overflow-auto">
       <div className="min-h-full px-5 py-6 pb-10 w-full max-w-md mx-auto">
         <div className="flex items-center justify-between">
           <div className="text-white/70 text-[12px]">
-            {step === 'lang'
-              ? '1/5'
-              : typeof step === 'number'
-                ? `${step + 2}/5`
-                : '✓'}
+            {step === 'lang' ? '1/5' : typeof step === 'number' ? `${step + 2}/5` : '✓'}
           </div>
           {typeof step === 'number' && step >= 0 ? (
             <button type="button" onClick={goBack} className="text-white/80 text-[13px]">
@@ -297,25 +298,23 @@ export default function OnboardingOverlay() {
           )}
         </div>
 
-        {step === 'splash' ? renderSplash() : renderQuestion()}
+        {renderQuestion()}
 
-        {step !== 'splash' ? (
-          <button
-            type="button"
-            disabled={!canNext || saving}
-            onClick={goNext}
-            className={[
-              'mt-8 w-full rounded-2xl py-3 font-semibold',
-              canNext ? 'bg-white text-[#3b1b6a]' : 'bg-white/20 text-white/60',
-            ].join(' ')}
-          >
-            {step === 'lang'
+        <button
+          type="button"
+          disabled={!canNext || saving}
+          onClick={goNext}
+          className={[
+            'mt-8 w-full rounded-2xl py-3 font-semibold',
+            canNext ? 'bg-white text-[#3b1b6a]' : 'bg-white/20 text-white/60',
+          ].join(' ')}
+        >
+          {step === 'lang'
+            ? (isRo ? 'Continuă' : 'Continue')
+            : typeof step === 'number' && step < 3
               ? (isRo ? 'Continuă' : 'Continue')
-              : typeof step === 'number' && step < 3
-                ? (isRo ? 'Continuă' : 'Continue')
-                : (isRo ? 'Finalizează' : 'Finish')}
-          </button>
-        ) : null}
+              : (isRo ? 'Finalizează' : 'Finish')}
+        </button>
       </div>
     </div>
   );

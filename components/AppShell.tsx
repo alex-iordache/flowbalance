@@ -14,7 +14,6 @@ import CategoryThemeSync from './CategoryThemeSync';
 import ChunkLoadRecovery from './ChunkLoadRecovery';
 import OverlayManager from './OverlayManager';
 import OnboardingGuard from './OnboardingGuard';
-import OfflineGuard from './OfflineGuard';
 
 setupIonicReact({});
 
@@ -49,7 +48,6 @@ const AppShell = () => {
           <HardwareBackHandler />
           <CategoryThemeSync />
           <ChunkLoadRecovery />
-          <OfflineGuard />
           <OnboardingGuard />
           <OverlayManager />
           <IonRouterOutlet id="main">

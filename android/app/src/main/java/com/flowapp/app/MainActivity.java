@@ -8,9 +8,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import com.getcapacitor.CapConfig;
 import com.getcapacitor.BridgeActivity;
+import com.getcapacitor.BridgeWebViewClient;
 import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -18,6 +22,9 @@ import java.io.InputStreamReader;
 
 public class MainActivity extends BridgeActivity {
   private static final String TAG = "FlowOffline";
+  // Load directly from bundled assets. This works even when `server.url` is set (remote-first),
+  // because Capacitor's local server won't reliably serve https://localhost/* in that mode.
+  private static final String LOCAL_OFFLINE_URL = "file:///android_asset/public/offline.html";
 
   private static boolean isOnline(Context ctx) {
     try {
@@ -74,6 +81,44 @@ public class MainActivity extends BridgeActivity {
     }
 
     super.onCreate(savedInstanceState);
+
+    // Install an error fallback that always loads the bundled offline page when the remote load fails.
+    // This is more reliable than trying to infer connectivity at launch.
+    try {
+      final WebView webView = this.getBridge().getWebView();
+      webView.setWebViewClient(new BridgeWebViewClient(this.getBridge()) {
+        private boolean isAlreadyOnOfflinePage(WebView view) {
+          try {
+            String current = view.getUrl();
+            return current != null && current.startsWith(LOCAL_OFFLINE_URL);
+          } catch (Exception ignored) {
+            return false;
+          }
+        }
+
+        @Override
+        public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+          // Don't call super: default handler would load errorPath using server.url (remote-first),
+          // which doesn't help when offline. We want the bundled offline page.
+          if (request != null && request.isForMainFrame()) {
+            if (isAlreadyOnOfflinePage(view)) return;
+            Log.i(TAG, "webview error (main frame) -> load bundled offline page");
+            view.loadUrl(LOCAL_OFFLINE_URL);
+          }
+        }
+
+        @Override
+        public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+          if (request != null && request.isForMainFrame()) {
+            if (isAlreadyOnOfflinePage(view)) return;
+            Log.i(TAG, "webview http error (main frame) -> load bundled offline page");
+            view.loadUrl(LOCAL_OFFLINE_URL);
+          }
+        }
+      });
+    } catch (Exception ignored) {
+      Log.i(TAG, "failed to install webview error fallback client");
+    }
 
     // If we launched offline, ensure we are actually showing the bundled app URL.
     // (Some devices may still try to show the remote error page even if the config is overridden.)

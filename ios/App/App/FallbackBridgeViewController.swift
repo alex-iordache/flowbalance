@@ -28,7 +28,7 @@ final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationD
         didAttemptLocalFallback = true
 
         // Load the bundled web app from Capacitor's local scheme handler.
-        if let url = URL(string: "capacitor://localhost/index.html") {
+        if let url = URL(string: "capacitor://localhost/offline.html") {
             let req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
             self.webView?.stopLoading()
             self.webView?.load(req)

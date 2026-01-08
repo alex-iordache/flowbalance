@@ -24,7 +24,7 @@ public class MainActivity extends BridgeActivity {
   private static final String TAG = "FlowOffline";
   // Load directly from bundled assets. This works even when `server.url` is set (remote-first),
   // because Capacitor's local server won't reliably serve https://localhost/* in that mode.
-  private static final String LOCAL_OFFLINE_URL = "file:///android_asset/public/offline.html";
+  private static final String LOCAL_OFFLINE_URL = "file:///android_asset/offline.html";
 
   private static boolean isOnline(Context ctx) {
     try {

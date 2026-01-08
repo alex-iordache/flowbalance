@@ -5,44 +5,89 @@ import { useEffect, useRef } from 'react';
 import Store from '../store';
 import { hideOverlay, showOverlay } from '../store/actions';
 
-function isOfflineNow(): boolean {
-  // Best-effort: in WKWebView this is generally good enough for v1.
-  // (We can later upgrade to @capacitor/network for more reliable signal.)
-  if (typeof navigator === 'undefined') return false;
-  return navigator.onLine === false;
+function getQuickOfflineSignal(): boolean | null {
+  // In some WebViews `navigator.onLine` is unreliable; treat it as a hint only.
+  if (typeof navigator === 'undefined') return null;
+  if (navigator.onLine === false) return true;
+  if (navigator.onLine === true) return false;
+  return null;
+}
+
+async function probeOnline(timeoutMs: number): Promise<boolean> {
+  // Probe same-origin so it works for both:
+  // - remote app (https://www.flowbalance.app)
+  // - local app (capacitor://localhost) once we add native fallback
+  try {
+    const controller = new AbortController();
+    const t = window.setTimeout(() => controller.abort(), timeoutMs);
+    const url = `${window.location.origin}/favicon.ico?ping=${Date.now()}`;
+    const res = await fetch(url, {
+      method: 'HEAD',
+      cache: 'no-store',
+      signal: controller.signal,
+    });
+    window.clearTimeout(t);
+    // Any HTTP response means we have connectivity to the app origin.
+    return res.ok || (res.status >= 200 && res.status < 500);
+  } catch {
+    return false;
+  }
 }
 
 export default function OfflineGuard() {
   const overlayType = Store.useState(s => s.overlayType);
   const lastOfflineRef = useRef<boolean | null>(null);
+  const inflightRef = useRef(false);
 
   useEffect(() => {
-    const apply = () => {
-      const offline = isOfflineNow();
+    const apply = async () => {
+      // Fast hint first (if available)
+      const hint = getQuickOfflineSignal();
+      let offline: boolean;
+
+      if (hint === true) {
+        offline = true;
+      } else {
+        // Reliable probe (fixes Android WebView cases where `navigator.onLine` never flips)
+        if (inflightRef.current) return;
+        inflightRef.current = true;
+        const ok = await probeOnline(1500);
+        inflightRef.current = false;
+        offline = !ok;
+      }
+
       if (lastOfflineRef.current === offline) return;
       lastOfflineRef.current = offline;
 
       if (offline) {
-        // Don't stomp other overlays (onboarding, etc.). We'll just avoid showing offline overlay in that case.
-        if (overlayType) return;
+        // Don't stomp onboarding; otherwise show offline overlay even if the app continues to navigate from cache.
+        if (overlayType === 'onboarding') return;
         showOverlay('offline', {
-          message: 'You can browse the app, but some features require an internet connection.',
+          message:
+            'You are offline. You can still browse, but images and audio require an internet connection.',
         });
         return;
       }
 
-      // Back online: only hide if we are the one showing.
       if (overlayType === 'offline') hideOverlay();
     };
 
-    apply();
+    // Run once quickly
+    void apply();
 
-    window.addEventListener('online', apply);
-    window.addEventListener('offline', apply);
+    // Event-based updates (best effort)
+    window.addEventListener('online', () => void apply());
+    window.addEventListener('offline', () => void apply());
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') void apply();
+    });
+
+    // Polling fallback (Android WebView often misses events)
+    const interval = window.setInterval(() => void apply(), 2500);
 
     return () => {
-      window.removeEventListener('online', apply);
-      window.removeEventListener('offline', apply);
+      window.clearInterval(interval);
+      // note: anonymous listeners can't be removed; acceptable for app lifetime, but keep scope stable in future refactor
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overlayType]);

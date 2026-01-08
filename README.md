@@ -151,7 +151,7 @@ However, when the device is offline, the WebView can fail **before any JS runs**
 
 To provide a clean offline experience:
 - We bundle the web build (`webDir: out`) into the native apps (Capacitor sync copies it into the platform projects)
-- On **offline at launch** (or initial remote load failure), native code loads the bundled app so our offline overlay can render.
+- On remote load failure, Capacitor loads a **dedicated offline fallback page** via `server.errorPath`, then the user can tap **Retry** to return online.
 
 Native entrypoints:
 - **iOS**: `FallbackBridgeViewController.swift` (wired in `ios/App/App/Base.lproj/Main.storyboard`)
@@ -160,6 +160,7 @@ Native entrypoints:
 Notes:
 - This requires a **one-time native rebuild** (APK/IPA) when you change the fallback behavior.
 - Once the app is loaded (online), the JS `OfflineGuard` can show/hide the offline overlay during runtime connectivity changes.
+- The native offline fallback page is `public/offline.html` and is referenced by Capacitor via `server.errorPath: "offline.html"`.
 
 ---
 

@@ -16,6 +16,8 @@ type StoreProps = {
   selectedList: TodoListItem | undefined;
   flows: Flow[];
   isSuperAdmin: boolean;
+  overlayType: 'onboarding' | 'offline' | null;
+  overlayProps: Record<string, any> | null;
 }
 
 const Store = new PullStateStore<StoreProps>({
@@ -31,6 +33,8 @@ const Store = new PullStateStore<StoreProps>({
   selectedList: undefined,
   flows: defaultFlows,
   isSuperAdmin: false,
+  overlayType: null,
+  overlayProps: null,
 });
 
 export default Store;

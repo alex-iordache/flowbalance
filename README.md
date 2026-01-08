@@ -94,6 +94,50 @@ This repo uses Ionic’s router for the in-app experience, and Next routes for a
 
 ---
 
+## Overlay system (reusable full-screen overlays)
+
+We use a **state-driven, reusable overlay system** for “full-screen interruptions” that should sit above the Ionic app UI (e.g. onboarding, offline, critical errors).
+
+- **Overlay wrapper**: `components/ui/Overlay.tsx`
+  - Fullscreen purple background (`var(--fb-bg)`), high z-index
+- **Overlay router/manager**: `components/OverlayManager.tsx`
+  - Renders an overlay based on `Store.overlayType`
+- **State + actions**
+  - `store/index.ts`: `overlayType`, `overlayProps`
+  - `store/actions.ts`: `showOverlay(type, props?)`, `hideOverlay()`
+
+### Adding a new overlay type
+
+1. Add the new union value to `StoreProps.overlayType` in `store/index.ts`
+2. Create a content component in `components/overlays/` (ex: `OfflineOverlay.tsx`)
+3. Add a render case in `components/OverlayManager.tsx`
+4. Trigger it from anywhere via `showOverlay('your-type', { ...props })`
+
+---
+
+## Onboarding: first-time sign-in questionnaire (overlay)
+
+New users (first sign-in) are required to complete a short questionnaire that recommends **Top 3 flow categories**, then routes them into a specific Flow and starts from the first practice.
+
+- **Guard**: `components/OnboardingGuard.tsx`
+  - Runs after `SignedIn` and checks completion status per `userId`
+  - If incomplete, it calls `showOverlay('onboarding')`
+- **UI**: `components/overlays/OnboardingOverlay.tsx`
+  - 4 questions, with Q1 allowing max 2 selections
+  - Shows a results screen (Top 3 categories) + CTA
+  - CTA routes to `/flows/:flowId/:practiceId` (first practice by lowest `position`)
+- **Question definitions**: `data/onboardingQuestions.ts`
+- **Scoring + mapping**: `helpers/onboardingScoring.ts`
+  - Scores categories: `emotional-regulation`, `performance-boost`, `mindset`, `stories`, `heart-balance`, `somatic-release`
+  - Deterministic tie-breaking + fallback: `emotional-regulation → heart-balance → somatic-release`
+  - Maps category → default Flow using `components/pages/flowsCatalog.ts` (`FLOW_CATEGORIES`)
+- **Persistence**: `store/persistence.ts`
+  - `saveOnboardingComplete(userId, recommendedCategories)`
+  - `hasCompletedOnboarding(userId)`
+  - Stored via Capacitor `Preferences` per user key (`onboarding_complete:<userId>`)
+
+---
+
 ## Clerk: rules of engagement (important)
 
 ### What we want

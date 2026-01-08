@@ -88,3 +88,20 @@ export const setFlowStarted = (flowId: string, started: boolean) => {
   });
   saveFlowsState();
 };
+
+export const showOverlay = (
+  type: 'onboarding' | 'offline',
+  props?: Record<string, any>,
+) => {
+  Store.update(s => {
+    s.overlayType = type;
+    s.overlayProps = props ?? null;
+  });
+};
+
+export const hideOverlay = () => {
+  Store.update(s => {
+    s.overlayType = null;
+    s.overlayProps = null;
+  });
+};

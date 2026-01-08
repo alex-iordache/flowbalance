@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   FLOWS: 'flows_state',
   SETTINGS: 'settings_state',
   LISTS: 'lists_state',
+  ONBOARDING_COMPLETE: 'onboarding_complete',
 } as const;
 
 // Save flows state to Preferences
@@ -139,7 +140,7 @@ export const loadAllPersistedState = async () => {
         return defaultFlow;
       });
     }
-    
+
     if (settings) {
       // Merge to keep forward-compatible defaults (e.g. newly added settings fields).
       s.settings = { ...(s.settings as any), ...(settings as any) };
@@ -150,4 +151,45 @@ export const loadAllPersistedState = async () => {
     }
   });
 };
+
+type OnboardingCompleteRecord = {
+  userId: string;
+  completedAt: string; // ISO timestamp
+  recommendedCategories: string[];
+};
+
+function onboardingKeyForUser(userId: string) {
+  return `${STORAGE_KEYS.ONBOARDING_COMPLETE}:${userId}`;
+}
+
+export async function saveOnboardingComplete(
+  userId: string,
+  recommendedCategories: string[],
+) {
+  try {
+    const rec: OnboardingCompleteRecord = {
+      userId,
+      completedAt: new Date().toISOString(),
+      recommendedCategories,
+    };
+    await Preferences.set({
+      key: onboardingKeyForUser(userId),
+      value: JSON.stringify(rec),
+    });
+  } catch (error) {
+    console.error('Error saving onboarding completion:', error);
+  }
+}
+
+export async function hasCompletedOnboarding(userId: string): Promise<boolean> {
+  try {
+    const { value } = await Preferences.get({ key: onboardingKeyForUser(userId) });
+    if (!value) return false;
+    const parsed = JSON.parse(value) as Partial<OnboardingCompleteRecord> | null;
+    return Boolean(parsed && parsed.userId === userId && parsed.completedAt);
+  } catch (error) {
+    console.error('Error checking onboarding completion:', error);
+    return false;
+  }
+}
 

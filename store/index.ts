@@ -18,6 +18,8 @@ type StoreProps = {
   isSuperAdmin: boolean;
   overlayType: 'onboarding' | 'offline' | null;
   overlayProps: Record<string, any> | null;
+  onboardingRecommendedCategories: string[] | null;
+  onboardingStart: { flowId: string; practiceId: string | null } | null;
 }
 
 const Store = new PullStateStore<StoreProps>({
@@ -35,6 +37,8 @@ const Store = new PullStateStore<StoreProps>({
   isSuperAdmin: false,
   overlayType: null,
   overlayProps: null,
+  onboardingRecommendedCategories: null,
+  onboardingStart: null,
 });
 
 export default Store;

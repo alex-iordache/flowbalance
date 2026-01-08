@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@clerk/nextjs';
 import { useHistory } from 'react-router-dom';
 
@@ -9,8 +9,7 @@ import { t, type Flow, type Language } from '../../data/flows';
 import { ONBOARDING_QUESTIONS, type OnboardingOptionId } from '../../data/onboardingQuestions';
 import { calculateCategoryScores, getDefaultFlowForCategory, getTop3Categories, type OnboardingAnswers } from '../../helpers/onboardingScoring';
 import { saveOnboardingComplete } from '../../store/persistence';
-import { hideOverlay } from '../../store/actions';
-import { FLOW_CATEGORIES } from '../pages/flowsCatalog';
+import { hideOverlay, setOnboardingRecommendations, setOnboardingStart, setSettings } from '../../store/actions';
 
 function firstPracticeId(flow: Flow): string | null {
   const practices = flow.practices ?? [];
@@ -32,13 +31,30 @@ function OptionButton({
       type="button"
       onClick={onClick}
       className={[
+        // Layout
         'w-full text-left rounded-2xl px-4 py-3',
-        'border border-white/15',
-        selected ? 'bg-white/14' : 'bg-white/8',
-        'active:bg-white/16',
+        // Simple, visible button styling (no shadows)
+        'border transition-colors',
+        selected ? 'bg-white/20 border-white/45 ring-2 ring-white/25' : 'bg-white/10 border-white/20',
+        'active:bg-white/25',
       ].join(' ')}
+      style={{
+        // Fallback in case some global CSS forces buttons transparent in certain WebViews
+        backgroundColor: selected ? 'rgba(255,255,255,0.20)' : 'rgba(255,255,255,0.10)',
+      }}
     >
-      <div className="text-white text-[14px] leading-snug">{label}</div>
+      <div className="flex items-start gap-3">
+        <div
+          className={[
+            'mt-[2px] w-5 h-5 rounded-full flex items-center justify-center shrink-0',
+            selected ? 'bg-white text-[#3b1b6a]' : 'bg-white/15 text-transparent',
+          ].join(' ')}
+          aria-hidden="true"
+        >
+          ✓
+        </div>
+        <div className="text-white text-[14px] leading-snug">{label}</div>
+      </div>
     </button>
   );
 }
@@ -50,20 +66,23 @@ export default function OnboardingOverlay() {
   const lang = Store.useState(s => s.settings.language) as Language;
   const isRo = lang === 'ro';
 
-  const [step, setStep] = useState<0 | 1 | 2 | 3 | 4>(0); // 0..3 questions, 4 = result
+  const [step, setStep] = useState<'lang' | 0 | 1 | 2 | 3 | 'splash'>('lang');
+  const [selectedLang, setSelectedLang] = useState<Language>('en');
   const [q1, setQ1] = useState<OnboardingAnswers['q1']>([]);
   const [q2, setQ2] = useState<OnboardingAnswers['q2'] | null>(null);
   const [q3, setQ3] = useState<OnboardingAnswers['q3'] | null>(null);
   const [q4, setQ4] = useState<OnboardingAnswers['q4'] | null>(null);
   const [saving, setSaving] = useState(false);
+  const [splashFading, setSplashFading] = useState(false);
 
   const canNext = useMemo(() => {
+    if (step === 'lang') return Boolean(selectedLang);
     if (step === 0) return q1.length > 0 && q1.length <= 2;
     if (step === 1) return Boolean(q2);
     if (step === 2) return Boolean(q3);
     if (step === 3) return Boolean(q4);
-    return true;
-  }, [step, q1.length, q2, q3, q4]);
+    return false;
+  }, [step, selectedLang, q1.length, q2, q3, q4]);
 
   const answers: OnboardingAnswers | null = useMemo(() => {
     if (!q2 || !q3 || !q4) return null;
@@ -81,22 +100,33 @@ export default function OnboardingOverlay() {
     ? 'Răspunde la câteva întrebări scurte și îți vom sugera cu ce să începi.'
     : 'Answer a few quick questions and we’ll suggest what to start with.';
 
-  const question = step <= 3 ? ONBOARDING_QUESTIONS[step] : null;
+  const question = typeof step === 'number' ? ONBOARDING_QUESTIONS[step] : null;
 
   const goBack = () => {
     if (saving) return;
-    if (step === 0) return;
-    setStep((step - 1) as any);
+    if (step === 'lang') return;
+    if (typeof step === 'number') {
+      if (step === 0) return setStep('lang');
+      setStep((step - 1) as any);
+    }
   };
 
-  const goNext = () => {
+  const goNext = async () => {
     if (saving) return;
     if (!canNext) return;
-    if (step < 3) setStep((step + 1) as any);
-    else setStep(4);
+    if (step === 'lang') {
+      // Apply language selection immediately; the whole app is language-based (UI + audio).
+      const current = Store.getRawState().settings;
+      setSettings({ ...(current as any), language: selectedLang } as any);
+      // Move to Q1
+      setStep(0);
+      return;
+    }
+    if (typeof step === 'number' && step < 3) setStep((step + 1) as any);
+    else if (step === 3) await onFinish();
   };
 
-  const onSubmit = async () => {
+  const onFinish = async () => {
     if (saving) return;
     if (!userId) return;
     if (!top3 || !answers) return;
@@ -106,19 +136,71 @@ export default function OnboardingOverlay() {
       const primary = top3[0] ?? 'emotional-regulation';
       const flow = getDefaultFlowForCategory(primary, flows) ?? null;
       const pid = flow ? firstPracticeId(flow) : null;
+      const start = { flowId: flow?.id ?? null, practiceId: pid };
 
-      await saveOnboardingComplete(userId, top3);
-      hideOverlay();
+      await saveOnboardingComplete(userId, top3, start);
+      setOnboardingRecommendations(top3);
+      setOnboardingStart(start.flowId ? { flowId: start.flowId, practiceId: start.practiceId } : null);
 
-      if (flow && pid) history.push(`/flows/${flow.id}/${pid}`);
-      else if (flow) history.push(`/flows/${flow.id}`);
-      else history.push('/home');
+      // Show a short welcome splash, then fade away to reveal Home.
+      setStep('splash');
+      setSplashFading(false);
     } finally {
       setSaving(false);
     }
   };
 
+  useEffect(() => {
+    if (step !== 'splash') return;
+    let cancelled = false;
+    const t1 = window.setTimeout(() => {
+      if (cancelled) return;
+      setSplashFading(true);
+    }, 650);
+    const t2 = window.setTimeout(() => {
+      if (cancelled) return;
+      hideOverlay();
+      history.push('/home');
+    }, 1150);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+    };
+  }, [step, history]);
+
   const renderQuestion = () => {
+    if (step === 'lang') {
+      return (
+        <>
+          <div className="text-white/80 text-[12px] tracking-wide uppercase">
+            {isRo ? 'SETUP' : 'SETUP'}
+          </div>
+          <div className="mt-3 text-white text-[20px] font-semibold leading-tight">
+            {isRo ? 'Alege limba' : 'Choose your language'}
+          </div>
+          <div className="mt-2 text-white/75 text-[13px] leading-snug">
+            {isRo
+              ? 'Interfața și sesiunile audio sunt bazate pe limba aleasă. Poți schimba limba și mai târziu din Setări.'
+              : 'The interface and all audio sessions follow this language. You can change it later in Settings.'}
+          </div>
+
+          <div className="mt-6 flex flex-col gap-3">
+            <OptionButton
+              label="English"
+              selected={selectedLang === 'en'}
+              onClick={() => setSelectedLang('en')}
+            />
+            <OptionButton
+              label="Română"
+              selected={selectedLang === 'ro'}
+              onClick={() => setSelectedLang('ro')}
+            />
+          </div>
+        </>
+      );
+    }
+
     if (!question) return null;
 
     const qTitle = t(question.title, lang);
@@ -173,46 +255,25 @@ export default function OnboardingOverlay() {
     );
   };
 
-  const renderResult = () => {
-    if (!top3) return null;
-    const [a, b, c] = top3;
-    const primary = a ?? 'emotional-regulation';
-    const secondary = b ?? 'heart-balance';
-    const tertiary = c ?? 'somatic-release';
-
-    // Use category titles from catalog, but keep it simple here: show ID as fallback.
-    const catTitle = (id: string) => {
-      const cat = FLOW_CATEGORIES.find(x => x.id === id) ?? null;
-      return cat ? t(cat.title, lang) : id;
-    };
+  const renderSplash = () => {
+    const headline = isRo ? 'Bine ai venit!' : 'Welcome!';
+    const copy = isRo
+      ? 'Am pregătit o recomandare pentru tine. Hai să începem.'
+      : 'We’ve prepared a recommendation for you. Let’s begin.';
 
     return (
-      <>
-        <div className="text-white/80 text-[12px] tracking-wide uppercase">
-          {isRo ? 'REZULTAT' : 'RESULT'}
+      <div
+        className={[
+          'h-full w-full flex items-center justify-center px-6',
+          'transition-opacity duration-500',
+          splashFading ? 'opacity-0' : 'opacity-100',
+        ].join(' ')}
+      >
+        <div className="w-full max-w-md text-center">
+          <div className="text-white text-[24px] font-semibold">{headline}</div>
+          <div className="mt-2 text-white/75 text-[13px] leading-snug">{copy}</div>
         </div>
-        <div className="mt-3 text-white text-[18px] font-semibold">
-          {isRo ? 'Recomandarea ta personalizată:' : 'Your personalized recommendation:'}
-        </div>
-        <div className="mt-4 flex flex-col gap-2 text-white/90 text-[14px]">
-          <div>1. {catTitle(primary)}</div>
-          <div>2. {catTitle(secondary)}</div>
-          <div>3. {catTitle(tertiary)}</div>
-        </div>
-
-        <button
-          type="button"
-          disabled={saving}
-          onClick={onSubmit}
-          className={[
-            'mt-8 w-full rounded-2xl py-3 font-semibold',
-            'bg-white text-[#3b1b6a]',
-            saving ? 'opacity-70' : 'active:opacity-90',
-          ].join(' ')}
-        >
-          {isRo ? 'Începe cu primul exercițiu (5 minute)' : 'Start with the first exercise (5 minutes)'}
-        </button>
-      </>
+      </div>
     );
   };
 
@@ -221,9 +282,13 @@ export default function OnboardingOverlay() {
       <div className="min-h-full px-5 py-6 pb-10 w-full max-w-md mx-auto">
         <div className="flex items-center justify-between">
           <div className="text-white/70 text-[12px]">
-            {step <= 3 ? `${step + 1}/4` : '✓'}
+            {step === 'lang'
+              ? '1/5'
+              : typeof step === 'number'
+                ? `${step + 2}/5`
+                : '✓'}
           </div>
-          {step <= 3 && step > 0 ? (
+          {typeof step === 'number' && step >= 0 ? (
             <button type="button" onClick={goBack} className="text-white/80 text-[13px]">
               {isRo ? 'Înapoi' : 'Back'}
             </button>
@@ -232,9 +297,9 @@ export default function OnboardingOverlay() {
           )}
         </div>
 
-        {step <= 3 ? renderQuestion() : renderResult()}
+        {step === 'splash' ? renderSplash() : renderQuestion()}
 
-        {step <= 3 ? (
+        {step !== 'splash' ? (
           <button
             type="button"
             disabled={!canNext || saving}
@@ -244,7 +309,11 @@ export default function OnboardingOverlay() {
               canNext ? 'bg-white text-[#3b1b6a]' : 'bg-white/20 text-white/60',
             ].join(' ')}
           >
-            {step < 3 ? (isRo ? 'Continuă' : 'Continue') : (isRo ? 'Vezi recomandarea' : 'See recommendation')}
+            {step === 'lang'
+              ? (isRo ? 'Continuă' : 'Continue')
+              : typeof step === 'number' && step < 3
+                ? (isRo ? 'Continuă' : 'Continue')
+                : (isRo ? 'Finalizează' : 'Finish')}
           </button>
         ) : null}
       </div>

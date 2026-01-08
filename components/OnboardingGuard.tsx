@@ -4,8 +4,8 @@ import { useAuth } from '@clerk/nextjs';
 import { useEffect, useRef } from 'react';
 
 import Store from '../store';
-import { hasCompletedOnboarding } from '../store/persistence';
-import { showOverlay } from '../store/actions';
+import { hasCompletedOnboarding, loadOnboardingComplete } from '../store/persistence';
+import { setOnboardingRecommendations, setOnboardingStart, showOverlay } from '../store/actions';
 
 export default function OnboardingGuard() {
   const { isLoaded, userId, isSignedIn } = useAuth();
@@ -22,7 +22,18 @@ export default function OnboardingGuard() {
 
     (async () => {
       const completed = await hasCompletedOnboarding(userId);
-      if (completed) return;
+      if (completed) {
+        const rec = await loadOnboardingComplete(userId);
+        if (rec) {
+          setOnboardingRecommendations(rec.recommendedCategories ?? []);
+          setOnboardingStart(
+            rec.startFlowId
+              ? { flowId: rec.startFlowId, practiceId: rec.startPracticeId ?? null }
+              : null,
+          );
+        }
+        return;
+      }
       // If something else is already showing, don't stomp it.
       if (overlayType) return;
       showOverlay('onboarding');

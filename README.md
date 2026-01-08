@@ -117,23 +117,28 @@ We use a **state-driven, reusable overlay system** for “full-screen interrupti
 
 ## Onboarding: first-time sign-in questionnaire (overlay)
 
-New users (first sign-in) are required to complete a short questionnaire that recommends **Top 3 flow categories**, then routes them into a specific Flow and starts from the first practice.
+New users (first sign-in) are required to complete a short questionnaire that:
+- starts with **language selection** (default: **English**)
+- produces **Top 3 flow categories**
+- configures the Home screen to show **Start here** + **Recommended for you (3 + 1 random)**.
 
 - **Guard**: `components/OnboardingGuard.tsx`
   - Runs after `SignedIn` and checks completion status per `userId`
   - If incomplete, it calls `showOverlay('onboarding')`
+  - If completed, it loads the saved onboarding record into Store (`onboardingRecommendedCategories`, `onboardingStart`) so Home can render the right cards
 - **UI**: `components/overlays/OnboardingOverlay.tsx`
   - 4 questions, with Q1 allowing max 2 selections
-  - Shows a results screen (Top 3 categories) + CTA
-  - CTA routes to `/flows/:flowId/:practiceId` (first practice by lowest `position`)
+  - First step: **language selection** (UI + audio language; can be changed later in Settings)
+  - End: shows a short **Welcome** splash that fades away and reveals Home (no results screen)
 - **Question definitions**: `data/onboardingQuestions.ts`
 - **Scoring + mapping**: `helpers/onboardingScoring.ts`
   - Scores categories: `emotional-regulation`, `performance-boost`, `mindset`, `stories`, `heart-balance`, `somatic-release`
   - Deterministic tie-breaking + fallback: `emotional-regulation → heart-balance → somatic-release`
   - Maps category → default Flow using `components/pages/flowsCatalog.ts` (`FLOW_CATEGORIES`)
 - **Persistence**: `store/persistence.ts`
-  - `saveOnboardingComplete(userId, recommendedCategories)`
+  - `saveOnboardingComplete(userId, recommendedCategories, start)`
   - `hasCompletedOnboarding(userId)`
+  - `loadOnboardingComplete(userId)`
   - Stored via Capacitor `Preferences` per user key (`onboarding_complete:<userId>`)
 
 ---

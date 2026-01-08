@@ -105,3 +105,15 @@ export const hideOverlay = () => {
     s.overlayProps = null;
   });
 };
+
+export const setOnboardingRecommendations = (recommendedCategories: string[]) => {
+  Store.update(s => {
+    s.onboardingRecommendedCategories = recommendedCategories;
+  });
+};
+
+export const setOnboardingStart = (start: { flowId: string; practiceId: string | null } | null) => {
+  Store.update(s => {
+    s.onboardingStart = start;
+  });
+};

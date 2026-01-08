@@ -103,5 +103,5 @@ export type Settings = {
 
 export const settings: Settings = {
   enableNotifications: true,
-  language: 'ro',
+  language: 'en',
 };

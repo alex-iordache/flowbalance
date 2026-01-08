@@ -144,7 +144,7 @@ export const loadAllPersistedState = async () => {
     if (settings) {
       // Merge to keep forward-compatible defaults (e.g. newly added settings fields).
       s.settings = { ...(s.settings as any), ...(settings as any) };
-      if (!(s.settings as any).language) (s.settings as any).language = 'ro';
+      if (!(s.settings as any).language) (s.settings as any).language = 'en';
     }
     if (lists) {
       s.lists = lists;
@@ -156,6 +156,8 @@ type OnboardingCompleteRecord = {
   userId: string;
   completedAt: string; // ISO timestamp
   recommendedCategories: string[];
+  startFlowId: string | null;
+  startPracticeId: string | null;
 };
 
 function onboardingKeyForUser(userId: string) {
@@ -165,12 +167,15 @@ function onboardingKeyForUser(userId: string) {
 export async function saveOnboardingComplete(
   userId: string,
   recommendedCategories: string[],
+  start: { flowId: string | null; practiceId: string | null },
 ) {
   try {
     const rec: OnboardingCompleteRecord = {
       userId,
       completedAt: new Date().toISOString(),
       recommendedCategories,
+      startFlowId: start.flowId,
+      startPracticeId: start.practiceId,
     };
     await Preferences.set({
       key: onboardingKeyForUser(userId),
@@ -190,6 +195,29 @@ export async function hasCompletedOnboarding(userId: string): Promise<boolean> {
   } catch (error) {
     console.error('Error checking onboarding completion:', error);
     return false;
+  }
+}
+
+export async function loadOnboardingComplete(
+  userId: string,
+): Promise<OnboardingCompleteRecord | null> {
+  try {
+    const { value } = await Preferences.get({ key: onboardingKeyForUser(userId) });
+    if (!value) return null;
+    const parsed = JSON.parse(value) as Partial<OnboardingCompleteRecord> | null;
+    if (!parsed || parsed.userId !== userId || !parsed.completedAt) return null;
+    return {
+      userId,
+      completedAt: String(parsed.completedAt),
+      recommendedCategories: Array.isArray(parsed.recommendedCategories)
+        ? (parsed.recommendedCategories.filter(x => typeof x === 'string') as string[])
+        : [],
+      startFlowId: typeof parsed.startFlowId === 'string' ? parsed.startFlowId : null,
+      startPracticeId: typeof parsed.startPracticeId === 'string' ? parsed.startPracticeId : null,
+    };
+  } catch (error) {
+    console.error('Error loading onboarding completion:', error);
+    return null;
   }
 }
 

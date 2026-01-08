@@ -19,7 +19,7 @@ import { Preferences } from '@capacitor/preferences';
 import Store from '../../store';
 import { t, type Flow, type Practice, type Language } from '../../data/flows';
 import { getAudioSrc } from '../../helpers/getAudioSrc';
-import { getCategoryForFlowId } from './flowsCatalog';
+import { FLOW_CATEGORIES, getCategoryForFlowId } from './flowsCatalog';
 import QuickActionCard from '../ui/QuickActionCard';
 
 type HelloUserProps ={
@@ -195,6 +195,96 @@ function ContinueCard({
   );
 }
 
+function StartHereCard({
+  flow,
+  lang,
+  onStart,
+  flowId,
+  practiceIdForMinutes,
+}: {
+  flow: Flow;
+  lang: Language;
+  onStart: () => void;
+  flowId: string;
+  practiceIdForMinutes: string | null;
+}) {
+  const isRo = lang === 'ro';
+  const [minutesLabel, setMinutesLabel] = useState<string>('');
+
+  useEffect(() => {
+    setMinutesLabel('');
+    if (!practiceIdForMinutes) return;
+    const practice = (flow.practices ?? []).find(p => p.id === practiceIdForMinutes) ?? null;
+    const audioKey = practice ? t(practice.audioUrl, lang) : '';
+    if (!audioKey) return;
+
+    const audio = document.createElement('audio');
+    audio.preload = 'metadata';
+    audio.src = getAudioSrc({
+      audioUrlOrPath: audioKey,
+      flowId,
+      practiceId: practiceIdForMinutes,
+    });
+    const onLoaded = () => {
+      const dur = Number.isFinite(audio.duration) ? audio.duration : 0;
+      const label = formatMinutesFromSeconds(dur);
+      if (label) setMinutesLabel(label);
+    };
+    audio.addEventListener('loadedmetadata', onLoaded);
+    audio.addEventListener('error', () => {});
+    try {
+      audio.load();
+    } catch {}
+    return () => {
+      audio.removeEventListener('loadedmetadata', onLoaded);
+      audio.src = '';
+    };
+  }, [flowId, practiceIdForMinutes, lang, flow.practices]);
+
+  const title = t(flow.name, lang);
+  const subtitle = t(flow.intro, lang);
+  const badgeText = isRo ? 'Începe aici' : 'Start here';
+
+  return (
+    <div
+      className="w-full max-w-md mx-auto rounded-[28px] overflow-hidden"
+      style={{
+        backgroundColor: 'var(--fb-bg)',
+        backgroundImage: 'var(--fb-card-gradient)',
+        boxShadow:
+          'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -18px 40px rgba(0,0,0,0.22)',
+      }}
+    >
+      <div className="p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-white/75 text-[11px] tracking-wide">
+              {minutesLabel ? `${minutesLabel} • ` : ''}
+              {isRo ? 'Recomandat pentru tine' : 'Recommended for you'}
+            </div>
+            <div className="mt-1 text-white text-[18px] font-semibold truncate">{title}</div>
+            <div className="mt-1 text-white/80 text-[13px] leading-snug line-clamp-2">{subtitle}</div>
+          </div>
+
+          <div className="shrink-0 flex flex-col items-end gap-2">
+            <div className="px-2 py-1 rounded-full text-[10px] font-semibold text-white/90 bg-white/12">
+              {badgeText}
+            </div>
+            <button
+              type="button"
+              onClick={onStart}
+              aria-label={isRo ? 'Pornește' : 'Start'}
+              className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/14 active:bg-white/18 flex items-center justify-center"
+            >
+              <IonIcon icon={play} className="text-white text-[18px]" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function RecommendedFlowsCard({
   flows,
   lang,
@@ -297,6 +387,8 @@ const Home = () => {
   const { user, isLoaded } = useUser();
   const lang = Store.useState(s => s.settings.language);
   const flows = Store.useState(s => s.flows);
+  const onboardingStart = Store.useState(s => s.onboardingStart);
+  const onboardingRecommendedCategories = Store.useState(s => s.onboardingRecommendedCategories);
   const [recommendedFlowIds, setRecommendedFlowIds] = useState<string[]>([]);
 
   const displayFirstNameFromClerk = useMemo(() => {
@@ -344,6 +436,36 @@ const Home = () => {
     const key = 'flow_recommended_flow_ids_v1';
 
     (async () => {
+      // If onboarding produced recommendations, prefer them and persist them.
+      if (Array.isArray(onboardingRecommendedCategories) && onboardingRecommendedCategories.length) {
+        const byId = new Map(flows.map(f => [f.id, f] as const));
+        const picked: string[] = [];
+
+        for (const catId of onboardingRecommendedCategories.slice(0, 3)) {
+          const cat = FLOW_CATEGORIES.find(c => c.id === catId) ?? null;
+          if (!cat) continue;
+          for (const fid of cat.flowIds) {
+            if (picked.includes(fid)) continue;
+            if (byId.has(fid)) {
+              picked.push(fid);
+              break;
+            }
+          }
+        }
+
+        const pool = flows.map(f => f.id).filter(id => !picked.includes(id));
+        const fourth = pickRandomDistinct(pool, 1)[0] ?? null;
+        const ids = [...picked, ...(fourth ? [fourth] : [])].slice(0, 4);
+
+        if (!cancelled) setRecommendedFlowIds(ids);
+        try {
+          await Preferences.set({ key, value: JSON.stringify(ids) });
+        } catch {
+          // ignore
+        }
+        return;
+      }
+
       try {
         const { value } = await Preferences.get({ key });
         if (cancelled) return;
@@ -372,7 +494,7 @@ const Home = () => {
     return () => {
       cancelled = true;
     };
-  }, [flows]);
+  }, [flows, onboardingRecommendedCategories]);
 
   const recommendedFlows = useMemo(() => {
     const byId = new Map(flows.map(f => [f.id, f] as const));
@@ -400,9 +522,32 @@ const Home = () => {
         {(() => {
           const activeFlow = pickActiveFlow(flows);
           if (!activeFlow) {
+            const startFlow = onboardingStart
+              ? flows.find(f => f.id === onboardingStart.flowId) ?? null
+              : null;
+            const startHref =
+              onboardingStart && onboardingStart.flowId
+                ? onboardingStart.practiceId
+                  ? `/flows/${onboardingStart.flowId}/${onboardingStart.practiceId}`
+                  : `/flows/${onboardingStart.flowId}`
+                : null;
+            const startPracticeForMinutes =
+              onboardingStart?.practiceId ??
+              (startFlow ? pickNextUnfinishedPractice(startFlow)?.id ?? null : null);
+
             return (
               <div className="flex flex-col gap-4">
-                <EmptyStateCard lang={lang} onBrowse={() => history.push('/flows')} />
+                {startFlow && startHref ? (
+                  <StartHereCard
+                    flow={startFlow}
+                    lang={lang}
+                    flowId={startFlow.id}
+                    practiceIdForMinutes={startPracticeForMinutes}
+                    onStart={() => history.push(startHref)}
+                  />
+                ) : (
+                  <EmptyStateCard lang={lang} onBrowse={() => history.push('/flows')} />
+                )}
                 {recommendedFlows.length ? (
                   <RecommendedFlowsCard
                     flows={recommendedFlows}

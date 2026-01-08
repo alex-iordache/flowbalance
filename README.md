@@ -143,6 +143,26 @@ New users (first sign-in) are required to complete a short questionnaire that:
 
 ---
 
+## Offline UX (v1): remote-first with bundled fallback
+
+The production mobile apps are configured as **remote-first** (`server.url` points at `https://www.flowbalance.app`) so most UI changes ship instantly via Vercel.
+
+However, when the device is offline, the WebView can fail **before any JS runs**, producing the ugly native “Webpage not available” screen. A JS-only overlay cannot fix that.
+
+To provide a clean offline experience:
+- We bundle the web build (`webDir: out`) into the native apps (Capacitor sync copies it into the platform projects)
+- On **offline at launch** (or initial remote load failure), native code loads the bundled app so our offline overlay can render.
+
+Native entrypoints:
+- **iOS**: `FallbackBridgeViewController.swift` (wired in `ios/App/App/Base.lproj/Main.storyboard`)
+- **Android**: `android/app/src/main/java/com/flowapp/app/MainActivity.java`
+
+Notes:
+- This requires a **one-time native rebuild** (APK/IPA) when you change the fallback behavior.
+- Once the app is loaded (online), the JS `OfflineGuard` can show/hide the offline overlay during runtime connectivity changes.
+
+---
+
 ## Clerk: rules of engagement (important)
 
 ### What we want

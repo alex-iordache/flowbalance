@@ -62,10 +62,7 @@ export default function OfflineGuard() {
       if (offline) {
         // Don't stomp onboarding; otherwise show offline overlay even if the app continues to navigate from cache.
         if (overlayType === 'onboarding') return;
-        showOverlay('offline', {
-          message:
-            'You are offline. You can still browse, but images and audio require an internet connection.',
-        });
+        showOverlay('offline');
         return;
       }
 

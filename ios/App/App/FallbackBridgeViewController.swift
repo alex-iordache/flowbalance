@@ -16,6 +16,24 @@ final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationD
         NSLog("[FlowOffline][iOS] \(msg)")
     }
 
+    override func instanceDescriptor() -> InstanceDescriptor {
+        // This is called very early (during CAPBridgeViewController.loadView), before the initial URL is loaded.
+        // For a true cold-start offline, relying on navigation delegate error callbacks is flaky.
+        // Instead, force Capacitor to start from the bundled local server when offline.
+        let descriptor = super.instanceDescriptor()
+
+        if !Self.isOnline() {
+            fbLog("instanceDescriptor: offline -> force local start (serverURL=nil, appStartPath=index.html)")
+            descriptor.serverURL = nil
+            descriptor.appStartPath = "index.html"
+            // Keep errorPath if present; it will resolve against localURL when serverURL is nil.
+        } else {
+            fbLog("instanceDescriptor: online -> keep remote-first server.url")
+        }
+
+        return descriptor
+    }
+
     override func capacitorDidLoad() {
         super.capacitorDidLoad()
         fbLog("FallbackBridgeViewController capacitorDidLoad")
@@ -39,18 +57,7 @@ final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationD
     override func viewDidLoad() {
         super.viewDidLoad()
         fbLog("FallbackBridgeViewController viewDidLoad")
-
-        if let wv = self.webView {
-            fbLog("webView created. initial url=\(wv.url?.absoluteString ?? "nil") isLoading=\(wv.isLoading)")
-        } else {
-            fbLog("webView is nil in viewDidLoad")
-        }
-
-        // If we're offline at launch, switch immediately to local.
-        if !Self.isOnline() {
-            fbLog("offline detected at launch -> loadLocalFallback()")
-            loadLocalFallback()
-        }
+        fbLog("webView initial url=\(self.webView?.url?.absoluteString ?? "nil") isLoading=\(self.webView?.isLoading ?? false)")
 
         // Watchdog: if we still end up blank/black (no url) shortly after launch, force local fallback.
         // This catches cases where WebKit fails before delegations fire.

@@ -10,26 +10,74 @@ import WebKit
 /// This prevents the ugly iOS "Webpage not available" white error page and allows our JS offline overlay to run.
 final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationDelegate {
     private var didAttemptLocalFallback = false
+    private var watchdogArmed = false
+
+    private func fbLog(_ msg: String) {
+        NSLog("[FlowOffline][iOS] \(msg)")
+    }
+
+    override func capacitorDidLoad() {
+        super.capacitorDidLoad()
+        fbLog("FallbackBridgeViewController capacitorDidLoad")
+
+        if let cfg = bridge?.config {
+            fbLog("config.serverURL=\(cfg.serverURL.absoluteString)")
+            fbLog("config.localURL=\(cfg.localURL.absoluteString)")
+            fbLog("config.appStartServerURL=\(cfg.appStartServerURL.absoluteString)")
+            fbLog("config.appLocation=\(cfg.appLocation.path)")
+            fbLog("config.errorPath=\(cfg.errorPath ?? "nil")")
+
+            let offlinePath = cfg.appLocation.appendingPathComponent("offline.html").path
+            let indexPath = cfg.appLocation.appendingPathComponent("index.html").path
+            fbLog("exists offline.html=\(FileManager.default.fileExists(atPath: offlinePath)) (\(offlinePath))")
+            fbLog("exists index.html=\(FileManager.default.fileExists(atPath: indexPath)) (\(indexPath))")
+        } else {
+            fbLog("bridge/config not available in capacitorDidLoad")
+        }
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        fbLog("FallbackBridgeViewController viewDidLoad")
 
-        // Ensure we get navigation failures so we can fall back.
-        self.webView?.navigationDelegate = self
+        if let wv = self.webView {
+            fbLog("webView created. initial url=\(wv.url?.absoluteString ?? "nil") isLoading=\(wv.isLoading)")
+        } else {
+            fbLog("webView is nil in viewDidLoad")
+        }
 
         // If we're offline at launch, switch immediately to local.
         if !Self.isOnline() {
+            fbLog("offline detected at launch -> loadLocalFallback()")
             loadLocalFallback()
+        }
+
+        // Watchdog: if we still end up blank/black (no url) shortly after launch, force local fallback.
+        // This catches cases where WebKit fails before delegations fire.
+        if !watchdogArmed {
+            watchdogArmed = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.25) { [weak self] in
+                guard let self = self else { return }
+                let current = self.webView?.url?.absoluteString ?? ""
+                let isBlank = current.isEmpty || current == "about:blank"
+                self.fbLog("watchdog(1.25s) url='\(current)' blank=\(isBlank)")
+                if isBlank {
+                    self.fbLog("watchdog -> loadLocalFallback()")
+                    self.loadLocalFallback()
+                }
+            }
         }
     }
 
     private func loadLocalFallback() {
         if didAttemptLocalFallback { return }
         didAttemptLocalFallback = true
+        fbLog("loadLocalFallback() start")
 
         // Load the bundled offline page from Capacitor's local scheme handler.
         // This must exist in `ios/App/App/public/offline.html` (bundled into the app).
         if let url = URL(string: "capacitor://localhost/offline.html") {
+            fbLog("loading capacitor://localhost/offline.html")
             let req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
             self.webView?.stopLoading()
             self.webView?.load(req)
@@ -40,8 +88,10 @@ final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationD
             guard let self = self else { return }
             guard let wv = self.webView else { return }
             let current = wv.url?.absoluteString ?? ""
+            self.fbLog("fallback-check(1.0s) url='\(current)'")
             if current.isEmpty || current == "about:blank" {
                 if let u = URL(string: "capacitor://localhost/index.html") {
+                    self.fbLog("fallback -> loading capacitor://localhost/index.html")
                     let req = URLRequest(url: u, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
                     wv.stopLoading()
                     wv.load(req)

@@ -14,13 +14,15 @@ function getQuickOfflineSignal(): boolean | null {
 }
 
 async function probeOnline(timeoutMs: number): Promise<boolean> {
-  // Probe same-origin so it works for both:
-  // - remote app (https://www.flowbalance.app)
-  // - local app (capacitor://localhost) once we add native fallback
+  // IMPORTANT:
+  // When the app is running from `capacitor://localhost`, probing `window.location.origin`
+  // only tells us whether the *local* bundle is reachable, not whether the internet is up.
+  // We specifically want to know if we can reach the remote app origin.
+  const REMOTE_ORIGIN = 'https://www.flowbalance.app';
   try {
     const controller = new AbortController();
     const t = window.setTimeout(() => controller.abort(), timeoutMs);
-    const url = `${window.location.origin}/favicon.ico?ping=${Date.now()}`;
+    const url = `${REMOTE_ORIGIN}/favicon.ico?ping=${Date.now()}`;
     const res = await fetch(url, {
       method: 'HEAD',
       cache: 'no-store',

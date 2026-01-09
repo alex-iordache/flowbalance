@@ -151,7 +151,8 @@ However, when the device is offline, the WebView can fail **before any JS runs**
 
 To provide a clean offline experience:
 - We bundle the web build (`webDir: out`) into the native apps (Capacitor sync copies it into the platform projects)
-- On remote load failure, Capacitor loads a **dedicated offline fallback page** via `server.errorPath`, then the user can tap **Retry** to return online.
+- On **cold start offline**, native code loads the bundled app entrypoint (`index.html`) so the UI can boot instead of a black/white WebView error screen.
+- Once the UI boots, `OfflineGuard` shows the offline overlay (with Retry) and hides it when internet returns.
 
 Native entrypoints:
 - **iOS**: `FallbackBridgeViewController.swift` (wired in `ios/App/App/Base.lproj/Main.storyboard`)
@@ -160,7 +161,7 @@ Native entrypoints:
 Notes:
 - This requires a **one-time native rebuild** (APK/IPA) when you change the fallback behavior.
 - Once the app is loaded (online), the JS `OfflineGuard` can show/hide the offline overlay during runtime connectivity changes.
-- The native offline fallback page is `public/offline.html` and is referenced by Capacitor via `server.errorPath: "offline.html"`.
+- `OfflineGuard` probes `https://www.flowbalance.app/favicon.ico` (not `window.location.origin`) so it still detects offline correctly when running from `capacitor://localhost`.
 
 ---
 

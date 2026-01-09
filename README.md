@@ -143,27 +143,24 @@ New users (first sign-in) are required to complete a short questionnaire that:
 
 ---
 
-## Offline UX: remote-first with native fallback + in-app overlay
+## Offline UX (v1): remote-first with bundled fallback
 
 The production mobile apps are configured as **remote-first** (`server.url` points at `https://www.flowbalance.app`) so most UI changes ship instantly via Vercel.
 
 However, when the device is offline, the WebView can fail **before any JS runs**, producing the ugly native “Webpage not available” screen. A JS-only overlay cannot fix that.
 
-**Solution:** Native error handlers load a bundled offline page when the remote load fails (cold start offline). Once the app is loaded, the JS `OfflineGuard` component detects connectivity changes and shows/hides an overlay.
+To provide a clean offline experience:
+- We bundle the web build (`webDir: out`) into the native apps (Capacitor sync copies it into the platform projects)
+- On remote load failure, Capacitor loads a **dedicated offline fallback page** via `server.errorPath`, then the user can tap **Retry** to return online.
 
-### Native fallback (cold-start offline)
-- **Android**: `MainActivity.java` installs a custom `WebViewClient` that catches main-frame load errors and loads `file:///android_asset/offline.html` from bundled assets.
-- **iOS**: `FallbackBridgeViewController.swift` (wired in `Main.storyboard`) catches navigation failures and loads `capacitor://localhost/offline.html`.
+Native entrypoints:
+- **iOS**: `FallbackBridgeViewController.swift` (wired in `ios/App/App/Base.lproj/Main.storyboard`)
+- **Android**: `android/app/src/main/java/com/flowapp/app/MainActivity.java`
 
-Both platforms bundle `public/offline.html` which includes a Retry button that pings the remote server and redirects when online.
-
-### In-app overlay (runtime connectivity loss)
-- `components/OfflineGuard.tsx` periodically probes connectivity and shows `components/overlays/OfflineOverlay.tsx` when offline.
-- The overlay matches the native offline page UI and includes a Retry button with the same behavior.
-
-**Notes:**
-- Changes to native fallback code require a native rebuild (APK/IPA).
-- The offline HTML files are bundled: `public/offline.html` (web) and `android/app/src/main/assets/offline.html` (native asset).
+Notes:
+- This requires a **one-time native rebuild** (APK/IPA) when you change the fallback behavior.
+- Once the app is loaded (online), the JS `OfflineGuard` can show/hide the offline overlay during runtime connectivity changes.
+- The native offline fallback page is `public/offline.html` and is referenced by Capacitor via `server.errorPath: "offline.html"`.
 
 ---
 

@@ -27,13 +27,26 @@ final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationD
         if didAttemptLocalFallback { return }
         didAttemptLocalFallback = true
 
-        // Load the bundled web app from Capacitor's local scheme handler.
-        // NOTE: `offline.html` is not guaranteed to exist in the bundled iOS `public/` folder.
-        // `index.html` is always present, and our JS `OfflineGuard` will show the offline overlay.
-        if let url = URL(string: "capacitor://localhost/index.html") {
+        // Load the bundled offline page from Capacitor's local scheme handler.
+        // This must exist in `ios/App/App/public/offline.html` (bundled into the app).
+        if let url = URL(string: "capacitor://localhost/offline.html") {
             let req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
             self.webView?.stopLoading()
             self.webView?.load(req)
+        }
+
+        // Safety net: if offline.html fails for any reason, fall back to index.html so we never stay black.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+            guard let self = self else { return }
+            guard let wv = self.webView else { return }
+            let current = wv.url?.absoluteString ?? ""
+            if current.isEmpty || current == "about:blank" {
+                if let u = URL(string: "capacitor://localhost/index.html") {
+                    let req = URLRequest(url: u, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
+                    wv.stopLoading()
+                    wv.load(req)
+                }
+            }
         }
     }
 

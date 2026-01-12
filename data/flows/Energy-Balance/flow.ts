@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Găsește mijlocul: energizat, nu agitat.", en: "Find the middle: energized, not wired." },
   description: { ro: "Unele zile ești fără energie; alte zile ești supra-stimulat. Acest flow te ajută să îți reglezi activarea astfel încât energia să fie stabilă și folosibilă. Vei exersa activare blândă, „downshift”-uri și ritmuri care susțin o zi echilibrată.", en: "Some days you’re flat; other days you’re overstimulated. This flow helps you regulate arousal so your energy feels usable and stable. You’ll practice gentle activation, downshifts, and rhythms that support a balanced day." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

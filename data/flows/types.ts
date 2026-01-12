@@ -56,6 +56,11 @@ export type FlowContent = {
   intro: LocalizedText;
   description: LocalizedText;
   image: LocalizedUrl; // public path
+  /**
+   * When true, this flow is visible in the UI but its content is not accessible yet.
+   * (Explicit flag — do NOT infer from cover image.)
+   */
+  comingSoon?: boolean;
 };
 
 export type FlowStateDefaults = {

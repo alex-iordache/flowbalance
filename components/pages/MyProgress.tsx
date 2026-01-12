@@ -6,10 +6,13 @@ import {
   IonContent,
   IonButtons,
   IonButton,
+  IonBadge,
   IonIcon,
+  IonToast,
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { settingsOutline } from 'ionicons/icons';
+import { useMemo, useState } from 'react';
 import Store from '../../store';
 import { t, type Language } from '../../data/flows';
 
@@ -18,6 +21,8 @@ const MyProgress = () => {
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
   const isRo = lang === 'ro';
+  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
+  const [comingSoonToastOpen, setComingSoonToastOpen] = useState(false);
   const startedFlows = flows.filter(flow => flow.started);
 
   const calculateProgress = (flow: typeof flows[0]) => {
@@ -25,6 +30,18 @@ const MyProgress = () => {
     const completedPractices = flow.practices.filter(p => p.finished).length;
     const percentage = totalPractices > 0 ? Math.round((completedPractices / totalPractices) * 100) : 0;
     return { completedPractices, totalPractices, percentage };
+  };
+
+  const comingSoonMessage = useMemo(() => {
+    return isRo ? 'În curând' : 'Coming soon';
+  }, [isRo]);
+
+  const openFlow = (flowId: string, comingSoon?: boolean) => {
+    if (comingSoon && !isSuperAdmin) {
+      setComingSoonToastOpen(true);
+      return;
+    }
+    history.push(`/flows/${flowId}`);
   };
 
   return (
@@ -52,7 +69,7 @@ const MyProgress = () => {
               return (
                 <div
                   key={flow.id}
-                  onClick={() => history.push(`/flows/${flow.id}`)}
+                  onClick={() => openFlow(flow.id, (flow as any).comingSoon)}
                   className="cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl max-w-xl gap-4"
                 >
                   <img
@@ -63,6 +80,11 @@ const MyProgress = () => {
                   <div className="flex flex-col justify-between flex-1 leading-normal min-w-0">
                     <h5 className="mt-0 mb-2 text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
                       {t(flow.name, lang)}
+                      {(flow as any).comingSoon ? (
+                        <IonBadge color="medium" className="ml-2 align-middle">
+                          Coming Soon
+                        </IonBadge>
+                      ) : null}
                     </h5>
                     <div className="mb-2">
                       <div className="flex items-center justify-between mb-1">
@@ -86,6 +108,15 @@ const MyProgress = () => {
             })}
           </div>
         )}
+
+        <IonToast
+          isOpen={comingSoonToastOpen}
+          message={comingSoonMessage}
+          duration={2000}
+          onDidDismiss={() => setComingSoonToastOpen(false)}
+          position="top"
+          color="dark"
+        />
       </IonContent>
     </IonPage>
   );

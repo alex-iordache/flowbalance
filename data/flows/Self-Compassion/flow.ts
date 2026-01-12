@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Poartă-te cu tine ca și cum ai avea responsabilitatea să te ajuți.", en: "Treat yourself like someone you’re responsible for helping." },
   description: { ro: "Compasiunea de sine nu e slăbiciune; e reglare plus sinceritate. Acest flow te ajută să înmoi auto-judecata, să revii după greșeli și să construiești un spațiu interior mai sigur. Folosește-l când ești dur cu tine, rușinat sau epuizat de prea multă forțare.", en: "Self-compassion is not weakness; it’s regulation plus honesty. This flow helps you soften self-judgment, recover after mistakes, and build a safer inner environment. Use it when you’re harsh, ashamed, or exhausted from pushing too hard." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

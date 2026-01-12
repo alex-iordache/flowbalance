@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Transformă intenția în acțiune—fără forțare.", en: "Turn intention into action—without forcing it." },
   description: { ro: "Obiectivele eșuează când ne bazăm doar pe motivație. Acest flow susține consecvența: angajamente mici, priorități clare și abilitatea de a relua după o zi ratată. Folosește-l când ai nevoie de momentum, structură și un „pas următor” calm.", en: "Goals fail when we rely on motivation alone. This flow supports consistency: small commitments, clear priorities, and the ability to restart after a missed day. Use it when you need momentum, structure, and a calm “next step.”" },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

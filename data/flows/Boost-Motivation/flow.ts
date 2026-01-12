@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Regăsește-ți „de ce”-ul și pornește din nou.", en: "Find your “why” and move again." },
   description: { ro: "Motivația scade când ești epuizat sau deconectat de sens. Practicile de aici te ajută să te reconectezi cu valorile, să creezi scântei mici de energie și să reduci fricțiunea mentală. Folosește-l când ți-ai pierdut avântul, te simți apatic sau ai nevoie de un restart curat.", en: "Motivation drops when you’re depleted or disconnected from meaning. These practices help you reconnect with values, generate small sparks of energy, and remove mental friction. Use it when you’ve lost drive, feel apathetic, or need a clean restart." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

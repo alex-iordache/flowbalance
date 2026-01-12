@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Echilibrează mintea și inima—ca să te simți aliniat.", en: "Balance head and heart—so you feel aligned." },
   description: { ro: "Când trăiești doar în minte, pierzi căldura; când trăiești doar în emoție, pierzi direcția. Acest flow te ajută să le integrezi: gândire calmă și simțire deschisă. Folosește-l în relații, decizii și momente când vrei să acționezi din centrul tău.", en: "When you live only in the mind, you lose warmth; when you live only in emotion, you lose direction. This flow helps you integrate both: calm thinking and open feeling. Use it for relationships, decisions, and moments when you want to act from your center." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

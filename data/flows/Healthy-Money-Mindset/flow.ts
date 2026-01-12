@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Adu calm, claritate și respect de sine în deciziile despre bani.", en: "Bring calm, clarity, and self-respect into money decisions." },
   description: { ro: "Banii pot activa rușine, urgență sau evitare. Acest flow te ajută să îți reglezi reacțiile ca să poți planifica, alege și acționa cu stabilitate. E util când îți faci buget, îți prețuiești munca, ceri mai mult sau treci prin incertitudine financiară.", en: "Money can trigger shame, urgency, or avoidance. This flow helps you regulate those reactions so you can plan, choose, and act with steadiness. Great when you’re budgeting, pricing your work, asking for more, or facing financial uncertainty." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

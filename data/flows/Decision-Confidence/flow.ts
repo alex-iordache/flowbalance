@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Ia decizii cu mai puțină îndoială și mai multă aliniere.", en: "Make decisions with less doubt and more alignment." },
   description: { ro: "Indecizia ascunde adesea frică: frica de a greși, de a fi judecat sau de a pierde ceva. Practicile de aici te ajută să asculți semnalele din corp și din valori, apoi să alegi cu un angajament calm. Ideal când ești prins între opțiuni sau rulezi „și dacă alegeam altfel?”", en: "Indecision often hides fear: fear of being wrong, judged, or missing out. These practices help you listen to signals from body and values, then choose with calm commitment. Ideal when you’re stuck between options or replaying “what if I chose differently?”" },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

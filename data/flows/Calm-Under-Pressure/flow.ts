@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Rămâi stabil când miza pare mare.", en: "Stay steady when the stakes feel high." },
   description: { ro: "Presiunea activează urgență, tensiune și vedere „în tunel.” Acest flow te învață să lărgești atenția, să îți reglezi respirația și să îți păstrezi corpul moale în timp ce performezi. Folosește-l înainte de ședințe, examene, competiții—sau când simți că ești privit și judecat.", en: "Pressure triggers urgency, tightness, and tunnel vision. This flow teaches you to widen your attention, regulate breath, and keep your body soft while you perform. Use it before meetings, exams, competitions—or anytime you feel watched and judged." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

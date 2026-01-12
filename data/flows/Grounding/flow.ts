@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Revino pe pământ: stabil, prezent, aici.", en: "Come back to the ground: stable, present, here." },
   description: { ro: "Împământarea este una dintre cele mai rapide ieșiri din spirale mentale. Practicile de aici aduc atenția în tălpi, respirație și simțuri, ca mintea să nu mai plutească înaintea vieții. Folosește-l înainte de conversații dificile, după mult ecran sau când te simți „neancorat.”", en: "Grounding is the fastest way to exit mental spirals. These practices bring attention into feet, breath, and the senses so your mind can stop floating ahead of life. Use it before difficult conversations, after screen time, or whenever you feel unrooted." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

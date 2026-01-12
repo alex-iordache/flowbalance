@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Fă un pas înainte cu un „da, pot” mai stabil.", en: "Step forward with a steadier “yes, I can.”" },
   description: { ro: "Încrederea crește când corpul se simte susținut și mintea clară. Acest flow combină ancorarea, postura și dialogul interior ca să te simți mai capabil în situații reale. Folosește-l înainte de conversații dificile, începuturi noi sau momente care te intimidează.", en: "Confidence grows when your body feels supported and your mind feels clear. This flow blends grounding, posture, and inner dialogue so you feel more capable in real situations. Use it before challenging conversations, new starts, or moments that intimidate you." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

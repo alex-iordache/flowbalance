@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Povești blânde care liniștesc mintea.", en: "Soft stories that settle the mind." },
   description: { ro: "Nu sunt lecții—sunt narațiuni blânde menite să încetinească ritmul interior. Lasă povestea să-ți poarte atenția departe de bucle și către imagini și ritm calm. Perfect înainte de somn, în recuperare sau când ai nevoie de blândețe.", en: "These are not lectures—these are gentle narratives meant to slow your inner pace. Let the story carry your attention away from loops and into calm imagery and rhythm. Perfect before sleep, during recovery, or whenever you need softness." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Mai puțină reactivitate, mai mult din ce contează.", en: "Do less reactivity, do more of what matters." },
   description: { ro: "Productivitatea este claritate plus momentum. Acest flow te ajută să alegi următoarea acțiune potrivită, să începi fără fricțiune și să continui fără auto-critică. Perfect în zilele cu procrastinare, blocaj sau sărit din task în task.", en: "Productivity is clarity plus momentum. This flow helps you choose the next right action, start without friction, and keep going without self-criticism. Perfect for days when you procrastinate, feel stuck, or bounce between tasks." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

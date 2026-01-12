@@ -34,6 +34,8 @@ const Practice = () => {
   const lang = Store.useState(s => s.settings.language) as Language;
   const flow = flows.find((f) => f.id === flowId);
   const practice = flow?.practices.find((p) => p.id === practiceId);
+  const isRo = lang === 'ro';
+  const comingSoon = !!(flow as any)?.comingSoon;
   // Category theming is handled globally (header/footer/background) via CategoryThemeSync.
   
   // Get flow and practice indices for access check
@@ -46,6 +48,8 @@ const Practice = () => {
 
   // If the user doesn't have access, route them to the in-app subscribe screen.
   useEffect(() => {
+    // Coming Soon flows are not accessible yet (and should not trigger the subscribe paywall).
+    if (comingSoon) return;
     if (hasAccess) {
       setIsActivating(false);
       return;
@@ -86,7 +90,48 @@ const Practice = () => {
 
     // Use replace so the Subscribe screen doesn't remain in back stack after returning.
     history.replace(`/subscribe?return=${encodeURIComponent(returnTo)}`);
-  }, [hasAccess, history, flowId, practiceId]);
+  }, [comingSoon, hasAccess, history, flowId, practiceId]);
+
+  if (comingSoon) {
+    return (
+      <IonPage>
+        <IonHeader>
+          <IonToolbar>
+            <IonTitle className="text-white">{isRo ? 'În curând' : 'Coming soon'}</IonTitle>
+            <IonButtons slot="end">
+              <IonButton routerLink="/settings" routerDirection="none">
+                <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+              </IonButton>
+            </IonButtons>
+          </IonToolbar>
+        </IonHeader>
+        <IonContent className="ion-padding">
+          <div
+            className="rounded-2xl p-4 text-white"
+            style={{
+              backgroundColor: 'rgba(0,0,0,0.25)',
+              border: '1px solid rgba(255,255,255,0.12)',
+            }}
+          >
+            <div className="font-semibold">{isRo ? 'Acest flow nu este încă disponibil.' : 'This flow isn’t available yet.'}</div>
+            <div className="text-sm text-white/80 mt-1">
+              {isRo ? 'Revino curând.' : 'Please check back soon.'}
+            </div>
+            <div className="mt-4">
+              <IonButton
+                expand="block"
+                fill="solid"
+                style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                onClick={() => history.replace('/flows')}
+              >
+                {isRo ? 'Înapoi la flows' : 'Back to flows'}
+              </IonButton>
+            </div>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
 
   const handleAudioPlay = () => {
     if (flowId) {

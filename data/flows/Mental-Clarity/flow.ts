@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Ridică ceața mentală și vezi ce e real.", en: "Clear the mental fog and see what’s true." },
   description: { ro: "Când capul e aglomerat, și deciziile simple par grele. Practicile de aici creează spațiu: mai puține bucle, mai multă perspectivă și o narațiune interioară mai calmă. Folosește-l când ești confuz, supra-stimulat sau ai nevoie de un reset curat.", en: "When your head feels crowded, even simple decisions feel heavy. These practices create space: fewer loops, more perspective, and a calmer inner narrative. Use it when you’re confused, overstimulated, or craving a clean reset." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

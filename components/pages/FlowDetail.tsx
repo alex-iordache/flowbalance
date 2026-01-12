@@ -8,9 +8,10 @@ import {
   IonTitle,
   IonToolbar,
   IonBadge,
+  IonToast,
 } from '@ionic/react';
 import { useParams, useHistory } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 
 import Store from '../../store';
 import { t, type Practice, type Language } from '../../data/flows';
@@ -27,25 +28,37 @@ function PracticeRow({
   flowIndex,
   practiceIndex,
   lang,
+  comingSoon,
+  onComingSoon,
 }: {
   practice: Practice;
   flowId: string;
   flowIndex: number;
   practiceIndex: number;
   lang: Language;
+  comingSoon: boolean;
+  onComingSoon: () => void;
 }) {
   const history = useHistory();
   const hasAccess = usePracticeAccess(flowId, practice.id, flowIndex, practiceIndex);
   
   if (!practice) return null;
 
+  const open = () => {
+    if (comingSoon) {
+      onComingSoon();
+      return;
+    }
+    history.push(`/flows/${flowId}/${practice.id}`);
+  };
+
   return (
     <div
       role="button"
       tabIndex={0}
-      onClick={() => history.push(`/flows/${flowId}/${practice.id}`)}
+      onClick={open}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') history.push(`/flows/${flowId}/${practice.id}`);
+        if (e.key === 'Enter' || e.key === ' ') open();
       }}
       className="w-full rounded-[20px] p-4 flex items-center gap-3 cursor-pointer"
       style={{
@@ -62,7 +75,9 @@ function PracticeRow({
       <div className="min-w-0 flex-1">
         <div className="text-white text-[15px] font-semibold truncate">
           {t(practice.name, lang)}
-          {!hasAccess ? (
+          {comingSoon ? (
+            <IonBadge color="medium" className="ml-2 align-middle">Coming Soon</IonBadge>
+          ) : !hasAccess ? (
             <IonBadge color="warning" className="ml-2 align-middle">Premium</IonBadge>
           ) : null}
         </div>
@@ -78,11 +93,15 @@ function PracticesList({
   flowId,
   flowIndex,
   lang,
+  comingSoon,
+  onComingSoon,
 }: {
   practices: Practice[];
   flowId: string;
   flowIndex: number;
   lang: Language;
+  comingSoon: boolean;
+  onComingSoon: () => void;
 }) {
   return practices && (<div className="flex flex-col gap-3 mt-4">
     {practices.map((practice, index) => (
@@ -93,6 +112,8 @@ function PracticesList({
         practiceIndex={index}
         key={practice.id}
         lang={lang}
+        comingSoon={comingSoon}
+        onComingSoon={onComingSoon}
       />
     ))}
   </div>)
@@ -106,12 +127,24 @@ const FlowDetail = () => {
   const allowAdmin = isSuperAdmin && isDesktopWeb();
   const flow = flows.find((flow) => flow.id === flowId);
   const flowIndex = flows.findIndex((flow) => flow.id === flowId);
+  const isRo = lang === 'ro';
+  const [comingSoonToastOpen, setComingSoonToastOpen] = useState(false);
+  const comingSoon = !!flow?.comingSoon && !allowAdmin;
+
+  const comingSoonMessage = useMemo(() => {
+    return isRo ? 'În curând' : 'Coming soon';
+  }, [isRo]);
   
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="text-white">{flow ? t(flow.title, lang) : ''}</IonTitle>
+          <IonTitle className="text-white">
+            {flow ? t(flow.title, lang) : ''}
+            {flow?.comingSoon ? (
+              <IonBadge color="medium" className="ml-2 align-middle">Coming Soon</IonBadge>
+            ) : null}
+          </IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
               <IonIcon icon={settingsOutline} className="text-white text-2xl" />
@@ -121,17 +154,56 @@ const FlowDetail = () => {
       </IonHeader>
       <IonContent className="ion-padding">
         <p className="text-white">{flow ? t(flow.description, lang) : ''}</p>
+        {comingSoon ? (
+          <div
+            className="mt-4 rounded-2xl p-4 text-white"
+            style={{
+              backgroundColor: 'rgba(0,0,0,0.25)',
+              border: '1px solid rgba(255,255,255,0.12)',
+            }}
+          >
+            <div className="font-semibold">{isRo ? 'În curând' : 'Coming soon'}</div>
+            <div className="text-sm text-white/80 mt-1">
+              {isRo ? 'Acest flow nu este încă disponibil.' : 'This flow isn’t available yet.'}
+            </div>
+          </div>
+        ) : null}
         {flowId ? (
           allowAdmin ? (
             <Suspense
-              fallback={<PracticesList practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} lang={lang} />}
+              fallback={
+                <PracticesList
+                  practices={flow?.practices ?? []}
+                  flowId={flowId}
+                  flowIndex={flowIndex}
+                  lang={lang}
+                  comingSoon={comingSoon}
+                  onComingSoon={() => setComingSoonToastOpen(true)}
+                />
+              }
             >
               <FlowDetailAdmin flowId={flowId} flowIndex={flowIndex} lang={lang} />
             </Suspense>
           ) : (
-            <PracticesList practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} lang={lang} />
+            <PracticesList
+              practices={flow?.practices ?? []}
+              flowId={flowId}
+              flowIndex={flowIndex}
+              lang={lang}
+              comingSoon={comingSoon}
+              onComingSoon={() => setComingSoonToastOpen(true)}
+            />
           )
         ) : null}
+
+        <IonToast
+          isOpen={comingSoonToastOpen}
+          message={comingSoonMessage}
+          duration={2000}
+          onDidDismiss={() => setComingSoonToastOpen(false)}
+          position="top"
+          color="dark"
+        />
       </IonContent>
     </IonPage>
   );

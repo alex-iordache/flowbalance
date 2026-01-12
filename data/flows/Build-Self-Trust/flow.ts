@@ -21,6 +21,7 @@ const flow: Flow = {
   intro: { ro: "Ține-ți promisiunile față de tine—și simte diferența.", en: "Keep promises to yourself—and feel the difference." },
   description: { ro: "Încrederea în tine se construiește prin repetiție: fă ce ai spus că faci, blând și consecvent. Practicile de aici te ajută să reduci îndoiala, să te asculți și să acționezi aliniat. Ideal pentru a reconstrui încrederea după eșecuri sau inconsecvență.", en: "Self-trust is built through repetition: do what you said you’d do, gently and consistently. These practices help you quiet doubt, listen inwardly, and take aligned action. Ideal for rebuilding confidence after setbacks or inconsistency." },
   image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
+  comingSoon: true,
 
   started: false,
   finished: false,

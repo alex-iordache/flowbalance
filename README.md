@@ -304,12 +304,13 @@ Implementation notes:
 **Payments must happen outside the app WebView**.
 
 ### Current approach
-- In-app buttons open the **system browser** to:
+- **Checkout (subscribe / upgrade)**: in-app buttons open the **system browser** to:
   - `${current web origin}/subscribe-web` (prod → `www.flowbalance.app`, staging → `flowbalance-staging.vercel.app`)
 - We pass a **Clerk sign-in token** so the browser page is authenticated:
   - `app/api/create-sign-in-token/route.ts`
   - The native app opens: `/subscribe-web?__clerk_ticket=...`
   - The web page consumes the ticket using `useSignIn().signIn.create({ strategy: 'ticket', ticket })`
+- **Manage existing subscription (cancel, etc.)**: on the in-app Settings screen we use Clerk’s [`<SubscriptionDetailsButton />`](https://clerk.com/docs/nextjs/reference/components/billing/subscription-details-button).\n+  - This button is only shown for **personal `pro_user` subscribers** (not for org access, and not for free users), so non-subscribed users still reach `/subscribe` only via Premium flows.
 
 Key files:
 - `components/pages/Settings.tsx` (“Manage Subscription”)

@@ -10,24 +10,34 @@ import {
   IonSelect,
   IonSelectOption,
 } from '@ionic/react';
-import { SignedIn, SignedOut, useClerk } from '@clerk/nextjs';
+import { SignedIn, SignedOut, useAuth, useClerk } from '@clerk/nextjs';
+import { SubscriptionDetailsButton } from '@clerk/nextjs/experimental';
+import { useMemo, useState } from 'react';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
 import { setSettings } from '../../store/actions';
-import { useHistory } from 'react-router-dom';
 
 const Settings = () => {
   const settings = Store.useState(selectors.selectSettings);
   const { signOut } = useClerk();
-  const history = useHistory();
+  const { userId, orgId, has } = useAuth();
   const isRo = settings.language === 'ro';
+  const [didCancelSubscription, setDidCancelSubscription] = useState(false);
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'var(--fb-bg)',
     backgroundImage:
       'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.05) 55%, rgba(255,255,255,0.05) 100%)',
   };
+
+  const showManageSubscription = useMemo(() => {
+    // Only show for personal subscribed users (not Organization access).
+    if (!userId) return false;
+    if (orgId) return false;
+    if (didCancelSubscription) return false;
+    return has?.({ plan: 'pro_user' }) ?? false;
+  }, [userId, orgId, has, didCancelSubscription]);
 
   const handleSignOut = async () => {
     // Sign out with Clerk
@@ -117,14 +127,35 @@ const Settings = () => {
 
             <SignedIn>
               <div className="mt-3 flex flex-col gap-2">
-                <IonButton
-                  expand="block"
-                  fill="solid"
-                  style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
-                  onClick={() => history.push(`/subscribe?return=${encodeURIComponent('/settings')}`)}
-                >
-                  {isRo ? 'Abonament' : 'Manage Subscription'}
-                </IonButton>
+                {showManageSubscription ? (
+                  <SubscriptionDetailsButton
+                    onSubscriptionCancel={() => {
+                      setDidCancelSubscription(true);
+                      try {
+                        const w = window as unknown as { Clerk?: { session?: { reload?: () => Promise<unknown> } } };
+                        void w.Clerk?.session?.reload?.();
+                        // Billing state can take a moment to propagate; refresh twice best-effort.
+                        window.setTimeout(() => {
+                          try {
+                            void w.Clerk?.session?.reload?.();
+                          } catch {
+                            // ignore
+                          }
+                        }, 1500);
+                      } catch {
+                        // ignore
+                      }
+                    }}
+                  >
+                    <IonButton
+                      expand="block"
+                      fill="solid"
+                      style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                    >
+                      {isRo ? 'Abonament' : 'Manage Subscription'}
+                    </IonButton>
+                  </SubscriptionDetailsButton>
+                ) : null}
                 <IonButton
                   expand="block"
                   fill="solid"

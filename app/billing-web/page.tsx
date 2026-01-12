@@ -2,7 +2,7 @@
 
 import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useSignIn, useAuth } from '@clerk/nextjs';
 import { SubscriptionDetailsButton } from '@clerk/nextjs/experimental';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 
 function sanitizeReturnTo(raw: string | null): string {
   if (!raw) return '/home';
@@ -25,6 +25,8 @@ export default function BillingWebPage() {
   const { signIn, isLoaded: signInLoaded, setActive } = useSignIn();
   const { userId } = useAuth();
   const [search, setSearch] = useState<string>(''); // window.location.search snapshot
+  const [didAutoOpen, setDidAutoOpen] = useState(false);
+  const subscriptionButtonRef = useRef<HTMLButtonElement | null>(null);
 
   // Keep query params in sync even if Clerk mutates URL via history APIs.
   useEffect(() => {
@@ -101,6 +103,21 @@ export default function BillingWebPage() {
       });
   }, [signInToken, signInLoaded, signIn, setActive, userId, isProcessingToken]);
 
+  // Auto-open subscription details drawer when user is signed in
+  useEffect(() => {
+    if (!userId) return;
+    if (didAutoOpen) return;
+    if (isProcessingToken) return;
+
+    // Small delay to ensure Clerk components are fully mounted
+    const timeout = window.setTimeout(() => {
+      subscriptionButtonRef.current?.click();
+      setDidAutoOpen(true);
+    }, 100);
+
+    return () => window.clearTimeout(timeout);
+  }, [userId, didAutoOpen, isProcessingToken]);
+
   return (
     <div
       className="flex flex-col bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4"
@@ -126,39 +143,55 @@ export default function BillingWebPage() {
         </ClerkLoading>
 
         <ClerkLoaded>
-          {/* Signed In: Show Subscription Management */}
+          {/* Signed In: Auto-open Subscription Management */}
           <SignedIn>
-            <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6">
-              <SubscriptionDetailsButton>
-                <button className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl text-base md:text-lg font-semibold transition-colors">
-                  Open Subscription Details
-                </button>
-              </SubscriptionDetailsButton>
-            </div>
+            {/* Hidden button that auto-clicks to open subscription details */}
+            <SubscriptionDetailsButton>
+              <button
+                ref={subscriptionButtonRef}
+                className="sr-only"
+                aria-hidden="true"
+                tabIndex={-1}
+              >
+                Open Subscription Details
+              </button>
+            </SubscriptionDetailsButton>
 
-            <div className="text-center">
-              <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-4">
-                {isMobile ? (
-                  <>
-                    <p className="text-white text-base md:text-lg font-semibold mb-2">
-                      ✅ After managing, return to Flow app
-                    </p>
-                    <p className="text-white text-sm md:text-base opacity-90">
-                      Changes sync automatically
-                    </p>
-                  </>
-                ) : (
-                  <>
-                    <p className="text-white text-base md:text-lg font-semibold mb-2">
-                      ✅ Manage your subscription details
-                    </p>
-                    <p className="text-white text-sm md:text-base opacity-90">
-                      View plan, billing, and cancellation options
-                    </p>
-                  </>
-                )}
+            {/* Loading state while drawer opens */}
+            {!didAutoOpen && (
+              <div className="bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-6 text-center">
+                <p className="text-base md:text-lg text-gray-700">
+                  Opening subscription details...
+                </p>
               </div>
-            </div>
+            )}
+
+            {/* Info message after drawer opens */}
+            {didAutoOpen && (
+              <div className="text-center">
+                <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-4">
+                  {isMobile ? (
+                    <>
+                      <p className="text-white text-base md:text-lg font-semibold mb-2">
+                        ✅ After managing, return to Flow app
+                      </p>
+                      <p className="text-white text-sm md:text-base opacity-90">
+                        Changes sync automatically
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-white text-base md:text-lg font-semibold mb-2">
+                        ✅ Manage your subscription details
+                      </p>
+                      <p className="text-white text-sm md:text-base opacity-90">
+                        View plan, billing, and cancellation options
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
           </SignedIn>
 
           {/* Signed Out: Show Sign In */}

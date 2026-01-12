@@ -169,22 +169,22 @@ export default function BillingWebPage() {
             {/* Info message after drawer opens */}
             {didAutoOpen && (
               <div className="text-center">
-                <div className="bg-white/20 backdrop-blur rounded-xl p-4 mb-4">
+                <div className="bg-black/30 backdrop-blur rounded-xl p-4 mb-4 border border-white/20">
                   {isMobile ? (
                     <>
-                      <p className="text-white text-base md:text-lg font-semibold mb-2">
+                      <p className="text-white text-base md:text-lg font-semibold mb-2 drop-shadow-lg">
                         ✅ After managing, return to Flow app
                       </p>
-                      <p className="text-white text-sm md:text-base opacity-90">
+                      <p className="text-white text-sm md:text-base opacity-95 drop-shadow-md">
                         Changes sync automatically
                       </p>
                     </>
                   ) : (
                     <>
-                      <p className="text-white text-base md:text-lg font-semibold mb-2">
+                      <p className="text-white text-base md:text-lg font-semibold mb-2 drop-shadow-lg">
                         ✅ Manage your subscription details
                       </p>
-                      <p className="text-white text-sm md:text-base opacity-90">
+                      <p className="text-white text-sm md:text-base opacity-95 drop-shadow-md">
                         View plan, billing, and cancellation options
                       </p>
                     </>

@@ -310,14 +310,19 @@ Implementation notes:
   - `app/api/create-sign-in-token/route.ts`
   - The native app opens: `/subscribe-web?__clerk_ticket=...`
   - The web page consumes the ticket using `useSignIn().signIn.create({ strategy: 'ticket', ticket })`
-- **Manage existing subscription (cancel, etc.)**: on the in-app Settings screen we use Clerk’s [`<SubscriptionDetailsButton />`](https://clerk.com/docs/nextjs/reference/components/billing/subscription-details-button).\n+  - This button is only shown for **personal `pro_user` subscribers** (not for org access, and not for free users), so non-subscribed users still reach `/subscribe` only via Premium flows.
+- **Manage existing subscription (cancel, etc.)**: in-app Settings button opens the **system browser** to:
+  - `${current web origin}/billing-web` (same pattern as checkout)
+  - Uses the same sign-in token mechanism for authentication
+  - The web page renders Clerk’s [`<SubscriptionDetailsButton />`](https://clerk.com/docs/nextjs/reference/components/billing/subscription-details-button) component
+  - This button is only shown for **personal `pro_user` subscribers** (not for org access, and not for free users), so non-subscribed users still reach `/subscribe` only via Premium flows.
 
 Key files:
-- `components/pages/Settings.tsx` (“Manage Subscription”)
+- `components/pages/Settings.tsx` (“Manage Subscription” → opens `/billing-web` in external browser)
 - `components/PaywallModal.tsx` (premium upsell → external browser)
 - `helpers/openExternal.ts` / `helpers/openSubscriptionPage.ts`
 - `helpers/webBaseUrl.ts` (figures out which domain we’re on)
-- `app/subscribe-web/page.tsx`
+- `app/subscribe-web/page.tsx` (checkout page)
+- `app/billing-web/page.tsx` (subscription management page)
 
 ---
 

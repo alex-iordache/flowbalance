@@ -11,19 +11,21 @@ import {
   IonSelectOption,
 } from '@ionic/react';
 import { SignedIn, SignedOut, useAuth, useClerk } from '@clerk/nextjs';
-import { SubscriptionDetailsButton } from '@clerk/nextjs/experimental';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
 import { setSettings } from '../../store/actions';
+import { openExternalUrl } from '../../helpers/openExternal';
+import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 
 const Settings = () => {
   const settings = Store.useState(selectors.selectSettings);
   const { signOut } = useClerk();
-  const { userId, orgId, has } = useAuth();
+  const { userId, orgId, has, isLoaded } = useAuth();
   const isRo = settings.language === 'ro';
-  const [didCancelSubscription, setDidCancelSubscription] = useState(false);
+  const [ticket, setTicket] = useState<string | null>(null);
+  const [ticketLoading, setTicketLoading] = useState(false);
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: 'var(--fb-bg)',
@@ -35,15 +37,58 @@ const Settings = () => {
     // Only show for personal subscribed users (not Organization access).
     if (!userId) return false;
     if (orgId) return false;
-    if (didCancelSubscription) return false;
     return has?.({ plan: 'pro_user' }) ?? false;
-  }, [userId, orgId, has, didCancelSubscription]);
+  }, [userId, orgId, has]);
+
+  // Prefetch a Clerk sign-in ticket so we can open billing-web with authentication
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!userId) return;
+    if (!showManageSubscription) return;
+    let cancelled = false;
+    const ctrl = new AbortController();
+
+    setTicketLoading(true);
+    setTicket(null);
+
+    window
+      .fetch('/api/create-sign-in-token', { signal: ctrl.signal })
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return;
+        setTicket(typeof data?.token === 'string' ? data.token : null);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setTicket(null);
+      })
+      .finally(() => {
+        if (cancelled) return;
+        setTicketLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+    };
+  }, [isLoaded, userId, showManageSubscription]);
 
   const handleSignOut = async () => {
     // Sign out with Clerk
     await signOut();
     // Redirect to sign-in page after sign out
     window.location.href = '/sign-in';
+  };
+
+  const handleManageSubscription = async () => {
+    const baseUrl = `${getWebBaseUrl()}/billing-web`;
+    const returnTo = '/settings';
+    const common = `return=${encodeURIComponent(returnTo)}`;
+    const url = ticket
+      ? `${baseUrl}?${common}&__clerk_ticket=${encodeURIComponent(ticket)}`
+      : `${baseUrl}?${common}`;
+    
+    await openExternalUrl(url);
   };
 
   return (
@@ -128,33 +173,15 @@ const Settings = () => {
             <SignedIn>
               <div className="mt-3 flex flex-col gap-2">
                 {showManageSubscription ? (
-                  <SubscriptionDetailsButton
-                    onSubscriptionCancel={() => {
-                      setDidCancelSubscription(true);
-                      try {
-                        const w = window as unknown as { Clerk?: { session?: { reload?: () => Promise<unknown> } } };
-                        void w.Clerk?.session?.reload?.();
-                        // Billing state can take a moment to propagate; refresh twice best-effort.
-                        window.setTimeout(() => {
-                          try {
-                            void w.Clerk?.session?.reload?.();
-                          } catch {
-                            // ignore
-                          }
-                        }, 1500);
-                      } catch {
-                        // ignore
-                      }
-                    }}
+                  <IonButton
+                    expand="block"
+                    fill="solid"
+                    style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                    onClick={() => void handleManageSubscription()}
+                    disabled={ticketLoading}
                   >
-                    <IonButton
-                      expand="block"
-                      fill="solid"
-                      style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
-                    >
-                      {isRo ? 'Abonament' : 'Manage Subscription'}
-                    </IonButton>
-                  </SubscriptionDetailsButton>
+                    {ticketLoading ? (isRo ? 'Se pregătește...' : 'Preparing...') : (isRo ? 'Abonament' : 'Manage Subscription')}
+                  </IonButton>
                 ) : null}
                 <IonButton
                   expand="block"

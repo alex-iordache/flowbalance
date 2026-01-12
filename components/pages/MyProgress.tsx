@@ -8,11 +8,10 @@ import {
   IonButton,
   IonBadge,
   IonIcon,
-  IonToast,
 } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { settingsOutline } from 'ionicons/icons';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Store from '../../store';
 import { t, type Language } from '../../data/flows';
 
@@ -22,7 +21,6 @@ const MyProgress = () => {
   const lang = Store.useState(s => s.settings.language) as Language;
   const isRo = lang === 'ro';
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const [comingSoonToastOpen, setComingSoonToastOpen] = useState(false);
   const startedFlows = flows.filter(flow => flow.started);
 
   const calculateProgress = (flow: typeof flows[0]) => {
@@ -32,13 +30,9 @@ const MyProgress = () => {
     return { completedPractices, totalPractices, percentage };
   };
 
-  const comingSoonMessage = useMemo(() => {
-    return isRo ? 'În curând' : 'Coming soon';
-  }, [isRo]);
-
   const openFlow = (flowId: string, comingSoon?: boolean) => {
     if (comingSoon && !isSuperAdmin) {
-      setComingSoonToastOpen(true);
+      // Do nothing.
       return;
     }
     history.push(`/flows/${flowId}`);
@@ -70,7 +64,9 @@ const MyProgress = () => {
                 <div
                   key={flow.id}
                   onClick={() => openFlow(flow.id, (flow as any).comingSoon)}
-                  className="cursor-pointer flex flex-row items-start p-6 rounded-lg shadow-xl max-w-xl gap-4"
+                  className={`flex flex-row items-start p-6 rounded-lg shadow-xl max-w-xl gap-4 ${
+                    (flow as any).comingSoon && !isSuperAdmin ? 'cursor-default opacity-90' : 'cursor-pointer'
+                  }`}
                 >
                   <img
                     className="object-contain w-24 h-24 rounded-2xl flex-shrink-0 md:w-48 md:h-48 self-start"
@@ -108,15 +104,6 @@ const MyProgress = () => {
             })}
           </div>
         )}
-
-        <IonToast
-          isOpen={comingSoonToastOpen}
-          message={comingSoonMessage}
-          duration={2000}
-          onDidDismiss={() => setComingSoonToastOpen(false)}
-          position="top"
-          color="dark"
-        />
       </IonContent>
     </IonPage>
   );

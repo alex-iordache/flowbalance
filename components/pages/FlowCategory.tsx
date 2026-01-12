@@ -6,13 +6,12 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
-  IonToast,
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
 import { useHistory, useParams } from 'react-router-dom';
 import { settingsOutline } from 'ionicons/icons';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 import Store from '../../store';
 import { t, type Flow, type Language } from '../../data/flows';
@@ -27,10 +26,13 @@ const FlowRow = ({
   lang: Language;
   onOpen: (flow: Flow) => void;
 }) => {
+  const disabled = !!flow.comingSoon;
   return (
     <div
       onClick={() => onOpen(flow)}
-      className="flow-entry cursor-pointer flex flex-row items-start p-4 rounded-[20px] w-full gap-4"
+      className={`flow-entry flex flex-row items-start p-4 rounded-[20px] w-full gap-4 ${
+        disabled ? 'cursor-default opacity-90' : 'cursor-pointer'
+      }`}
       style={{
         backgroundColor: 'var(--fb-bg)',
         backgroundImage: 'var(--fb-card-gradient)',
@@ -64,20 +66,14 @@ export default function FlowCategory() {
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const isRo = lang === 'ro';
-  const [comingSoonToastOpen, setComingSoonToastOpen] = useState(false);
 
   const category = FLOW_CATEGORIES.find(c => c.id === categoryId) ?? null;
   const flowsById = new Map(flows.map(f => [f.id, f]));
   const categoryFlows = category ? category.flowIds.map(id => flowsById.get(id)).filter(Boolean) as Flow[] : [];
 
-  const comingSoonMessage = useMemo(() => {
-    return isRo ? 'În curând' : 'Coming soon';
-  }, [isRo]);
-
   const openFlow = (flow: Flow) => {
     if (flow.comingSoon && !isSuperAdmin) {
-      setComingSoonToastOpen(true);
+      // Do nothing.
       return;
     }
     history.push(`/flows/${flow.id}`);
@@ -102,15 +98,6 @@ export default function FlowCategory() {
             <FlowRow key={flow.id} flow={flow} lang={lang} onOpen={openFlow} />
           ))}
         </div>
-
-        <IonToast
-          isOpen={comingSoonToastOpen}
-          message={comingSoonMessage}
-          duration={2000}
-          onDidDismiss={() => setComingSoonToastOpen(false)}
-          position="top"
-          color="dark"
-        />
       </IonContent>
     </IonPage>
   );

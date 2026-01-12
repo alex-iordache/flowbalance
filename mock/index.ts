@@ -99,9 +99,15 @@ export const lists: TodoListItem[] = [
 export type Settings = {
   enableNotifications: boolean;
   language: 'ro' | 'en';
+  /** Super-admin-only: enable the web-only admin editing routes/tools. */
+  adminContentEditingTools?: boolean;
+  /** Admin/editor: allow entering flows/practices marked as comingSoon. */
+  adminAccessComingSoon?: boolean;
 };
 
 export const settings: Settings = {
   enableNotifications: true,
   language: 'en',
+  adminContentEditingTools: false,
+  adminAccessComingSoon: false,
 };

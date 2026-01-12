@@ -119,11 +119,15 @@ const FlowDetail = () => {
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const allowAdmin = isSuperAdmin && isDesktopWeb();
+  const isEditor = Store.useState(s => s.isEditor);
+  const adminContentEditingTools = Store.useState(s => Boolean((s.settings as any)?.adminContentEditingTools));
+  const adminAccessComingSoon = Store.useState(s => Boolean((s.settings as any)?.adminAccessComingSoon));
+  const allowAdmin = isSuperAdmin && adminContentEditingTools && isDesktopWeb();
+  const canAccessComingSoon = (isSuperAdmin || isEditor) && adminAccessComingSoon;
   const flow = flows.find((flow) => flow.id === flowId);
   const flowIndex = flows.findIndex((flow) => flow.id === flowId);
   const isRo = lang === 'ro';
-  const comingSoon = !!flow?.comingSoon && !allowAdmin;
+  const comingSoonBlocked = !!flow?.comingSoon && !canAccessComingSoon;
 
   return (
     <IonPage>
@@ -144,7 +148,7 @@ const FlowDetail = () => {
       </IonHeader>
       <IonContent className="ion-padding">
         <p className="text-white">{flow ? t(flow.description, lang) : ''}</p>
-        {comingSoon ? (
+        {comingSoonBlocked ? (
           <div
             className="mt-4 rounded-2xl p-4 text-white"
             style={{
@@ -161,7 +165,7 @@ const FlowDetail = () => {
         {flowId ? (
           allowAdmin ? (
             <Suspense
-              fallback={<PracticesList practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} lang={lang} comingSoon={comingSoon} />}
+              fallback={<PracticesList practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} lang={lang} comingSoon={comingSoonBlocked} />}
             >
               <FlowDetailAdmin flowId={flowId} flowIndex={flowIndex} lang={lang} />
             </Suspense>
@@ -171,7 +175,7 @@ const FlowDetail = () => {
               flowId={flowId}
               flowIndex={flowIndex}
               lang={lang}
-              comingSoon={comingSoon}
+              comingSoon={comingSoonBlocked}
             />
           )
         ) : null}

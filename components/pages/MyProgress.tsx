@@ -21,6 +21,9 @@ const MyProgress = () => {
   const lang = Store.useState(s => s.settings.language) as Language;
   const isRo = lang === 'ro';
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
+  const isEditor = Store.useState(s => s.isEditor);
+  const adminAccessComingSoon = Store.useState(s => Boolean((s.settings as any)?.adminAccessComingSoon));
+  const canAccessComingSoon = (isSuperAdmin || isEditor) && adminAccessComingSoon;
   const startedFlows = flows.filter(flow => flow.started);
 
   const calculateProgress = (flow: typeof flows[0]) => {
@@ -31,7 +34,7 @@ const MyProgress = () => {
   };
 
   const openFlow = (flowId: string, comingSoon?: boolean) => {
-    if (comingSoon && !isSuperAdmin) {
+    if (comingSoon && !canAccessComingSoon) {
       // Do nothing.
       return;
     }
@@ -65,7 +68,7 @@ const MyProgress = () => {
                   key={flow.id}
                   onClick={() => openFlow(flow.id, (flow as any).comingSoon)}
                   className={`flex flex-row items-start p-6 rounded-lg shadow-xl max-w-xl gap-4 ${
-                    (flow as any).comingSoon && !isSuperAdmin ? 'cursor-default opacity-90' : 'cursor-pointer'
+                    (flow as any).comingSoon && !canAccessComingSoon ? 'cursor-default opacity-90' : 'cursor-pointer'
                   }`}
                 >
                   <img

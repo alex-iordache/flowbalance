@@ -21,12 +21,13 @@ const FlowRow = ({
   flow,
   lang,
   onOpen,
+  disabled,
 }: {
   flow: Flow;
   lang: Language;
   onOpen: (flow: Flow) => void;
+  disabled: boolean;
 }) => {
-  const disabled = !!flow.comingSoon;
   return (
     <div
       onClick={() => onOpen(flow)}
@@ -66,13 +67,16 @@ export default function FlowCategory() {
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
+  const isEditor = Store.useState(s => s.isEditor);
+  const adminAccessComingSoon = Store.useState(s => Boolean((s.settings as any)?.adminAccessComingSoon));
+  const canAccessComingSoon = (isSuperAdmin || isEditor) && adminAccessComingSoon;
 
   const category = FLOW_CATEGORIES.find(c => c.id === categoryId) ?? null;
   const flowsById = new Map(flows.map(f => [f.id, f]));
   const categoryFlows = category ? category.flowIds.map(id => flowsById.get(id)).filter(Boolean) as Flow[] : [];
 
   const openFlow = (flow: Flow) => {
-    if (flow.comingSoon && !isSuperAdmin) {
+    if (flow.comingSoon && !canAccessComingSoon) {
       // Do nothing.
       return;
     }
@@ -95,7 +99,13 @@ export default function FlowCategory() {
       <IonContent fullscreen={true}>
         <div className="flex flex-col gap-4 p-4 w-full max-w-2xl mx-auto">
           {categoryFlows.map(flow => (
-            <FlowRow key={flow.id} flow={flow} lang={lang} onOpen={openFlow} />
+            <FlowRow
+              key={flow.id}
+              flow={flow}
+              lang={lang}
+              onOpen={openFlow}
+              disabled={!!flow.comingSoon && !canAccessComingSoon}
+            />
           ))}
         </div>
       </IonContent>

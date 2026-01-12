@@ -239,7 +239,8 @@ export default function FlowDetailAdmin({
 }) {
   const history = useHistory();
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const allowAdmin = isSuperAdmin && isDesktopWeb();
+  const adminContentEditingTools = Store.useState(s => Boolean((s.settings as any)?.adminContentEditingTools));
+  const allowAdmin = isSuperAdmin && adminContentEditingTools && isDesktopWeb();
 
   const flows = Store.useState(s => s.flows);
   const flow = flows.find(f => f.id === flowId) ?? null;

@@ -222,7 +222,8 @@ export default function FlowsAdmin({ lang }: { lang: Language }) {
   const history = useHistory();
 
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const allowAdmin = isSuperAdmin && isDesktopWeb();
+  const adminContentEditingTools = Store.useState(s => Boolean((s.settings as any)?.adminContentEditingTools));
+  const allowAdmin = isSuperAdmin && adminContentEditingTools && isDesktopWeb();
 
   const flows = Store.useState(s => s.flows);
 

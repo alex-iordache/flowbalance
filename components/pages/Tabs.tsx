@@ -25,7 +25,8 @@ const AdminRoutes = lazy(() => import('../admin/AdminRoutes'));
 
 const Tabs = () => {
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const allowAdmin = isSuperAdmin && isDesktopWeb();
+  const adminContentEditingTools = Store.useState(s => Boolean((s.settings as any)?.adminContentEditingTools));
+  const allowAdmin = isSuperAdmin && adminContentEditingTools && isDesktopWeb();
   const lang = Store.useState(s => s.settings.language);
   const isRo = lang === 'ro';
 

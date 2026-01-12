@@ -18,9 +18,12 @@ import * as selectors from '../../store/selectors';
 import { setSettings } from '../../store/actions';
 import { openExternalUrl } from '../../helpers/openExternal';
 import { getWebBaseUrl } from '../../helpers/webBaseUrl';
+import { isDesktopWeb } from '../admin/adminEnv';
 
 const Settings = () => {
   const settings = Store.useState(selectors.selectSettings);
+  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
+  const isEditor = Store.useState(s => s.isEditor);
   const { signOut } = useClerk();
   const { userId, orgId, has, isLoaded } = useAuth();
   const isRo = settings.language === 'ro';
@@ -39,6 +42,12 @@ const Settings = () => {
     if (orgId) return false;
     return has?.({ plan: 'pro_user' }) ?? false;
   }, [userId, orgId, has]);
+
+  const showAdminSettings = isSuperAdmin || isEditor;
+  const canToggleContentTools = isSuperAdmin;
+  const canToggleComingSoonAccess = isSuperAdmin || isEditor;
+  const adminContentEditingTools = Boolean((settings as any).adminContentEditingTools);
+  const adminAccessComingSoon = Boolean((settings as any).adminAccessComingSoon);
 
   // Prefetch a Clerk sign-in ticket so we can open billing-web with authentication
   useEffect(() => {
@@ -207,6 +216,66 @@ const Settings = () => {
               </div>
             </SignedOut>
           </div>
+
+          {/* Admin Settings */}
+          {showAdminSettings ? (
+            <div className="rounded-[20px] p-4 text-white shadow-xl" style={cardStyle}>
+              <div className="text-[14px] font-semibold">{isRo ? 'Setări admin' : 'Admin Settings'}</div>
+
+              <div className="mt-3 flex flex-col gap-3">
+                {canToggleContentTools ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-[14px] font-semibold text-white">
+                      {isRo ? 'Instrumente editare conținut' : 'Content editing tools'}
+                      {!isDesktopWeb() ? (
+                        <div className="text-[12px] text-white/70 font-normal">
+                          {isRo ? 'Disponibil doar pe desktop web.' : 'Desktop web only.'}
+                        </div>
+                      ) : null}
+                    </div>
+                    <IonToggle
+                      checked={adminContentEditingTools}
+                      style={{
+                        '--handle-background': '#ffffff',
+                        '--handle-background-checked': '#ffffff',
+                        '--track-background': 'rgba(255,255,255,0.35)',
+                        '--track-background-checked': 'rgba(255,255,255,0.55)',
+                      } as any}
+                      onIonChange={e => {
+                        setSettings({
+                          ...settings,
+                          adminContentEditingTools: e.target.checked,
+                        } as any);
+                      }}
+                    />
+                  </div>
+                ) : null}
+
+                {canToggleComingSoonAccess ? (
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-[14px] font-semibold text-white">
+                      {isRo ? 'Acces “în curând”' : 'Access “coming soon”'}
+                    </div>
+                    <IonToggle
+                      checked={adminAccessComingSoon}
+                      style={{
+                        '--handle-background': '#ffffff',
+                        '--handle-background-checked': '#ffffff',
+                        '--track-background': 'rgba(255,255,255,0.35)',
+                        '--track-background-checked': 'rgba(255,255,255,0.55)',
+                      } as any}
+                      onIonChange={e => {
+                        setSettings({
+                          ...settings,
+                          adminAccessComingSoon: e.target.checked,
+                        } as any);
+                      }}
+                    />
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
         </div>
       </IonContent>
     </IonPage>

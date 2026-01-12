@@ -32,10 +32,14 @@ const Practice = () => {
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
+  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
+  const isEditor = Store.useState(s => s.isEditor);
+  const adminAccessComingSoon = Store.useState(s => Boolean((s.settings as any)?.adminAccessComingSoon));
+  const canAccessComingSoon = (isSuperAdmin || isEditor) && adminAccessComingSoon;
   const flow = flows.find((f) => f.id === flowId);
   const practice = flow?.practices.find((p) => p.id === practiceId);
   const isRo = lang === 'ro';
-  const comingSoon = !!(flow as any)?.comingSoon;
+  const comingSoonBlocked = !!(flow as any)?.comingSoon && !canAccessComingSoon;
   // Category theming is handled globally (header/footer/background) via CategoryThemeSync.
   
   // Get flow and practice indices for access check
@@ -49,7 +53,7 @@ const Practice = () => {
   // If the user doesn't have access, route them to the in-app subscribe screen.
   useEffect(() => {
     // Coming Soon flows are not accessible yet (and should not trigger the subscribe paywall).
-    if (comingSoon) return;
+    if (comingSoonBlocked) return;
     if (hasAccess) {
       setIsActivating(false);
       return;
@@ -90,9 +94,9 @@ const Practice = () => {
 
     // Use replace so the Subscribe screen doesn't remain in back stack after returning.
     history.replace(`/subscribe?return=${encodeURIComponent(returnTo)}`);
-  }, [comingSoon, hasAccess, history, flowId, practiceId]);
+  }, [comingSoonBlocked, hasAccess, history, flowId, practiceId]);
 
-  if (comingSoon) {
+  if (comingSoonBlocked) {
     return (
       <IonPage>
         <IonHeader>

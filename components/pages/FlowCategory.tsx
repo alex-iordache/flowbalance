@@ -12,7 +12,7 @@ import {
 } from '@ionic/react';
 import { useIonRouter } from '@ionic/react';
 import { useParams } from 'react-router-dom';
-import { settingsOutline } from 'ionicons/icons';
+import { chevronBackOutline, settingsOutline } from 'ionicons/icons';
 import { useState } from 'react';
 
 import Store from '../../store';
@@ -90,9 +90,16 @@ export default function FlowCategory() {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/flows" text="" />
+            <IonBackButton
+              defaultHref="/flows"
+              icon={chevronBackOutline}
+              text=""
+              style={{ '--color': '#fff' } as any}
+            />
           </IonButtons>
-          <IonTitle className="text-white">{category ? t(category.title, lang) : 'Category'}</IonTitle>
+          <IonTitle className="text-white text-base font-bold truncate">
+            {category ? t(category.title, lang) : 'Category'}
+          </IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
               <IonIcon icon={settingsOutline} className="text-white text-2xl" />

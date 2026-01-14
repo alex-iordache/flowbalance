@@ -14,7 +14,7 @@ import { useState, useEffect } from 'react';
 
 import Store from '../../store';
 import * as actions from '../../store/actions';
-import { settingsOutline, lockClosedOutline } from 'ionicons/icons';
+import { chevronBackOutline, settingsOutline, lockClosedOutline } from 'ionicons/icons';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { t, type Language } from '../../data/flows';
 import AudioPlayer from '../ui/AudioPlayer';
@@ -170,9 +170,14 @@ const Practice = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref={flowId ? `/flows/${flowId}` : '/flows'} text="" />
+            <IonBackButton
+              defaultHref={flowId ? `/flows/${flowId}` : '/flows'}
+              icon={chevronBackOutline}
+              text=""
+              style={{ '--color': '#fff' } as any}
+            />
           </IonButtons>
-          <IonTitle className="text-white">
+          <IonTitle className="text-white text-base font-bold truncate">
             {getDisplayName()}
             {!hasAccess && <IonIcon icon={lockClosedOutline} className="ml-2" />}
           </IonTitle>

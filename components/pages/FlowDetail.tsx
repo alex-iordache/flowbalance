@@ -19,7 +19,14 @@ import { t, type Practice, type Language } from '../../data/flows';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { isDesktopWeb } from '../admin/adminEnv';
 
-import { playCircleOutline, checkmarkDoneCircleOutline, ellipseOutline, settingsOutline, lockClosedOutline } from 'ionicons/icons';
+import {
+  chevronBackOutline,
+  playCircleOutline,
+  checkmarkDoneCircleOutline,
+  ellipseOutline,
+  settingsOutline,
+  lockClosedOutline,
+} from 'ionicons/icons';
 
 const FlowDetailAdmin = lazy(() => import('../admin/FlowDetailAdmin'));
 
@@ -139,9 +146,14 @@ const FlowDetail = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/flows" text="" />
+            <IonBackButton
+              defaultHref="/flows"
+              icon={chevronBackOutline}
+              text=""
+              style={{ '--color': '#fff' } as any}
+            />
           </IonButtons>
-          <IonTitle className="text-white">
+          <IonTitle className="text-white text-base font-bold truncate">
             {flow ? t(flow.title, lang) : ''}
             {flow?.comingSoon ? (
               <IonBadge color="medium" className="ml-2 align-middle">Coming Soon</IonBadge>

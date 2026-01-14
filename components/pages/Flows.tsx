@@ -10,12 +10,12 @@ import {
   IonButtons,
   IonIcon,
 } from '@ionic/react';
-import { useHistory } from 'react-router-dom';
+import { useIonRouter } from '@ionic/react';
 import { settingsOutline } from 'ionicons/icons';
 import { FLOW_CATEGORIES } from './flowsCatalog';
 
 function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
-  const history = useHistory();
+  const ionRouter = useIonRouter();
   const flowsById = new Map(flows.map(f => [f.id, f]));
 
   return (
@@ -35,7 +35,7 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
             key={cat.id}
             role="button"
             tabIndex={0}
-            onClick={() => history.push(`/flows/category/${cat.id}`)}
+            onClick={() => ionRouter.push(`/flows/category/${cat.id}`, 'forward')}
             className={`${cat.bgClass} rounded-2xl p-5 w-full cursor-pointer`}
           >
             <div className="flex items-start justify-between gap-3">
@@ -69,7 +69,7 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
 }
 
 const Flows = () => {
-  const history = useHistory();
+  const ionRouter = useIonRouter();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
   const isRo = lang === 'ro';

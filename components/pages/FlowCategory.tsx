@@ -9,7 +9,8 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useIonRouter } from '@ionic/react';
+import { useParams } from 'react-router-dom';
 import { settingsOutline } from 'ionicons/icons';
 import { useState } from 'react';
 
@@ -62,7 +63,7 @@ const FlowRow = ({
 };
 
 export default function FlowCategory() {
-  const history = useHistory();
+  const ionRouter = useIonRouter();
   const { categoryId } = useParams<{ categoryId: string }>();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
@@ -80,7 +81,7 @@ export default function FlowCategory() {
       // Do nothing.
       return;
     }
-    history.push(`/flows/${flow.id}`);
+    ionRouter.push(`/flows/${flow.id}`, 'forward');
   };
 
   return (

@@ -9,7 +9,8 @@ import {
   IonToolbar,
   IonBadge,
 } from '@ionic/react';
-import { useParams, useHistory } from 'react-router-dom';
+import { useIonRouter } from '@ionic/react';
+import { useParams } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 
 import Store from '../../store';
@@ -36,7 +37,7 @@ function PracticeRow({
   lang: Language;
   comingSoon: boolean;
 }) {
-  const history = useHistory();
+  const ionRouter = useIonRouter();
   const hasAccess = usePracticeAccess(flowId, practice.id, flowIndex, practiceIndex);
   
   if (!practice) return null;
@@ -45,7 +46,7 @@ function PracticeRow({
     if (comingSoon) {
       return;
     }
-    history.push(`/flows/${flowId}/${practice.id}`);
+    ionRouter.push(`/flows/${flowId}/${practice.id}`, 'forward');
   };
 
   return (
@@ -115,7 +116,6 @@ function PracticesList({
 }
 const FlowDetail = () => {
   const { flowId } = useParams<{ flowId: string }>();
-  const history = useHistory();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);

@@ -572,6 +572,29 @@ Example:
 - Practice audioUrl: `"1-2-trecerea-peste-obstacole.mp3"`
 - R2 key: `"1-2-trecerea-peste-obstacole.mp3"`
 
+### Data conventions: flows + practices (rich text + "AIT")
+
+Flow and practice content lives in `data/flows/**` and is bundled at build time (not fetched from R2).
+
+- **Descriptions are JSX**:
+  - Each `flow.tsx` and `practice.tsx` defines:
+    - `const roDescription = (<>...</>);`
+    - `const enDescription = (<>...</>);`
+  - And wires:
+    - `description: { ro: roDescription, en: enDescription }`
+- **"AIT" placeholder**:
+  - `"AIT"` means “AI Translation pending”.
+  - The `t()` helper treats `"AIT"` as a placeholder and falls back to the Romanian value, so the UI never shows `"AIT"`.
+- **Audio keys**:
+  - `audioUrl.{ro,en}` should be the R2 key used by `GET /api/audio?path=...`
+  - Current convention supports subfolders (e.g. `"audioFiles/<name>.mp3"`). Only the legacy `audio/` prefix is normalized.
+
+### UI conventions: FlowDetail split scrolling
+
+`components/pages/FlowDetail.tsx` uses two independent scroll containers (scrollbars hidden):
+- **Top**: flow description box (max height 40%)
+- **Bottom**: practices list (fills remaining space)
+
 ### Cloudflare settings (security)
 
 To actually prevent unauthorized access:

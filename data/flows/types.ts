@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 export type Language = 'ro' | 'en';
 
 /**
@@ -14,12 +16,19 @@ export type Localized<T> = {
 
 export type LocalizedText = Localized<string>;
 export type LocalizedUrl = Localized<string>;
+export type LocalizedRichText = Localized<ReactNode>;
 
 /**
  * Helper for picking the current language. (UI language switch will come later.)
  */
 export function t<T>(value: Localized<T>, lang: Language): T {
-  return value[lang] ?? value.ro;
+  // Special-case: we use "AIT" as an internal placeholder meaning "AI Translation pending".
+  // When encountered, prefer Romanian so the UI never shows "AIT".
+  const v = value[lang] ?? value.ro;
+  if (lang !== 'ro' && typeof v === 'string' && v.trim() === 'AIT') {
+    return value.ro;
+  }
+  return v;
 }
 
 export type PracticeId = string;
@@ -31,7 +40,11 @@ export type PracticeContent = {
   /** Display name inside lists/cards. */
   name: LocalizedText;
   intro: LocalizedText;
-  description: LocalizedText;
+  /**
+   * Rich text (JSX) description shown inside the Practice screen.
+   * Use strings for plain text, or JSX for formatting.
+   */
+  description: LocalizedRichText;
   audioUrl: LocalizedUrl;
 };
 
@@ -54,7 +67,11 @@ export type FlowContent = {
   /** Display name inside lists/cards. */
   name: LocalizedText;
   intro: LocalizedText;
-  description: LocalizedText;
+  /**
+   * Rich text (JSX) description shown inside the Flow detail screen.
+   * Use strings for plain text, or JSX for formatting.
+   */
+  description: LocalizedRichText;
   image: LocalizedUrl; // public path
   /**
    * When true, this flow is visible in the UI but its content is not accessible yet.

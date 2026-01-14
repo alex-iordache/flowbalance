@@ -6,7 +6,7 @@ import { addOutline, createOutline, arrowUpOutline, arrowDownOutline } from 'ion
 import { useHistory } from 'react-router-dom';
 
 import Store from '../../store';
-import { t, type Flow, type Language, type LocalizedText, type LocalizedUrl } from '../../data/flows';
+import { t, type Flow, type Language, type LocalizedText, type LocalizedUrl, type LocalizedRichText } from '../../data/flows';
 import { isDesktopWeb } from './adminEnv';
 import { loadDraftFlows, saveDraftFlows } from './draftStorage';
 import { getAsset, putAsset } from './assetsDb';
@@ -17,6 +17,10 @@ function emptyLocalizedText(): LocalizedText {
 }
 
 function emptyLocalizedUrl(): LocalizedUrl {
+  return { ro: '', en: '' };
+}
+
+function emptyLocalizedRichText(): LocalizedRichText {
   return { ro: '', en: '' };
 }
 
@@ -32,7 +36,7 @@ function createNewFlow(position: number): Flow {
     title: { ro: 'New Flow', en: 'New Flow' },
     name: { ro: 'New Flow', en: 'New Flow' },
     intro: emptyLocalizedText(),
-    description: emptyLocalizedText(),
+    description: emptyLocalizedRichText(),
     image: emptyLocalizedUrl(),
     practices: [],
     totalPractices: 0,
@@ -63,6 +67,10 @@ function FlowEditModal({
   }, [flow]);
 
   if (!isOpen || !draft) return null;
+  const descRo = draft.description.ro;
+  const descEn = draft.description.en;
+  const descRoIsString = typeof descRo === 'string';
+  const descEnIsString = typeof descEn === 'string';
 
   return (
     <div className="fixed inset-0 z-[9999] bg-black/60 flex items-center justify-center p-4">
@@ -161,19 +169,31 @@ function FlowEditModal({
             <label className="text-sm font-semibold text-gray-700">Description (RO)</label>
             <textarea
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-              value={draft.description.ro}
+              value={descRoIsString ? descRo : ''}
+              disabled={!descRoIsString}
               onChange={e => setDraft({ ...draft, description: { ...draft.description, ro: e.target.value } })}
               rows={4}
             />
+            {!descRoIsString ? (
+              <div className="mt-1 text-xs text-gray-500">
+                This description is JSX-coded. Edit it in the source flow file (not here).
+              </div>
+            ) : null}
           </div>
           <div className="md:col-span-2">
             <label className="text-sm font-semibold text-gray-700">Description (EN)</label>
             <textarea
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm"
-              value={draft.description.en}
+              value={descEnIsString ? descEn : ''}
+              disabled={!descEnIsString}
               onChange={e => setDraft({ ...draft, description: { ...draft.description, en: e.target.value } })}
               rows={4}
             />
+            {!descEnIsString ? (
+              <div className="mt-1 text-xs text-gray-500">
+                This description is JSX-coded. Edit it in the source flow file (not here).
+              </div>
+            ) : null}
           </div>
           <div className="md:col-span-2">
             <label className="text-sm font-semibold text-gray-700">Image URL (EN)</label>

@@ -1,4 +1,4 @@
-import type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, Language } from './types';
+import type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, LocalizedRichText, Language } from './types';
 import { t } from './types';
 
 import flow_1_Calming_Anxiety from "./Calming-Anxiety/flow";
@@ -38,7 +38,7 @@ import flow_34_Shake_Method from "./Shake-Method/flow";
 import flow_35_Nervous_System_Reset from "./Nervous-System-Reset/flow";
 
 export { t };
-export type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, Language };
+export type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, LocalizedRichText, Language };
 
 export const defaultFlows: Flow[] = [
   flow_1_Calming_Anxiety,

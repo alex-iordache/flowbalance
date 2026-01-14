@@ -159,6 +159,11 @@ const Practice = () => {
     return dayMatch ? dayMatch[1] : name;
   };
 
+  const description = practice ? t(practice.description, lang) : null;
+  const descriptionIsString = typeof description === 'string';
+  const descriptionClassName =
+    'text-white leading-relaxed [&>p]:mb-4 [&>p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-3 [&_li]:my-1';
+
   return (
     <IonPage>
       <IonHeader>
@@ -200,10 +205,16 @@ const Practice = () => {
                   /* Hide scrollbars (Chrome/Safari/WebView) but keep scrolling */
                   .fb-no-scrollbar::-webkit-scrollbar { display: none; }
                 `}</style>
-                {practice && t(practice.description, lang) ? (
-                  <p className="text-white leading-relaxed whitespace-pre-wrap">
-                    {t(practice.description, lang)}
-                  </p>
+                {description ? (
+                  descriptionIsString ? (
+                    <p className={`${descriptionClassName} whitespace-pre-wrap`}>
+                      {description}
+                    </p>
+                  ) : (
+                    <div className={descriptionClassName}>
+                      {description}
+                    </div>
+                  )
                 ) : null}
               </div>
 

@@ -128,6 +128,10 @@ const FlowDetail = () => {
   const flowIndex = flows.findIndex((flow) => flow.id === flowId);
   const isRo = lang === 'ro';
   const comingSoonBlocked = !!flow?.comingSoon && !canAccessComingSoon;
+  const description = flow ? t(flow.description, lang) : null;
+  const descriptionIsString = typeof description === 'string';
+  const descriptionClassName =
+    'text-white leading-relaxed [&>p]:mb-4 [&>p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-3 [&_li]:my-1';
 
   return (
     <IonPage>
@@ -146,39 +150,72 @@ const FlowDetail = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
-        <p className="text-white">{flow ? t(flow.description, lang) : ''}</p>
-        {comingSoonBlocked ? (
+      {/* Custom scroll containers: description (max 40%) + practices list (remaining), each independently scrollable. */}
+      <IonContent className="text-white" fullscreen={true} scrollY={false}>
+        <div className="h-full p-4 flex flex-col gap-3">
+          {/* Top: description box (max 40% height) */}
           <div
-            className="mt-4 rounded-2xl p-4 text-white"
+            className="fb-no-scrollbar overflow-auto rounded-2xl p-4"
             style={{
-              backgroundColor: 'rgba(0,0,0,0.25)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              flex: '0 0 auto',
+              maxHeight: '40%',
+              minHeight: 0,
+              backgroundColor: 'rgba(0,0,0,0.18)',
+              border: '1px solid rgba(255,255,255,0.10)',
             }}
           >
-            <div className="font-semibold">{isRo ? 'În curând' : 'Coming soon'}</div>
-            <div className="text-sm text-white/80 mt-1">
-              {isRo ? 'Acest flow nu este încă disponibil.' : 'This flow isn’t available yet.'}
-            </div>
+            <style>{`
+              /* Hide scrollbars (Chrome/Safari/WebView) but keep scrolling */
+              .fb-no-scrollbar::-webkit-scrollbar { display: none; }
+            `}</style>
+
+            {description ? (
+              descriptionIsString ? (
+                <p className={`${descriptionClassName} whitespace-pre-wrap`}>{description}</p>
+              ) : (
+                <div className={descriptionClassName}>{description}</div>
+              )
+            ) : null}
+
+            {comingSoonBlocked ? (
+              <div className="mt-3 rounded-xl p-3" style={{ backgroundColor: 'rgba(0,0,0,0.25)' }}>
+                <div className="font-semibold">{isRo ? 'În curând' : 'Coming soon'}</div>
+                <div className="text-sm text-white/80 mt-1">
+                  {isRo ? 'Acest flow nu este încă disponibil.' : 'This flow isn’t available yet.'}
+                </div>
+              </div>
+            ) : null}
           </div>
-        ) : null}
-        {flowId ? (
-          allowAdmin ? (
-            <Suspense
-              fallback={<PracticesList practices={flow?.practices ?? []} flowId={flowId} flowIndex={flowIndex} lang={lang} comingSoon={comingSoonBlocked} />}
-            >
-              <FlowDetailAdmin flowId={flowId} flowIndex={flowIndex} lang={lang} />
-            </Suspense>
-          ) : (
-            <PracticesList
-              practices={flow?.practices ?? []}
-              flowId={flowId}
-              flowIndex={flowIndex}
-              lang={lang}
-              comingSoon={comingSoonBlocked}
-            />
-          )
-        ) : null}
+
+          {/* Bottom: practices list (remaining space) */}
+          <div className="fb-no-scrollbar overflow-auto" style={{ flex: 1, minHeight: 0 }}>
+            {flowId ? (
+              allowAdmin ? (
+                <Suspense
+                  fallback={
+                    <PracticesList
+                      practices={flow?.practices ?? []}
+                      flowId={flowId}
+                      flowIndex={flowIndex}
+                      lang={lang}
+                      comingSoon={comingSoonBlocked}
+                    />
+                  }
+                >
+                  <FlowDetailAdmin flowId={flowId} flowIndex={flowIndex} lang={lang} />
+                </Suspense>
+              ) : (
+                <PracticesList
+                  practices={flow?.practices ?? []}
+                  flowId={flowId}
+                  flowIndex={flowIndex}
+                  lang={lang}
+                  comingSoon={comingSoonBlocked}
+                />
+              )
+            ) : null}
+          </div>
+        </div>
       </IonContent>
     </IonPage>
   );

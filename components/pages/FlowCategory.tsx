@@ -1,4 +1,5 @@
 import {
+  IonBackButton,
   IonButton,
   IonButtons,
   IonBadge,
@@ -88,6 +89,9 @@ export default function FlowCategory() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/flows" text="" />
+          </IonButtons>
           <IonTitle className="text-white">{category ? t(category.title, lang) : 'Category'}</IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">

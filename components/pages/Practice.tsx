@@ -1,4 +1,5 @@
 import {
+  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -168,6 +169,9 @@ const Practice = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref={flowId ? `/flows/${flowId}` : '/flows'} text="" />
+          </IonButtons>
           <IonTitle className="text-white">
             {getDisplayName()}
             {!hasAccess && <IonIcon icon={lockClosedOutline} className="ml-2" />}

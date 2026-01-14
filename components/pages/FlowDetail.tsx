@@ -1,4 +1,5 @@
 import {
+  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -137,6 +138,9 @@ const FlowDetail = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/flows" text="" />
+          </IonButtons>
           <IonTitle className="text-white">
             {flow ? t(flow.title, lang) : ''}
             {flow?.comingSoon ? (

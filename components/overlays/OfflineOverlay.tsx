@@ -45,9 +45,16 @@ export default function OfflineOverlay() {
     const onOnline = () => {
       void tryGoOnline();
     };
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') void tryGoOnline();
+    };
     window.addEventListener('online', onOnline);
+    document.addEventListener('visibilitychange', onVisible);
     setStatus(navigator.onLine === false ? 'No connection detected.' : '');
-    return () => window.removeEventListener('online', onOnline);
+    return () => {
+      window.removeEventListener('online', onOnline);
+      document.removeEventListener('visibilitychange', onVisible);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

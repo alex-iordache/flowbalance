@@ -44,7 +44,7 @@ const flow: Flow = {
   name: { ro: "Controlul Compulsiilor", en: "Craving Relief" },
   intro: { ro: "Transformă compulsia în reacție conștientă.", en: "Turn compulsion into a conscious response." },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flows/craving-relief.png", en: "/img/flows/craving-relief.png" },
+  image: { ro: "/img/flows/craving-relief.jpg", en: "/img/flows/craving-relief.jpg" },
 
   started: false,
   finished: false,

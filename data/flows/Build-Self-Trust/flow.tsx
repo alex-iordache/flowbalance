@@ -9,17 +9,29 @@ import practice_7 from "./Day-7/practice";
 import practice_8 from "./Day-8/practice";
 import practice_9 from "./Day-9/practice";
 import practice_10 from "./Day-10/practice";
-import practice_11 from "./Day-11/practice";
-import practice_12 from "./Day-12/practice";
 
 const roDescription = (
   <>
-    <p>{"Încrederea în tine se construiește prin repetiție: fă ce ai spus că faci, blând și consecvent. Practicile de aici te ajută să reduci îndoiala, să te asculți și să acționezi aliniat. Ideal pentru a reconstrui încrederea după eșecuri sau inconsecvență."}</p>
+    <p>
+      Lipsa încrederii în sine apare atunci când îți pui la îndoială deciziile, te bazezi pe validare externă sau renunți la tine sub presiune.
+      În acest program înveți să separi gândurile de fapte, să îți respecți promisiunile mici și să construiești stabilitate interioară.
+    </p>
+    <p>
+      Lucrezi cu experiențe reale, nu cu afirmații forțate, și exersezi consecvența chiar și în momente de nesiguranță.
+      Folosește acest flow pentru decizii, limite personale și obiective importante din viața ta de zi cu zi.
+    </p>
   </>
 );
 const enDescription = (
   <>
-    <p>{"Self-trust is built through repetition: do what you said you’d do, gently and consistently. These practices help you quiet doubt, listen inwardly, and take aligned action. Ideal for rebuilding confidence after setbacks or inconsistency."}</p>
+    <p>
+      A lack of self-trust shows up when you doubt your decisions, rely on external validation, or abandon yourself under pressure.
+      In this program you’ll learn to separate thoughts from facts, keep small promises to yourself, and build inner stability.
+    </p>
+    <p>
+      You’ll work with real-life experiences—not forced affirmations—and practice consistency even in moments of uncertainty.
+      Use this flow for decisions, personal boundaries, and important goals in your daily life.
+    </p>
   </>
 );
 
@@ -28,12 +40,11 @@ const flow: Flow = {
   id: "Build-Self-Trust",
   position: 19,
 
-  title: { ro: "Construiește încrederea în tine", en: "Build Self-Trust" },
-  name: { ro: "Construiește încrederea în tine", en: "Build Self-Trust" },
-  intro: { ro: "Ține-ți promisiunile față de tine—și simte diferența.", en: "Keep promises to yourself—and feel the difference." },
+  title: { ro: "Încredere în sine", en: "Build Self-Trust" },
+  name: { ro: "Încredere în sine", en: "Build Self-Trust" },
+  intro: { ro: "Crește încrederea în sine pentru a obține ce îți dorești.", en: "Build self-trust to get what you want." },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flow-bg.png", en: "/img/flow-bg.png" },
-  comingSoon: true,
+  image: { ro: "/img/flows/incredere-de-sine.jpg", en: "/img/flows/incredere-de-sine.jpg" },
 
   started: false,
   finished: false,
@@ -41,8 +52,8 @@ const flow: Flow = {
   lastPracticeFinishedId: null,
   lastPracticePositionSec: 0,
 
-  totalPractices: 12,
-  practices: [practice_1, practice_2, practice_3, practice_4, practice_5, practice_6, practice_7, practice_8, practice_9, practice_10, practice_11, practice_12],
+  totalPractices: 10,
+  practices: [practice_1, practice_2, practice_3, practice_4, practice_5, practice_6, practice_7, practice_8, practice_9, practice_10],
 };
 
 export default flow;

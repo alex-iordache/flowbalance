@@ -2,12 +2,30 @@ import type { Practice } from '../../types';
 
 const roDescription = (
   <>
-    <p>{"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}</p>
+    <p>
+      <strong>Exercițiu principal:</strong> Listează 15 situații în care ai simțit ceva „din interior” și s-a confirmat ulterior.
+      Notează ce ai simțit în corp atunci.
+    </p>
+    <p className="mt-2"><strong>Seara:</strong> scrii:</p>
+    <ul className="list-disc pl-5 mt-2">
+      <li>3 lucruri făcute bine</li>
+      <li>1 act de grijă față de tine</li>
+      <li>1 lucru învățat</li>
+    </ul>
   </>
 );
 const enDescription = (
   <>
-    <p>{"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}</p>
+    <p>
+      <strong>Main exercise:</strong> List 15 situations where you felt something “from the inside” and it was later confirmed.
+      Note what you felt in your body at that time.
+    </p>
+    <p className="mt-2"><strong>Evening:</strong> write:</p>
+    <ul className="list-disc pl-5 mt-2">
+      <li>3 things you did well</li>
+      <li>1 act of care toward yourself</li>
+      <li>1 thing you learned</li>
+    </ul>
   </>
 );
 
@@ -15,11 +33,11 @@ const enDescription = (
 const practice: Practice = {
   id: "Build-Self-Trust-Day-06",
   position: 6,
-  title: { ro: "Construiește încrederea în tine - Ziua 6", en: "Build Self-Trust - Day 6" },
-  name: { ro: "Ziua 6", en: "Day 6" },
-  intro: { ro: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", en: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." },
+  title: { ro: "Ziua 6 – Intuiția care a avut dreptate", en: "Day 6 – The Intuition That Was Right" },
+  name: { ro: "Intuiția care a avut dreptate", en: "The Intuition That Was Right" },
+  intro: { ro: "Reține dovezi că vocea ta interioară a fost corectă — și încheie ziua cu 3–1–1.", en: "Collect evidence your inner voice has been right—and end the day with 3–1–1." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "1-2-trecerea-peste-obstacole.mp3", en: "1-2-trecerea-peste-obstacole.mp3" },
+  audioUrl: { ro: "audioFiles/intuitia-mea-este-reala.mp3", en: "audioFiles/intuitia-mea-este-reala.mp3" },
 
   finished: false,
   lastPositionSec: 0,

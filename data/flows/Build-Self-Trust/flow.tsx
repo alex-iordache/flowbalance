@@ -44,7 +44,7 @@ const flow: Flow = {
   name: { ro: "Încredere în sine", en: "Build Self-Trust" },
   intro: { ro: "Crește încrederea în sine pentru a obține ce îți dorești.", en: "Build self-trust to get what you want." },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flows/incredere-de-sine.jpg", en: "/img/flows/incredere-de-sine.jpg" },
+  image: { ro: "/img/flows/incredere-in-sine.jpg", en: "/img/flows/incredere-in-sine.jpg" },
 
   started: false,
   finished: false,

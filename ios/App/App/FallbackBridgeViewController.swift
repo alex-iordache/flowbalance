@@ -15,6 +15,22 @@ final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationD
     private func fbLog(_ msg: String) {
         NSLog("[FlowOffline][iOS] \(msg)")
     }
+    
+    private func isIgnorableNavigationError(_ error: Error) -> Bool {
+        let ns = error as NSError
+        // -999 is "NSURLErrorCancelled" and happens during normal redirects/navigation replacements.
+        // Treating it as a fatal load failure causes false-positive offline fallbacks and loops.
+        if ns.domain == NSURLErrorDomain && ns.code == NSURLErrorCancelled {
+            return true
+        }
+        return false
+    }
+    
+    private func bundledFileExists(_ name: String) -> Bool {
+        guard let cfg = bridge?.config else { return false }
+        let path = cfg.appLocation.appendingPathComponent(name).path
+        return FileManager.default.fileExists(atPath: path)
+    }
 
     override func instanceDescriptor() -> InstanceDescriptor {
         // This is called very early (during CAPBridgeViewController.loadView), before the initial URL is loaded.
@@ -81,10 +97,13 @@ final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationD
         didAttemptLocalFallback = true
         fbLog("loadLocalFallback() start")
 
-        // Load the bundled offline page from Capacitor's local scheme handler.
-        // This must exist in `ios/App/App/public/offline.html` (bundled into the app).
-        if let url = URL(string: "capacitor://localhost/offline.html") {
-            fbLog("loading capacitor://localhost/offline.html")
+        // Prefer offline.html (nice UI), but never loop if it's missing.
+        let hasOffline = bundledFileExists("offline.html")
+        let target = hasOffline ? "offline.html" : "index.html"
+        
+        // Load the bundled page from Capacitor's local scheme handler.
+        if let url = URL(string: "capacitor://localhost/\(target)") {
+            fbLog("loading capacitor://localhost/\(target) (hasOffline=\(hasOffline))")
             let req = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 5)
             self.webView?.stopLoading()
             self.webView?.load(req)
@@ -110,10 +129,12 @@ final class FallbackBridgeViewController: CAPBridgeViewController, WKNavigationD
     // MARK: - WKNavigationDelegate
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        if isIgnorableNavigationError(error) { return }
         loadLocalFallback()
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        if isIgnorableNavigationError(error) { return }
         loadLocalFallback()
     }
 

@@ -21,9 +21,9 @@ export default function DeepLinkReturnHandler() {
       try {
         const u = new URL(url);
         // Accept both:
-        // - custom scheme deep links: com.flowapp.app://sso-callback?...
+        // - custom scheme deep links: com.flowbalance.app://sso-callback?...
         // - universal link fallbacks: https://www.flowbalance.app/subscribe-web/return?...
-        const isCustomScheme = u.protocol === 'com.flowapp.app:' && u.hostname === 'sso-callback';
+        const isCustomScheme = u.protocol === 'com.flowbalance.app:' && u.hostname === 'sso-callback';
         const isUniversalReturn =
           (u.protocol === 'https:' || u.protocol === 'http:') &&
           (u.hostname === 'www.flowbalance.app' || u.hostname === 'flowbalance.app') &&

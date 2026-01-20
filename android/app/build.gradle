@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.flowapp.app"
+    namespace "com.flowbalance.app"
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     buildFeatures {
@@ -14,12 +14,12 @@ android {
     }
     
     defaultConfig {
-        applicationId "com.flowapp.app"
+        applicationId "com.flowbalance.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
         versionName "1.0"
-        manifestPlaceholders = [customUrlScheme: "com.flowapp.app"]
+        manifestPlaceholders = [customUrlScheme: "com.flowbalance.app"]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -33,7 +33,7 @@ android {
         prod {
             dimension "env"
             // production app (users)
-            manifestPlaceholders = [customUrlScheme: "com.flowapp.app"]
+            manifestPlaceholders = [customUrlScheme: "com.flowbalance.app"]
             resValue "string", "app_name", "Flow"
             resValue "string", "title_activity_main", "Flow"
         }
@@ -42,7 +42,7 @@ android {
             // staging app (internal testing)
             applicationIdSuffix ".staging"
             versionNameSuffix "-staging"
-            manifestPlaceholders = [customUrlScheme: "com.flowapp.app.staging"]
+            manifestPlaceholders = [customUrlScheme: "com.flowbalance.app.staging"]
             resValue "string", "app_name", "Flow Staging"
             resValue "string", "title_activity_main", "Flow Staging"
         }

@@ -1,4 +1,4 @@
-package com.flowapp.app;
+package com.flowbalance.app;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
@@ -161,3 +161,4 @@ public class MainActivity extends BridgeActivity {
     }
   }
 }
+

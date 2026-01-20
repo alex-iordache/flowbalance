@@ -51,7 +51,7 @@ export default function SubscribeWebReturnPage() {
 
   useEffect(() => {
     // Deep link back into the app. Android/iOS will open the app via the custom scheme.
-    const deepLink = `com.flowapp.app://sso-callback?subscribed=1&return=${encodeURIComponent(returnTo)}`;
+    const deepLink = `com.flowbalance.app://sso-callback?subscribed=1&return=${encodeURIComponent(returnTo)}`;
 
     // Attempt to open the app immediately (may be blocked by some browsers).
     setDidAutoTry(true);
@@ -78,7 +78,7 @@ export default function SubscribeWebReturnPage() {
           {!didAutoTry ? null : ' If nothing happens, tap the button below.'}
         </p>
         <a
-          href={`com.flowapp.app://sso-callback?subscribed=1&return=${encodeURIComponent(returnTo)}`}
+          href={`com.flowbalance.app://sso-callback?subscribed=1&return=${encodeURIComponent(returnTo)}`}
           className="inline-block mt-4 bg-purple-600 hover:bg-purple-700 text-white py-3 px-5 rounded-xl font-semibold"
         >
           Return to app

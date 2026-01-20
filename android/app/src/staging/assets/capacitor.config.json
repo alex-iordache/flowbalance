@@ -1,5 +1,5 @@
 {
-  "appId": "com.flowapp.app.staging",
+  "appId": "com.flowbalance.app.staging",
   "appName": "Flow Staging",
   "bundledWebRuntime": false,
   "npmClient": "npm",

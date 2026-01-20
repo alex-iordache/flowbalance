@@ -193,8 +193,8 @@ Current expected entries:
 ```text
 capacitor://localhost/post-signup-redirect?
 http://localhost/post-signup-redirect?
-com.flowapp.app://oauth?
-clerk://com.flowapp.app.oauth?
+com.flowbalance.app://oauth?
+clerk://com.flowbalance.app.oauth?
 https://flowbalance.vercel.app/post-signup-redirect?
 https://flowbalance.vercel.app/sign-in?
 https://flowbalance.app/post-signup-redirect?
@@ -278,16 +278,16 @@ npx cap sync android
 We build **two Android flavors** so you can install both on a single phone:
 
 - **Prod**
-  - App ID: `com.flowapp.app`
+  - App ID: `com.flowbalance.app`
   - Label: `Flow`
   - WebView loads: `https://www.flowbalance.app` (aliases: `https://flowbalance.app`, `https://flowbalance.vercel.app`)
-  - Deep link scheme: `com.flowapp.app://sso-callback?...`
+  - Deep link scheme: `com.flowbalance.app://sso-callback?...`
 
 - **Staging**
-  - App ID: `com.flowapp.app.staging`
+  - App ID: `com.flowbalance.app.staging`
   - Label: `Flow Staging`
   - WebView loads: `https://flowbalance-staging.vercel.app`
-  - Deep link scheme: `com.flowapp.app.staging://sso-callback?...`
+  - Deep link scheme: `com.flowbalance.app.staging://sso-callback?...`
 
 Implementation notes:
 - Android flavors are configured in `android/app/build.gradle`.

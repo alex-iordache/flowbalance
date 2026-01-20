@@ -8,10 +8,11 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { SignedIn, SignedOut, useClerk, useUser } from '@clerk/nextjs';
+import { SignedIn, SignedOut, useUser } from '@clerk/nextjs';
 import { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
+import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
 
@@ -21,7 +22,6 @@ export default function DeleteAccount() {
   const isRo = settings.language === 'ro';
 
   const { isLoaded, user } = useUser();
-  const { signOut } = useClerk();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -46,15 +46,11 @@ export default function DeleteAccount() {
       // Clerk: delete the currently signed-in user
       await user.delete();
 
-      // Best-effort cleanup
-      try {
-        await signOut();
-      } catch {
-        // ignore
-      }
-
-      // Redirect to sign-in
-      window.location.href = '/sign-in';
+      // IMPORTANT (iOS WebView): keep this as ONE navigation.
+      // Triggering multiple navigations (e.g. signOut redirect + manual href) can produce
+      // NSURLErrorDomain -999 (navigation cancelled), which our native offline fallback interprets as failure.
+      // Single hard redirect to the Next.js sign-in route
+      window.location.replace(`${getWebBaseUrl()}/sign-in`);
     } catch {
       setError(
         isRo

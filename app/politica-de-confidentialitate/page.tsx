@@ -7,8 +7,12 @@ export const metadata: Metadata = {
 
 export default function PoliticaDeConfidentialitatePage() {
   return (
-    <main className="min-h-screen bg-white">
-      <div className="max-w-3xl mx-auto px-6 py-12">
+    <main className="bg-gradient-to-br from-orange-400 via-red-500 to-purple-600 p-4" style={{ minHeight: '100dvh' }}>
+      <div className="max-w-4xl mx-auto">
+        <div
+          className="bg-white rounded-2xl shadow-2xl px-6 py-10 md:px-10 md:py-12 overflow-y-auto"
+          style={{ maxHeight: 'calc(100dvh - 32px)', WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
+        >
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900">Politica de Confidențialitate – Flow Balance</h1>
 
         <p className="mt-3 text-sm text-gray-600">
@@ -147,6 +151,7 @@ export default function PoliticaDeConfidentialitatePage() {
             https://www.flowbalance.app
           </a>
         </p>
+        </div>
       </div>
     </main>
   );

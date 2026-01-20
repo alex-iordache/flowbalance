@@ -12,6 +12,7 @@ import {
 } from '@ionic/react';
 import { SignedIn, SignedOut, useAuth, useClerk } from '@clerk/nextjs';
 import { useMemo, useState, useEffect } from 'react';
+import { useHistory } from 'react-router-dom';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -21,6 +22,7 @@ import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import { isDesktopWeb } from '../admin/adminEnv';
 
 const Settings = () => {
+  const history = useHistory();
   const settings = Store.useState(selectors.selectSettings);
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
   const isEditor = Store.useState(s => s.isEditor);
@@ -192,6 +194,20 @@ const Settings = () => {
                     {ticketLoading ? (isRo ? 'Se pregătește...' : 'Preparing...') : (isRo ? 'Abonament' : 'Manage Subscription')}
                   </IonButton>
                 ) : null}
+                <IonButton
+                  expand="block"
+                  fill="solid"
+                  style={
+                    {
+                      '--background': 'rgba(255, 59, 48, 0.22)',
+                      '--background-activated': 'rgba(255, 59, 48, 0.30)',
+                      '--color': '#fff',
+                    } as any
+                  }
+                  onClick={() => history.push('/settings/delete-account')}
+                >
+                  {isRo ? 'Șterge contul' : 'Delete my account'}
+                </IonButton>
                 <IonButton
                   expand="block"
                   fill="solid"

@@ -10,6 +10,7 @@ export async function generateStaticParams() {
     { all: ['home'] },
     { all: ['flows'] },
     { all: ['settings'] },
+    { all: ['settings', 'delete-account'] },
     { all: ['progress'] },
     ...defaultFlows.map(flow => ({ all: ['flows', flow.id] })),
     ...defaultFlows.flatMap(flow =>

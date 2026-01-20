@@ -18,6 +18,7 @@ import Practice from './Practice';
 import Settings from './Settings';
 import MyProgress from './MyProgress';
 import Subscribe from './Subscribe';
+import DeleteAccount from './DeleteAccount';
 import Store from '../../store';
 import { isDesktopWeb } from '../admin/adminEnv';
 
@@ -51,6 +52,7 @@ const Tabs = () => {
             render={() => <Practice />}
             exact={true}
           />
+          <Route path="/settings/delete-account" render={() => <DeleteAccount />} exact={true} />
           <Route path="/settings" render={() => <Settings />} exact={true} />
           <Route path="/subscribe" render={() => <Subscribe />} exact={true} />
           <Route path="/progress" render={() => <MyProgress />} exact={true} />

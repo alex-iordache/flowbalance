@@ -129,13 +129,11 @@ const FlowDetail = () => {
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
   const isEditor = Store.useState(s => s.isEditor);
   const adminContentEditingTools = Store.useState(s => Boolean((s.settings as any)?.adminContentEditingTools));
-  const adminAccessComingSoon = Store.useState(s => Boolean((s.settings as any)?.adminAccessComingSoon));
   const allowAdmin = isSuperAdmin && adminContentEditingTools && isDesktopWeb();
-  const canAccessComingSoon = (isSuperAdmin || isEditor) && adminAccessComingSoon;
   const flow = flows.find((flow) => flow.id === flowId);
   const flowIndex = flows.findIndex((flow) => flow.id === flowId);
   const isRo = lang === 'ro';
-  const comingSoonBlocked = !!flow?.comingSoon && !canAccessComingSoon;
+  const comingSoonBlocked = !!flow?.comingSoon;
   const description = flow ? t(flow.description, lang) : null;
   const descriptionIsString = typeof description === 'string';
   const descriptionClassName =
@@ -205,7 +203,7 @@ const FlowDetail = () => {
 
           {/* Bottom: practices list (remaining space) */}
           <div className="fb-no-scrollbar overflow-auto" style={{ flex: 1, minHeight: 0 }}>
-            {flowId ? (
+            {flowId && !comingSoonBlocked ? (
               allowAdmin ? (
                 <Suspense
                   fallback={
@@ -214,7 +212,7 @@ const FlowDetail = () => {
                       flowId={flowId}
                       flowIndex={flowIndex}
                       lang={lang}
-                      comingSoon={comingSoonBlocked}
+                      comingSoon={false}
                     />
                   }
                 >
@@ -226,7 +224,7 @@ const FlowDetail = () => {
                   flowId={flowId}
                   flowIndex={flowIndex}
                   lang={lang}
-                  comingSoon={comingSoonBlocked}
+                  comingSoon={false}
                 />
               )
             ) : null}

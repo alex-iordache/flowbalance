@@ -32,9 +32,9 @@ const FlowRow = ({
 }) => {
   return (
     <div
-      onClick={() => onOpen(flow)}
+      onClick={disabled ? undefined : () => onOpen(flow)}
       className={`flow-entry flex flex-row items-start p-4 rounded-[20px] w-full gap-4 ${
-        disabled ? 'cursor-default opacity-90' : 'cursor-pointer'
+        disabled ? 'cursor-default opacity-90 pointer-events-none' : 'cursor-pointer'
       }`}
       style={{
         backgroundColor: 'var(--fb-bg)',
@@ -68,20 +68,14 @@ export default function FlowCategory() {
   const { categoryId } = useParams<{ categoryId: string }>();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
-  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const isEditor = Store.useState(s => s.isEditor);
-  const adminAccessComingSoon = Store.useState(s => Boolean((s.settings as any)?.adminAccessComingSoon));
-  const canAccessComingSoon = (isSuperAdmin || isEditor) && adminAccessComingSoon;
 
   const category = FLOW_CATEGORIES.find(c => c.id === categoryId) ?? null;
   const flowsById = new Map(flows.map(f => [f.id, f]));
   const categoryFlows = category ? category.flowIds.map(id => flowsById.get(id)).filter(Boolean) as Flow[] : [];
 
   const openFlow = (flow: Flow) => {
-    if (flow.comingSoon && !canAccessComingSoon) {
-      // Do nothing.
-      return;
-    }
+    // Coming soon flows are not accessible.
+    if (flow.comingSoon) return;
     ionRouter.push(`/flows/${flow.id}`, 'forward');
   };
 
@@ -116,7 +110,7 @@ export default function FlowCategory() {
               flow={flow}
               lang={lang}
               onOpen={openFlow}
-              disabled={!!flow.comingSoon && !canAccessComingSoon}
+              disabled={!!flow.comingSoon}
             />
           ))}
         </div>

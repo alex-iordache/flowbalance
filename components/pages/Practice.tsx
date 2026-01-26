@@ -33,14 +33,10 @@ const Practice = () => {
   const history = useHistory();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
-  const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
-  const isEditor = Store.useState(s => s.isEditor);
-  const adminAccessComingSoon = Store.useState(s => Boolean((s.settings as any)?.adminAccessComingSoon));
-  const canAccessComingSoon = (isSuperAdmin || isEditor) && adminAccessComingSoon;
   const flow = flows.find((f) => f.id === flowId);
   const practice = flow?.practices.find((p) => p.id === practiceId);
   const isRo = lang === 'ro';
-  const comingSoonBlocked = !!(flow as any)?.comingSoon && !canAccessComingSoon;
+  const comingSoonBlocked = !!(flow as any)?.comingSoon;
   // Category theming is handled globally (header/footer/background) via CategoryThemeSync.
   
   // Get flow and practice indices for access check

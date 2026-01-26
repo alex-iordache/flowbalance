@@ -156,7 +156,7 @@ To provide a clean offline experience:
 
 Native entrypoints:
 - **iOS**: `FallbackBridgeViewController.swift` (wired in `ios/App/App/Base.lproj/Main.storyboard`)
-- **Android**: `android/app/src/main/java/com/flowapp/app/MainActivity.java`
+- **Android**: `android/app/src/main/java/com/flowbalance/app/MainActivity.java`
 
 Notes:
 - This requires a **one-time native rebuild** (APK/IPA) when you change the fallback behavior.

@@ -1,7 +1,6 @@
 import type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, LocalizedRichText, Language } from './types';
 import { t } from './types';
 
-import flow_2_Panic_Support from "./Panic-Support/flow";
 import flow_3_Craving_Relief from "./Craving-Relief/flow";
 import flow_4_Ease_Overwhelm from "./Ease-Overwhelm/flow";
 import flow_8_Boost_Performance from "./Boost-Performance/flow";
@@ -15,7 +14,6 @@ export { t };
 export type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, LocalizedRichText, Language };
 
 export const defaultFlows: Flow[] = [
-  flow_2_Panic_Support,
   flow_3_Craving_Relief,
   flow_4_Ease_Overwhelm,
   flow_8_Boost_Performance,

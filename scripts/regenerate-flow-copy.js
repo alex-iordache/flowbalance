@@ -96,14 +96,6 @@ const COPY = {
     descRo:
       'Acest flow te ajută să înmoi grija la nivelul corpului: respirație, maxilar, abdomen și atenție. Vei exersa resetări scurte care întrerup spiralele „dar dacă…” și reconstruiesc senzația de siguranță. Folosește-l când mintea aleargă sau înainte de momente în care ai tendința să supra-analizezi.',
   },
-  'Panic-Support': {
-    introEn: 'Ground yourself when panic hits—one small step at a time.',
-    descEn:
-      'Panic feels fast; this flow slows everything down. You’ll anchor in sensation, widen your exhale, and give your nervous system clear signals that you are safe right now. Start with Day 1 when the wave is rising, or practice ahead of time to build confidence.',
-    introRo: 'Împământează-te când apare panica—pas cu pas.',
-    descRo:
-      'Panica se simte rapidă; acest flow încetinește totul. Te ancorezi în senzații, lungești expirația și îi oferi sistemului nervos semnale clare că ești în siguranță acum. Începe cu Ziua 1 când valul crește sau exersează din timp pentru a construi încredere.',
-  },
   'Craving-Relief': {
     introEn: 'Turn cravings into information, not commands.',
     descEn:

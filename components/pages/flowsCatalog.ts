@@ -17,7 +17,6 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     id: 'emotional-regulation',
     title: { ro: 'Reglare emoțională', en: 'Emotional Regulation' },
     flowIds: [
-      'Panic-Support',
       'Craving-Relief',
       'Ease-Overwhelm',
     ],

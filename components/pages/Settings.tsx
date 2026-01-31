@@ -128,11 +128,11 @@ const Settings = () => {
             margin-right: 0 !important;
           }
         `}</style>
-        <div className="w-full max-w-md mx-auto flex flex-col gap-4">
+        <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-4">
           {/* Preferences */}
-          <div className="rounded-[20px] p-4 text-white shadow-xl" style={cardStyle}>
+          <div className="rounded-[20px] p-4 md:p-5 text-white shadow-xl" style={cardStyle}>
             <div className="flex items-center justify-between gap-3">
-              <div className="text-[14px] font-semibold text-white">{isRo ? 'Notificări' : 'Notifications'}</div>
+              <div className="text-[14px] md:text-[16px] font-semibold text-white">{isRo ? 'Notificări' : 'Notifications'}</div>
               <IonToggle
                 checked={settings.enableNotifications}
                 style={{
@@ -152,7 +152,7 @@ const Settings = () => {
             </div>
 
             <div className="mt-4 flex items-center gap-3">
-              <IonLabel className="text-white text-[14px] font-semibold">{isRo ? 'Limbă' : 'Language'}</IonLabel>
+              <IonLabel className="text-white text-[14px] md:text-[16px] font-semibold">{isRo ? 'Limbă' : 'Language'}</IonLabel>
               <div style={{ marginLeft: 'auto' }}>
                 <IonSelect
                   className="fb-lang-select"
@@ -178,8 +178,8 @@ const Settings = () => {
           </div>
 
           {/* Account */}
-          <div className="rounded-[20px] p-4 text-white shadow-xl" style={cardStyle}>
-            <div className="text-[14px] font-semibold">{isRo ? 'Cont' : 'Account'}</div>
+          <div className="rounded-[20px] p-4 md:p-5 text-white shadow-xl" style={cardStyle}>
+            <div className="text-[14px] md:text-[16px] font-semibold">{isRo ? 'Cont' : 'Account'}</div>
 
             <SignedIn>
               <div className="mt-3 flex flex-col gap-2">
@@ -235,16 +235,16 @@ const Settings = () => {
 
           {/* Admin Settings */}
           {showAdminSettings ? (
-            <div className="rounded-[20px] p-4 text-white shadow-xl" style={cardStyle}>
-              <div className="text-[14px] font-semibold">{isRo ? 'Setări admin' : 'Admin Settings'}</div>
+            <div className="rounded-[20px] p-4 md:p-5 text-white shadow-xl" style={cardStyle}>
+              <div className="text-[14px] md:text-[16px] font-semibold">{isRo ? 'Setări admin' : 'Admin Settings'}</div>
 
               <div className="mt-3 flex flex-col gap-3">
                 {canToggleContentTools ? (
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-[14px] font-semibold text-white">
+                    <div className="text-[14px] md:text-[16px] font-semibold text-white">
                       {isRo ? 'Instrumente editare conținut' : 'Content editing tools'}
                       {!isDesktopWeb() ? (
-                        <div className="text-[12px] text-white/70 font-normal">
+                        <div className="text-[12px] md:text-[14px] text-white/70 font-normal">
                           {isRo ? 'Disponibil doar pe desktop web.' : 'Desktop web only.'}
                         </div>
                       ) : null}
@@ -269,7 +269,7 @@ const Settings = () => {
 
                 {canToggleComingSoonAccess ? (
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-[14px] font-semibold text-white">
+                    <div className="text-[14px] md:text-[16px] font-semibold text-white">
                       {isRo ? 'Acces “în curând”' : 'Access “coming soon”'}
                     </div>
                     <IonToggle

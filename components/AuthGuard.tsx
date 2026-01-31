@@ -50,7 +50,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                     background: 'var(--fb-bg)',
                   }}
                 >
-                  <div className="w-full max-w-md space-y-4">
+                  <div className="w-full max-w-md md:max-w-xl lg:max-w-2xl space-y-4">
                     {/* 
                       IMPORTANT:
                       We render SignIn inline (instead of redirecting to /sign-in) because iOS WKWebView
@@ -78,7 +78,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                       forceRedirectUrl="/home"
                     />
                     {isSignedIn === false && !userId ? null : (
-                      <div className="text-center text-white/80 text-[12px]">
+                      <div className="text-center text-white/80 text-[12px] md:text-[14px]">
                         <IonSpinner name="crescent" className="w-5 h-5 align-[-4px] mr-2" />
                         Loading…
                       </div>

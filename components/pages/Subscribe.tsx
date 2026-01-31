@@ -395,7 +395,7 @@ export default function Subscribe() {
       </IonHeader>
 
       <IonContent style={{ '--background': 'var(--fb-bg)' } as any}>
-        <div className="w-full max-w-md mx-auto pt-3 pb-24 px-4" style={{ background: 'var(--fb-bg)' }}>
+        <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto pt-3 pb-24 px-4" style={{ background: 'var(--fb-bg)' }}>
             <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
               <div className="p-4">
                 <h2 className="font-bold text-gray-900">Flow Pro</h2>
@@ -511,7 +511,7 @@ export default function Subscribe() {
         {waitingForPayment ? (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
             <div
-              className="w-full max-w-sm rounded-2xl p-5 text-white"
+              className="w-full max-w-sm md:max-w-md rounded-2xl p-5 text-white"
               style={{
                 backgroundColor: 'rgba(125, 99, 255, 0.92)',
                 boxShadow: 'inset 0 10px 22px rgba(0,0,0,0.14), inset 0 -10px 22px rgba(0,0,0,0.14)',

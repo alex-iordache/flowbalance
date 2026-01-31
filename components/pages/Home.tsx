@@ -45,7 +45,7 @@ function getGreetingForLocalTime(
 
 const HelloUser = ({ firstName, lang }: HelloUserProps & { lang: 'ro' | 'en' }) => (
   <div className="hello-user-container">
-    <h2 className="text-base text-white/95">
+    <h2 className="text-base md:text-xl text-white/95">
       {(() => {
         const greeting = getGreetingForLocalTime(new Date(), lang);
         return firstName ? `${greeting}, ${firstName}!` : `${greeting}!`;
@@ -155,7 +155,7 @@ function ContinueCard({
 
   return (
     <div
-      className="w-full max-w-md mx-auto rounded-[28px] overflow-hidden"
+      className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto rounded-[28px] overflow-hidden"
       style={{
         // Same as app background, with a subtle grey-ish gradient to read as a card
         backgroundColor: 'var(--fb-bg)',
@@ -165,28 +165,28 @@ function ContinueCard({
           'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -18px 40px rgba(0,0,0,0.22)',
       }}
     >
-      <div className="p-5">
+      <div className="p-5 md:p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-white/75 text-[11px] tracking-wide">
+            <div className="text-white/75 text-[11px] md:text-[13px] tracking-wide">
               {minutesLabel ? `${minutesLabel} • ` : ''}
               {pct}% {isRo ? 'complet' : 'complete'}
             </div>
-            <div className="mt-1 text-white text-[18px] font-semibold truncate">{title}</div>
-            <div className="mt-1 text-white/80 text-[13px] leading-snug line-clamp-2">{subtitle}</div>
+            <div className="mt-1 text-white text-[18px] md:text-[22px] font-semibold truncate">{title}</div>
+            <div className="mt-1 text-white/80 text-[13px] md:text-[15px] leading-snug line-clamp-2">{subtitle}</div>
           </div>
 
           <div className="shrink-0 flex flex-col items-end gap-2">
-            <div className="px-2 py-1 rounded-full text-[10px] font-semibold text-white/90 bg-white/12">
+            <div className="px-2 py-1 rounded-full text-[10px] md:text-[12px] font-semibold text-white/90 bg-white/12">
               {badgeText}
             </div>
             <button
               type="button"
               onClick={onContinue}
               aria-label={isRo ? 'Redă' : 'Play'}
-              className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/14 active:bg-white/18 flex items-center justify-center"
+              className="w-11 h-11 md:w-14 md:h-14 rounded-full bg-white/10 hover:bg-white/14 active:bg-white/18 flex items-center justify-center"
             >
-              <IonIcon icon={play} className="text-white text-[18px]" />
+              <IonIcon icon={play} className="text-white text-[18px] md:text-[22px]" />
             </button>
           </div>
         </div>
@@ -247,7 +247,7 @@ function StartHereCard({
 
   return (
     <div
-      className="w-full max-w-md mx-auto rounded-[28px] overflow-hidden"
+      className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto rounded-[28px] overflow-hidden"
       style={{
         backgroundColor: 'var(--fb-bg)',
         backgroundImage: 'var(--fb-card-gradient)',
@@ -255,28 +255,28 @@ function StartHereCard({
           'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -18px 40px rgba(0,0,0,0.22)',
       }}
     >
-      <div className="p-5">
+      <div className="p-5 md:p-6">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="text-white/75 text-[11px] tracking-wide">
+            <div className="text-white/75 text-[11px] md:text-[13px] tracking-wide">
               {minutesLabel ? `${minutesLabel} • ` : ''}
               {isRo ? 'Recomandat pentru tine' : 'Recommended for you'}
             </div>
-            <div className="mt-1 text-white text-[18px] font-semibold truncate">{title}</div>
-            <div className="mt-1 text-white/80 text-[13px] leading-snug line-clamp-2">{subtitle}</div>
+            <div className="mt-1 text-white text-[18px] md:text-[22px] font-semibold truncate">{title}</div>
+            <div className="mt-1 text-white/80 text-[13px] md:text-[15px] leading-snug line-clamp-2">{subtitle}</div>
           </div>
 
           <div className="shrink-0 flex flex-col items-end gap-2">
-            <div className="px-2 py-1 rounded-full text-[10px] font-semibold text-white/90 bg-white/12">
+            <div className="px-2 py-1 rounded-full text-[10px] md:text-[12px] font-semibold text-white/90 bg-white/12">
               {badgeText}
             </div>
             <button
               type="button"
               onClick={onStart}
               aria-label={isRo ? 'Pornește' : 'Start'}
-              className="w-11 h-11 rounded-full bg-white/10 hover:bg-white/14 active:bg-white/18 flex items-center justify-center"
+              className="w-11 h-11 md:w-14 md:h-14 rounded-full bg-white/10 hover:bg-white/14 active:bg-white/18 flex items-center justify-center"
             >
-              <IonIcon icon={play} className="text-white text-[18px]" />
+              <IonIcon icon={play} className="text-white text-[18px] md:text-[22px]" />
             </button>
           </div>
         </div>
@@ -301,10 +301,10 @@ function RecommendedFlowsCard({
     : 'Pick a flow and start with a short practice.';
 
   return (
-    <div className="w-full max-w-md mx-auto text-white">
+    <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto text-white">
       <div className="px-1">
-        <div className="text-white text-[16px] font-semibold">{title}</div>
-        <div className="mt-1 text-white/75 text-[12px] leading-snug">{subtitle}</div>
+        <div className="text-white text-[16px] md:text-[20px] font-semibold">{title}</div>
+        <div className="mt-1 text-white/75 text-[12px] md:text-[14px] leading-snug">{subtitle}</div>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
@@ -328,9 +328,9 @@ function RecommendedFlowsCard({
                   'linear-gradient(135deg, rgba(255,255,255,0.14) 0%, rgba(0,0,0,0.10) 100%)',
               }}
             >
-              <div className="p-4 bg-black/10 h-full flex flex-col">
+              <div className="p-4 md:p-5 bg-black/10 h-full flex flex-col">
                 <div className="min-w-0">
-                  <div className="text-white text-[14px] font-semibold leading-snug line-clamp-2">
+                  <div className="text-white text-[14px] md:text-[16px] font-semibold leading-snug line-clamp-2">
                     {t(flow.name, lang)}
                   </div>
                 </div>
@@ -338,10 +338,10 @@ function RecommendedFlowsCard({
                 <div className="mt-auto pt-3 flex items-end justify-between gap-2">
                   <span className="sr-only">{href}</span>
                   <div className="flex items-center justify-between gap-2 w-full">
-                    <div className="text-white/85 text-[11px] leading-tight whitespace-nowrap">
+                    <div className="text-white/85 text-[11px] md:text-[13px] leading-tight whitespace-nowrap">
                       {totalPractices} {isRo ? 'practici' : 'practices'} ~{totalMinutes} min
                     </div>
-                    <IonIcon icon={play} className="text-white text-[13px] shrink-0 mr-0.5" aria-hidden="true" />
+                    <IonIcon icon={play} className="text-white text-[13px] md:text-[15px] shrink-0 mr-0.5" aria-hidden="true" />
                   </div>
                 </div>
               </div>
@@ -357,7 +357,7 @@ function EmptyStateCard({ lang, onBrowse }: { lang: Language; onBrowse: () => vo
   const isRo = lang === 'ro';
   return (
     <div
-      className="w-full max-w-md mx-auto rounded-[28px] p-5 text-white"
+      className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto rounded-[28px] p-5 md:p-6 text-white"
       style={{
         backgroundColor: 'var(--fb-bg)',
         backgroundImage: 'var(--fb-card-gradient)',
@@ -365,8 +365,8 @@ function EmptyStateCard({ lang, onBrowse }: { lang: Language; onBrowse: () => vo
           'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -18px 40px rgba(0,0,0,0.22)',
       }}
     >
-      <div className="text-[18px] font-semibold">{isRo ? 'Nu ai început încă niciun flow' : "You haven't started any Flow"}</div>
-      <div className="mt-2 text-white/80 text-[13px] leading-snug">
+      <div className="text-[18px] md:text-[22px] font-semibold">{isRo ? 'Nu ai început încă niciun flow' : "You haven't started any Flow"}</div>
+      <div className="mt-2 text-white/80 text-[13px] md:text-[15px] leading-snug">
         {isRo
           ? 'Alege o categorie și începe un flow care ți se potrivește acum.'
           : 'Pick a category and start a flow that matches how you feel right now.'}
@@ -374,7 +374,7 @@ function EmptyStateCard({ lang, onBrowse }: { lang: Language; onBrowse: () => vo
       <button
         type="button"
         onClick={onBrowse}
-        className="mt-4 inline-flex items-center justify-center w-full text-white bg-white/15 hover:bg-white/20 active:bg-white/25 shadow-sm font-medium rounded-2xl text-sm px-4 py-3 focus:outline-none transition-colors"
+        className="mt-4 inline-flex items-center justify-center w-full text-white bg-white/15 hover:bg-white/20 active:bg-white/25 shadow-sm font-medium rounded-2xl text-sm md:text-base px-4 py-3 focus:outline-none transition-colors"
       >
         {isRo ? 'Vezi flow-urile' : 'Browse Flows'}
       </button>
@@ -558,7 +558,7 @@ const Home = () => {
                     }}
                   />
                 ) : null}
-                <div className="mt-1 w-full max-w-md mx-auto">
+                <div className="mt-1 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
                   <QuickActionCard
                     meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
                     title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}
@@ -595,7 +595,7 @@ const Home = () => {
                   }}
                 />
               ) : null}
-              <div className="mt-1 w-full max-w-md mx-auto">
+              <div className="mt-1 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
                 <QuickActionCard
                   meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
                   title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}

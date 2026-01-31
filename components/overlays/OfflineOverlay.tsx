@@ -60,12 +60,12 @@ export default function OfflineOverlay() {
 
   return (
     <div className="h-full w-full flex items-center justify-center px-6">
-      <div className="w-full max-w-md text-center">
-        <div className="text-white text-[26px] font-semibold">You’re offline</div>
-        <div className="mt-3 text-white/85 text-[14px] leading-snug">
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl text-center">
+        <div className="text-white text-[26px] md:text-[34px] font-semibold">You’re offline</div>
+        <div className="mt-3 text-white/85 text-[14px] md:text-[17px] leading-snug">
           Flow needs an internet connection to load the latest content. Check your connection, then tap Retry.
         </div>
-        <div className="mt-2 text-white/75 text-[12px] leading-snug">
+        <div className="mt-2 text-white/75 text-[12px] md:text-[14px] leading-snug">
           If you’re on Wi‑Fi, it may be connected without internet. Try mobile data or another network.
         </div>
 
@@ -75,7 +75,7 @@ export default function OfflineOverlay() {
             disabled={busy}
             onClick={() => void tryGoOnline()}
             className={[
-              'min-w-[140px] rounded-2xl px-5 py-3 font-semibold text-[14px]',
+              'min-w-[140px] rounded-2xl px-5 py-3 font-semibold text-[14px] md:text-[16px]',
               'border border-white/25',
               busy ? 'bg-white/12 text-white/80' : 'bg-white/14 text-white active:bg-white/20',
             ].join(' ')}
@@ -84,7 +84,7 @@ export default function OfflineOverlay() {
           </button>
         </div>
 
-        <div className="mt-3 text-white/75 text-[12px] min-h-[16px]">{status}</div>
+        <div className="mt-3 text-white/75 text-[12px] md:text-[14px] min-h-[16px]">{status}</div>
       </div>
     </div>
   );

@@ -21,7 +21,7 @@ export default function QuickActionCard({ meta, title, onClick, metaIcon }: Prop
     <button
       type="button"
       onClick={onClick}
-      className="w-full rounded-2xl px-4 py-3 text-left"
+      className="w-full rounded-2xl px-4 py-3 md:px-5 md:py-4 text-left"
       style={{
         backgroundColor: 'rgba(255,255,255,0.10)',
         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -14px 30px rgba(0,0,0,0.20)',
@@ -33,8 +33,8 @@ export default function QuickActionCard({ meta, title, onClick, metaIcon }: Prop
             <IonIcon icon={metaIcon} className="text-white/80 text-2xl shrink-0" />
           ) : null}
           <div className="min-w-0">
-            <div className="text-white/75 text-[11px] leading-tight">{meta}</div>
-            <div className="mt-0.5 text-white text-[13px] font-semibold leading-tight truncate">
+            <div className="text-white/75 text-[11px] md:text-[13px] leading-tight">{meta}</div>
+            <div className="mt-0.5 text-white text-[13px] md:text-[15px] font-semibold leading-tight truncate">
               {title}
             </div>
           </div>

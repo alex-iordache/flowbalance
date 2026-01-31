@@ -71,12 +71,12 @@ export default function DeleteAccount() {
       </IonHeader>
 
       <IonContent className="ion-padding">
-        <div className="w-full max-w-md mx-auto flex flex-col gap-4">
-          <div className="rounded-[20px] p-4 text-white shadow-xl" style={cardStyle}>
+        <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-4">
+          <div className="rounded-[20px] p-4 md:p-5 text-white shadow-xl" style={cardStyle}>
             <SignedIn>
-              <div className="text-[14px] font-semibold">{isRo ? 'Confirmare' : 'Confirmation'}</div>
+              <div className="text-[14px] md:text-[16px] font-semibold">{isRo ? 'Confirmare' : 'Confirmation'}</div>
 
-              <div className="mt-3 text-white/85 text-[13px] leading-snug">
+              <div className="mt-3 text-white/85 text-[13px] md:text-[15px] leading-snug">
                 {isRo ? (
                   <>
                     Ești sigur(ă) că vrei să îți ștergi contul? Această acțiune este{' '}
@@ -89,7 +89,7 @@ export default function DeleteAccount() {
                 )}
               </div>
 
-              <div className="mt-2 text-white/75 text-[12px] leading-snug">
+              <div className="mt-2 text-white/75 text-[12px] md:text-[14px] leading-snug">
                 {isRo ? (
                   <>
                     Notă: dacă ai un abonament activ, îl poți gestiona din <em>Abonament</em> înainte de ștergere.
@@ -102,7 +102,7 @@ export default function DeleteAccount() {
                 )}
               </div>
 
-              {error ? <div className="mt-3 text-[13px] text-red-200">{error}</div> : null}
+              {error ? <div className="mt-3 text-[13px] md:text-[15px] text-red-200">{error}</div> : null}
 
               <div className="mt-4 flex flex-col gap-2">
                 <IonButton
@@ -134,8 +134,8 @@ export default function DeleteAccount() {
             </SignedIn>
 
             <SignedOut>
-              <div className="text-[14px] font-semibold">{isRo ? 'Cont' : 'Account'}</div>
-              <div className="mt-2 text-white/85 text-[13px] leading-snug">
+              <div className="text-[14px] md:text-[16px] font-semibold">{isRo ? 'Cont' : 'Account'}</div>
+              <div className="mt-2 text-white/85 text-[13px] md:text-[15px] leading-snug">
                 {isRo
                   ? 'Trebuie să fii autentificat pentru a șterge contul.'
                   : 'You must be signed in to delete your account.'}

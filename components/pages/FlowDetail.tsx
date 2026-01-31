@@ -65,7 +65,7 @@ function PracticeRow({
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') open();
       }}
-      className={`w-full rounded-[20px] p-4 flex items-center gap-3 ${
+      className={`w-full rounded-[20px] p-4 md:p-5 flex items-center gap-3 ${
         comingSoon ? 'cursor-default opacity-90' : 'cursor-pointer'
       }`}
       style={{
@@ -75,12 +75,12 @@ function PracticeRow({
       }}
     >
       <IonIcon
-        className="text-white text-2xl shrink-0"
+        className="text-white text-2xl md:text-3xl shrink-0"
         icon={practice.finished ? checkmarkDoneCircleOutline : ellipseOutline}
       />
 
       <div className="min-w-0 flex-1">
-        <div className="text-white text-[15px] font-semibold truncate">
+        <div className="text-white text-[15px] md:text-[17px] font-semibold truncate">
           {t(practice.name, lang)}
           {comingSoon ? (
             <IonBadge color="medium" className="ml-2 align-middle">Coming Soon</IonBadge>
@@ -90,7 +90,7 @@ function PracticeRow({
         </div>
       </div>
 
-      <IonIcon className="text-white text-xl shrink-0" icon={hasAccess ? playCircleOutline : lockClosedOutline} />
+      <IonIcon className="text-white text-xl md:text-2xl shrink-0" icon={hasAccess ? playCircleOutline : lockClosedOutline} />
     </div>
   );
 }
@@ -151,7 +151,7 @@ const FlowDetail = () => {
               style={{ '--color': '#fff' } as any}
             />
           </IonButtons>
-          <IonTitle className="text-white text-base font-bold truncate">
+          <IonTitle className="text-white text-base md:text-lg font-bold truncate">
             {flow ? t(flow.title, lang) : ''}
             {flow?.comingSoon ? (
               <IonBadge color="medium" className="ml-2 align-middle">Coming Soon</IonBadge>
@@ -166,7 +166,7 @@ const FlowDetail = () => {
       </IonHeader>
       {/* Custom scroll containers: description (max 40%) + practices list (remaining), each independently scrollable. */}
       <IonContent className="text-white" fullscreen={true} scrollY={false}>
-        <div className="h-full p-4 flex flex-col gap-3">
+        <div className="h-full p-4 md:p-6 flex flex-col gap-3">
           {/* Top: description box (max 40% height) */}
           <div
             className="fb-no-scrollbar overflow-auto rounded-2xl p-4"

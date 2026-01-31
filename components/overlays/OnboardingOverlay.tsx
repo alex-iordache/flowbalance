@@ -53,7 +53,7 @@ function OptionButton({
         >
           ✓
         </div>
-        <div className="text-white text-[14px] leading-snug">{label}</div>
+        <div className="text-white text-[14px] md:text-[16px] leading-snug">{label}</div>
       </div>
     </button>
   );
@@ -173,13 +173,13 @@ export default function OnboardingOverlay() {
     if (step === 'lang') {
       return (
         <>
-          <div className="text-white/80 text-[12px] tracking-wide uppercase">
+          <div className="text-white/80 text-[12px] md:text-[13px] tracking-wide uppercase">
             {isRo ? 'SETUP' : 'SETUP'}
           </div>
-          <div className="mt-3 text-white text-[20px] font-semibold leading-tight">
+          <div className="mt-3 text-white text-[20px] md:text-[26px] font-semibold leading-tight">
             {isRo ? 'Alege limba' : 'Choose your language'}
           </div>
-          <div className="mt-2 text-white/75 text-[13px] leading-snug">
+          <div className="mt-2 text-white/75 text-[13px] md:text-[15px] leading-snug">
             {isRo
               ? 'Interfața și sesiunile audio sunt bazate pe limba aleasă. Poți schimba limba și mai târziu din Setări.'
               : 'The interface and all audio sessions follow this language. You can change it later in Settings.'}
@@ -208,15 +208,15 @@ export default function OnboardingOverlay() {
 
     return (
       <>
-        <div className="text-white/80 text-[12px] tracking-wide uppercase">
+        <div className="text-white/80 text-[12px] md:text-[13px] tracking-wide uppercase">
           {isRo ? 'FLOW: Mind & Heart Balance' : 'FLOW: Mind & Heart Balance'}
         </div>
-        <div className="mt-3 text-white text-[20px] font-semibold leading-tight">{title}</div>
-        <div className="mt-2 text-white/75 text-[13px] leading-snug">{subtitle}</div>
+        <div className="mt-3 text-white text-[20px] md:text-[26px] font-semibold leading-tight">{title}</div>
+        <div className="mt-2 text-white/75 text-[13px] md:text-[15px] leading-snug">{subtitle}</div>
 
         <div className="mt-7">
-          <div className="text-white text-[16px] font-semibold leading-tight">{qTitle}</div>
-          {qSubtitle ? <div className="mt-1 text-white/70 text-[12px]">{qSubtitle}</div> : null}
+          <div className="text-white text-[16px] md:text-[20px] font-semibold leading-tight">{qTitle}</div>
+          {qSubtitle ? <div className="mt-1 text-white/70 text-[12px] md:text-[14px]">{qSubtitle}</div> : null}
         </div>
 
         <div className="mt-4 flex flex-col gap-3">
@@ -269,9 +269,9 @@ export default function OnboardingOverlay() {
           splashFading ? 'opacity-0' : 'opacity-100',
         ].join(' ')}
       >
-        <div className="w-full max-w-md text-center">
-          <div className="text-white text-[28px] font-semibold">{headline}</div>
-          <div className="mt-3 text-white/80 text-[15px] leading-snug">{copy}</div>
+        <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl text-center">
+          <div className="text-white text-[28px] md:text-[36px] font-semibold">{headline}</div>
+          <div className="mt-3 text-white/80 text-[15px] md:text-[18px] leading-snug">{copy}</div>
         </div>
       </div>
     );
@@ -284,13 +284,13 @@ export default function OnboardingOverlay() {
 
   return (
     <div className="h-full w-full overflow-auto">
-      <div className="min-h-full px-5 py-6 pb-10 w-full max-w-md mx-auto">
+      <div className="min-h-full px-5 py-6 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
         <div className="flex items-center justify-between">
-          <div className="text-white/70 text-[12px]">
+          <div className="text-white/70 text-[12px] md:text-[13px]">
             {step === 'lang' ? '1/5' : typeof step === 'number' ? `${step + 2}/5` : '✓'}
           </div>
           {typeof step === 'number' && step >= 0 ? (
-            <button type="button" onClick={goBack} className="text-white/80 text-[13px]">
+            <button type="button" onClick={goBack} className="text-white/80 text-[13px] md:text-[15px]">
               {isRo ? 'Înapoi' : 'Back'}
             </button>
           ) : (

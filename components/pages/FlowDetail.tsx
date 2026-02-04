@@ -164,15 +164,14 @@ const FlowDetail = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      {/* Custom scroll containers: description (max 40%) + practices list (remaining), each independently scrollable. */}
+      {/* Custom scroll containers: description grows to fill leftover space; practices scroll when long. */}
       <IonContent className="text-white" fullscreen={true} scrollY={false}>
         <div className="h-full p-4 md:p-6 flex flex-col gap-3">
-          {/* Top: description box (max 40% height) */}
+          {/* Top: description box (fills remaining height) */}
           <div
             className="fb-no-scrollbar overflow-auto rounded-2xl p-4"
             style={{
-              flex: '0 0 auto',
-              maxHeight: '40%',
+              flex: '1 1 0',
               minHeight: 0,
               backgroundColor: 'rgba(0,0,0,0.18)',
               border: '1px solid rgba(255,255,255,0.10)',
@@ -201,8 +200,15 @@ const FlowDetail = () => {
             ) : null}
           </div>
 
-          {/* Bottom: practices list (remaining space) */}
-          <div className="fb-no-scrollbar overflow-auto" style={{ flex: 1, minHeight: 0 }}>
+          {/* Bottom: practices list (auto height; scrolls when long) */}
+          <div
+            className="fb-no-scrollbar overflow-auto"
+            style={{
+              flex: '0 1 auto',
+              minHeight: 0,
+              maxHeight: '55%',
+            }}
+          >
             {flowId && !comingSoonBlocked ? (
               allowAdmin ? (
                 <Suspense

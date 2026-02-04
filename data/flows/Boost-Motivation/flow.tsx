@@ -60,7 +60,7 @@ const flow: Flow = {
   name: { ro: "Boost motivațional", en: "Boost Motivation" },
   intro: { ro: "Reactivează motivația autentică, din sens, nu din presiune.", en: "Reactivate authentic motivation—from meaning, not pressure." },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flows/boost-motivation.jpg", en: "/img/flows/boost-motivation.jpg" },
+  image: { ro: "/img/flows/boost-motivation.png", en: "/img/flows/boost-motivation.png" },
   comingSoon: false,
 
   started: false,

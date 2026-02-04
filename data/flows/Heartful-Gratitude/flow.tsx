@@ -56,7 +56,7 @@ const flow: Flow = {
     en: "Cultivate a steady sense of gratitude that supports your emotional balance.",
   },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flows/heartful-gratitude.jpg", en: "/img/flows/heartful-gratitude.jpg" },
+  image: { ro: "/img/flows/heartful-gratitude.png", en: "/img/flows/heartful-gratitude.png" },
   comingSoon: false,
 
   started: false,

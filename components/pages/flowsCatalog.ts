@@ -58,6 +58,9 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     title: { ro: 'Echilibru al inimii', en: 'Heart Balance' },
     flowIds: [
       'Heartful-Gratitude',
+      'Boost-Motivation',
+      'Self-Compassion',
+      'Daily-Heart-Lift',
     ],
     theme: 5,
     bgClass: 'bg-gradient-to-br from-rose-500 to-pink-600',

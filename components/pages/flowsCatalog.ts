@@ -28,7 +28,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     id: 'performance-boost',
     title: { ro: 'Performanță', en: 'Performance Boost' },
     flowIds: [
-      'Boost-Performance',
+      'Improve-Sleep',
     ],
     theme: 2,
     bgClass: 'bg-gradient-to-br from-emerald-500 to-teal-600',

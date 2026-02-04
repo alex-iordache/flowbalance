@@ -3,7 +3,7 @@ import { t } from './types';
 
 import flow_3_Craving_Relief from "./Craving-Relief/flow";
 import flow_4_Ease_Overwhelm from "./Ease-Overwhelm/flow";
-import flow_8_Boost_Performance from "./Boost-Performance/flow";
+import flow_8_Improve_Sleep from "./Improve-Sleep/flow";
 import flow_19_Build_Self_Trust from "./Build-Self-Trust/flow";
 import flow_21_Healthy_Money_Mindset from "./Healthy-Money-Mindset/flow";
 import flow_22_Calm_Stories from "./Calm-Stories/flow";
@@ -19,7 +19,7 @@ export type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, LocalizedR
 export const defaultFlows: Flow[] = [
   flow_3_Craving_Relief,
   flow_4_Ease_Overwhelm,
-  flow_8_Boost_Performance,
+  flow_8_Improve_Sleep,
   flow_19_Build_Self_Trust,
   flow_21_Healthy_Money_Mindset,
   flow_22_Calm_Stories,

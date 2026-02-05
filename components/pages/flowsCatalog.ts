@@ -19,6 +19,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     flowIds: [
       'Craving-Relief',
       'Ease-Overwhelm',
+      'Calming-Anxiety',
     ],
     theme: 1,
     bgClass: 'bg-gradient-to-br from-sky-500 to-indigo-600',

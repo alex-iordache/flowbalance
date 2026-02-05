@@ -13,6 +13,7 @@ import flow_28_Self_Compassion from "./Self-Compassion/flow";
 import flow_29_Daily_Heart_Lift from "./Daily-Heart-Lift/flow";
 import flow_32_Body_Release from "./Body-Release/flow";
 import flow_30_Stress_Soothing from "./Stress-Soothing/flow";
+import flow_31_Calming_Anxiety from "./Calming-Anxiety/flow";
 
 export { t };
 export type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, LocalizedRichText, Language };
@@ -29,5 +30,6 @@ export const defaultFlows: Flow[] = [
   flow_28_Self_Compassion,
   flow_29_Daily_Heart_Lift,
   flow_30_Stress_Soothing,
+  flow_31_Calming_Anxiety,
   flow_32_Body_Release,
 ];

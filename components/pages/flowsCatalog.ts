@@ -71,7 +71,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
   {
     id: 'somatic-release',
     title: { ro: 'Eliberare somatică', en: 'Somatic Release' },
-    flowIds: ['Body-Release', 'Inner-Healing'],
+    flowIds: ['Inner-Healing'],
     theme: 6,
     bgClass: 'bg-gradient-to-br from-cyan-500 to-blue-600',
     gradientCss: 'linear-gradient(135deg, #06b6d4 0%, #2563eb 100%)',

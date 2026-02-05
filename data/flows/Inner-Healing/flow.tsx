@@ -56,7 +56,6 @@ const flow: Flow = {
   },
   description: { ro: roDescription, en: enDescription },
   image: { ro: '/img/flows/inner-healing.png', en: '/img/flows/inner-healing.png' },
-  comingSoon: true,
 
   started: false,
   finished: false,

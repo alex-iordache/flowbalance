@@ -20,7 +20,7 @@ const practice: Practice = {
     en: 'AIT',
   },
   description: { ro: roDescription, en: 'AIT' },
-  audioUrl: { ro: 'https://www.simonanicolaescu.ro/wp-content/uploads/2021/10/08-analiza-vietii-personale.mp3', en: 'https://www.simonanicolaescu.ro/wp-content/uploads/2021/10/08-analiza-vietii-personale.mp3' },
+  audioUrl: { ro: 'audioFiles/VECHI-analiza-propriei-vieti.mp3', en: 'audioFiles/VECHI-analiza-propriei-vieti.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

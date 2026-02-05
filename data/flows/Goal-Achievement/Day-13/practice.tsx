@@ -20,7 +20,7 @@ const practice: Practice = {
     en: 'AIT',
   },
   description: { ro: roDescription, en: 'AIT' },
-  audioUrl: { ro: 'audioFiles/calitatea-de-care-ai-nevoie.mp3', en: 'audioFiles/calitatea-de-care-ai-nevoie.mp3' },
+  audioUrl: { ro: 'audioFiles/incepe-ziua-cu-bucurie.mp3', en: 'audioFiles/incepe-ziua-cu-bucurie.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

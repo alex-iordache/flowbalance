@@ -4,9 +4,7 @@ import type { Flow } from '../../data/flows';
 import { defaultFlows } from '../../data/flows';
 
 const DRAFT_KEY = 'flow_admin_draft_v1';
-const LEGACY_REMOTE_AUDIO =
-  'https://www.simonanicolaescu.ro/wp-content/uploads/2021/10/1-2-trecerea-peste-obstacole.mp3';
-const DEFAULT_AUDIO_KEY = '1-2-trecerea-peste-obstacole.mp3';
+const DEFAULT_AUDIO_KEY = 'audioFiles/trecerea-peste-obstacole.mp3';
 
 type DraftPayload = {
   version: 1;
@@ -55,7 +53,10 @@ export function loadDraftFlows(): Flow[] | null {
         ? flow.practices.map(p => ({
             ...p,
             audioUrl:
-              p?.audioUrl?.ro === LEGACY_REMOTE_AUDIO || p?.audioUrl?.en === LEGACY_REMOTE_AUDIO
+              (typeof p?.audioUrl?.ro === 'string' &&
+                (p.audioUrl.ro.startsWith('http://') || p.audioUrl.ro.startsWith('https://'))) ||
+              (typeof p?.audioUrl?.en === 'string' &&
+                (p.audioUrl.en.startsWith('http://') || p.audioUrl.en.startsWith('https://')))
                 ? { ro: DEFAULT_AUDIO_KEY, en: DEFAULT_AUDIO_KEY }
                 : p.audioUrl,
           }))

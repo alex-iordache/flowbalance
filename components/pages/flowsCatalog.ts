@@ -61,6 +61,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
       'Boost-Motivation',
       'Self-Compassion',
       'Daily-Heart-Lift',
+      'Stress-Soothing',
     ],
     theme: 5,
     bgClass: 'bg-gradient-to-br from-rose-500 to-pink-600',

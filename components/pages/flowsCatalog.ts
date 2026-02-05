@@ -41,6 +41,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     flowIds: [
       'Build-Self-Trust',
       'Healthy-Money-Mindset',
+      'Goal-Achievement',
     ],
     theme: 3,
     bgClass: 'bg-gradient-to-br from-violet-500 to-fuchsia-600',

@@ -1,0 +1,28 @@
+import type { Practice } from '../../types';
+
+const roDescription = (
+  <>
+    <p>Bun găsit,</p>
+    <p>Nimic nu este mai important în viață decât pasiunea. Nu contează ceea ce faci în viață, atât timp cât o faci cu și din pasiune.</p>
+    <p>Pentru ziua aceasta scrie pe o hârtie cel puțin 20 de soluții ca să creezi mai mult timp pentru pasiunile tale, pentru ceea ce te relaxează. Împărtășește ideile cu cel mai bun prieten.</p>
+    <p>Ascultă această înregistrare audio, care te va ajuta să îți înțelegi mai bine eul tău interior și să încerci noi perspective.</p>
+  </>
+)
+
+
+const practice: Practice = {
+  id: 'Goal-Achievement-Day-23',
+  position: 23,
+  title: { ro: 'Ziua 23', en: 'Day 23' },
+  name: { ro: 'Ziua 23', en: 'Day 23' },
+  intro: {
+    ro: 'Nimic nu este mai important în viață decât pasiunea. Nu contează ceea ce faci în viață, atât timp cât o fac…',
+    en: 'AIT',
+  },
+  description: { ro: roDescription, en: 'AIT' },
+  audioUrl: { ro: 'audioFiles/conectarea-la-propriul-intelept.mp3', en: 'audioFiles/conectarea-la-propriul-intelept.mp3' },
+  finished: false,
+  lastPositionSec: 0,
+};
+
+export default practice;

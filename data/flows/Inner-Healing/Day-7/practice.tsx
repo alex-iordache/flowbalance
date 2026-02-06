@@ -17,6 +17,25 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      For today, take at least five pauses where you scan your body for 5 minutes and simply notice how it feels.
+    </p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      In the evening, listen to this audio recording—it will help you connect with your emotions. If you fall asleep
+      before the recording ends, that’s perfectly fine.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-07',
   position: 7,
@@ -26,7 +45,7 @@ const practice: Practice = {
     ro: '5 pauze de body scan.',
     en: 'Five short body scans.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/conectarea-la-propriile-emotii.mp3', en: 'audioFiles/conectarea-la-propriile-emotii.mp3' },
   finished: false,
   lastPositionSec: 0,

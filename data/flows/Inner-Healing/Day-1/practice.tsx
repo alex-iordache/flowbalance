@@ -20,6 +20,25 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      Today is the first day of your journey, where you will connect with your body and bring awareness to each part of
+      it. From today on, you’ll become more aware of your body’s needs.
+    </p>
+    <p>
+      For today, repeat at least 5 times the following affirmations: My only life partner, who accompanies me
+      everywhere, is my BODY. Thank you for all the efforts you have made for me until now.
+    </p>
+    <p>
+      Listen to this audio recording—it will help you disconnect from stressful situations in your life and regain a
+      state of relaxation. Please listen in the evening, before going to sleep. If you fall asleep before the recording
+      ends, that’s perfectly fine.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-01',
   position: 1,
@@ -29,7 +48,7 @@ const practice: Practice = {
     ro: 'Afirmații + relaxare seara.',
     en: 'Affirmations + evening relaxation.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/deconectare-relaxare-vindecare.mp3', en: 'audioFiles/deconectare-relaxare-vindecare.mp3' },
   finished: false,
   lastPositionSec: 0,

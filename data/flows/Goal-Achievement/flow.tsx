@@ -39,6 +39,29 @@ const roDescription = (
   </>
 )
 
+const enDescription = (
+  <>
+    <p>
+      Difficulties in reaching your goals don’t come from a lack of willpower, but from inner conflict, procrastination,
+      self-sabotage, and losing connection to personal meaning. Often, you know what to do, but something stops you from
+      starting or continuing. This program is designed to help you regain direction, energy, and confidence so you can
+      act consistently toward what you want.
+    </p>
+    <p>
+      In this program you work with both the conscious and unconscious mind to identify what blocks you, what resources
+      you already have, and what skills you need to develop in order to achieve your goals. You’ll learn to reduce
+      procrastination, manage self-sabotage, and build an inner state that supports action—not avoidance. The focus is on
+      real, personal goals aligned with your values, not pressure or forced performance.
+    </p>
+    <p>
+      Over these 30 days, you’ll practice daily intention clarity, inner motivation, and trust in your own resources.
+      Through short exercises and guided audio recordings, you train your mind to work in your favor, support your
+      decisions, and create emotional stability throughout the goal-achievement process. This program is designed to be
+      followed step by step, so changes integrate naturally and last over time.
+    </p>
+  </>
+);
+
 
 const flow: Flow = {
   id: 'Goal-Achievement',
@@ -48,9 +71,9 @@ const flow: Flow = {
   name: { ro: 'Atingerea obiectivelor', en: 'Goal Achievement' },
   intro: {
     ro: 'Construiește claritate, motivație și consecvență pentru a transforma visurile tale în realitate.',
-    en: 'AIT',
+    en: 'Build clarity, motivation, and consistency to turn your dreams into reality.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   image: { ro: '/img/flows/goal-achievement.png', en: '/img/flows/goal-achievement.png' },
 
   started: false,

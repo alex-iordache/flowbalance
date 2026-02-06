@@ -11,7 +11,6 @@ import flow_26_Heartful_Gratitude from "./Heartful-Gratitude/flow";
 import flow_27_Boost_Motivation from "./Boost-Motivation/flow";
 import flow_28_Self_Compassion from "./Self-Compassion/flow";
 import flow_29_Daily_Heart_Lift from "./Daily-Heart-Lift/flow";
-import flow_32_Body_Release from "./Body-Release/flow";
 import flow_30_Stress_Soothing from "./Stress-Soothing/flow";
 import flow_31_Calming_Anxiety from "./Calming-Anxiety/flow";
 import flow_33_Inner_Healing from "./Inner-Healing/flow";
@@ -33,7 +32,6 @@ export const defaultFlows: Flow[] = [
   flow_29_Daily_Heart_Lift,
   flow_30_Stress_Soothing,
   flow_31_Calming_Anxiety,
-  flow_32_Body_Release,
   flow_33_Inner_Healing,
   flow_34_Goal_Achievement,
 ];

@@ -25,6 +25,31 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      A small break from the turmoil of everyday life can bring you more than you think. Sometimes the best thing you can
+      do is to do nothing.
+    </p>
+    <p>
+      For today, set a daily ritual you can keep. Choose consistent bedtimes, mealtimes, and times for physical exercise.
+      In the evening—two hours before sleep—treat yourself and do activities that relax you. Make sure you get restful
+      sleep.
+    </p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      In the evening, listen to this audio recording—it can help reduce physical discomfort you feel in the body. If you
+      fall asleep before the recording ends, that’s perfectly fine.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-10',
   position: 10,
@@ -34,7 +59,7 @@ const practice: Practice = {
     ro: 'Ritual zilnic + odihnă.',
     en: 'Daily ritual + rest.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/redu-disconfortul-fizic.mp3', en: 'audioFiles/redu-disconfortul-fizic.mp3' },
   finished: false,
   lastPositionSec: 0,

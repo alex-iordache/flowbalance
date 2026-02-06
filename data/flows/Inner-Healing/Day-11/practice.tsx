@@ -26,6 +26,31 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      Every thought and every emotion corresponds to a physical reaction. A good joke can soften your forehead and make
+      you feel better, while an argument with someone close can leave you feeling low, with headaches or stomach aches.
+    </p>
+    <p>
+      These days, pay attention to the phrases you say in conversations that relate to the physical body. For example:
+      “My head hurts from how much X talked today”, “I don’t care about this problem.” Then notice whether there is a
+      correlation between what you repeat and what you feel physically, over time.
+    </p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      Listen to this audio recording ONLY IF you have a physical issue that needs a stronger immune system. It will help
+      you identify physical problems and the emotional causes behind them.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-11',
   position: 11,
@@ -35,7 +60,7 @@ const practice: Practice = {
     ro: 'Legătura gând–emoție–corp.',
     en: 'Mind–emotion–body link.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/vindecare.mp3', en: 'audioFiles/vindecare.mp3' },
   finished: false,
   lastPositionSec: 0,

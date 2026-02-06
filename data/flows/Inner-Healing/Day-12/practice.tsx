@@ -44,6 +44,48 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      A small break from the turmoil of everyday life can bring you more than you think. Remember: sometimes the best
+      thing you can do is to do nothing.
+    </p>
+    <p>Today, I’m proposing an exercise to stimulate the two hemispheres of the brain.</p>
+    <p>
+      <strong>Stage 1</strong>
+    </p>
+    <p>
+      Draw a circle in the air with your left hand and a square with your right hand. Do this simultaneously with both
+      hands.
+    </p>
+    <p>
+      When it becomes easy, switch the tasks between your hands. With your right hand drawing a circle, draw it in the
+      opposite direction compared to how you drew it with your left hand.
+    </p>
+    <p>Continue alternating until it feels easy.</p>
+    <p>
+      <strong>Stage 2</strong>
+    </p>
+    <p>Stand up and raise one knee until it meets the opposite hand.</p>
+    <p>Lower the knee and repeat with the other knee.</p>
+    <p>
+      Keep alternating between knees, but change the speed (very, very slow, then very, very fast).
+    </p>
+    <p>Do the same exercise with your eyes closed.</p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      Listen to this audio recording ONLY IF you have a physical issue that needs a stronger immune system. It will help
+      you identify physical problems and the emotional causes behind them.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-12',
   position: 12,
@@ -53,7 +95,7 @@ const practice: Practice = {
     ro: 'Exerciții pentru emisferele creierului.',
     en: 'Brain hemisphere exercises.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/vindecare.mp3', en: 'audioFiles/vindecare.mp3' },
   finished: false,
   lastPositionSec: 0,

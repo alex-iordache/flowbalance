@@ -41,8 +41,31 @@ const roDescription = (
   </>
 );
 
-// Use "AIT" placeholder so English UI falls back to Romanian until translated.
-const enDescription = 'AIT';
+const enDescription = (
+  <>
+    <p>
+      Inner Healing is a guided program for deep reconnection with the body, designed to support physical and emotional
+      regulation through listening, presence, and conscious relaxation.
+    </p>
+    <p>
+      Often, the body starts speaking through tension, pain, or fatigue when the pace of life exceeds our capacity to
+      adapt. This program helps you slow down, notice the body’s messages, and create a safe space where mind and body
+      can collaborate—rather than fight.
+    </p>
+    <p>
+      Through short audio exercises and simple daily practices, you learn to reduce physical tension, influence your
+      state through attention and breath, and recognise the impact of emotions and thoughts on your health. Inner Healing
+      is not about “forcing healing”, but about supporting the body’s natural processes through relaxation, clarity, and
+      self-compassion.
+    </p>
+    <p>
+      The program unfolds over 14 days. Each day includes a short awareness lesson and an audio recording that guides you
+      in connecting with different areas of the body and the states associated with them. Practiced consistently, this
+      flow supports a more balanced lifestyle, increases energy, and contributes to a healthier, more respectful
+      relationship with your own body—as an essential life partner.
+    </p>
+  </>
+);
 
 const flow: Flow = {
   id: 'Inner-Healing',

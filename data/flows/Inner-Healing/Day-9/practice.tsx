@@ -32,6 +32,36 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      One of the most calming activities—mentally and physically—is to become conscious of an activity we normally do on
+      autopilot.
+    </p>
+    <p>
+      Today, I invite you to move around your home or outside while staying aware of the movement. As you walk at your
+      usual pace, feel how your legs move. Feel the contact of your foot with the ground, the bend of your knee, the
+      movement of your thighs and hips. Notice what happens on the left side, then on the right. Notice whether your legs
+      feel heavy or light, feel the warmth in your body as you walk, and hear the sounds of your movement.
+    </p>
+    <p>
+      This way of becoming aware of your body disconnects you from tiring thoughts and helps you discover the wonder of a
+      body that works in such synchrony. It relaxes the mind and brings you into closer contact with your body.
+    </p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      In the evening, listen to this audio recording—it can help reduce physical discomfort you feel in the body. If you
+      fall asleep before the recording ends, that’s perfectly fine.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-09',
   position: 9,
@@ -41,7 +71,7 @@ const practice: Practice = {
     ro: 'Mers conștient + audio seara.',
     en: 'Conscious walking + evening audio.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/redu-disconfortul-fizic.mp3', en: 'audioFiles/redu-disconfortul-fizic.mp3' },
   finished: false,
   lastPositionSec: 0,

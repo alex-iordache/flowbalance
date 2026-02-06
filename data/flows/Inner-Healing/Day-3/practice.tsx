@@ -24,6 +24,30 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      We all face stressful or difficult situations in everyday life. But have you ever wondered what exactly triggers
+      our reactions?
+    </p>
+    <p>
+      For today, look at the list of emotions you noted yesterday and write next to each one what triggers it (for
+      example: I feel very irritable when I’m criticised).
+    </p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      Listen to this audio recording—it will help you notice tension stored in the body and relax tense areas. If you
+      fall asleep before the recording ends, that’s perfectly fine.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-03',
   position: 3,
@@ -33,7 +57,7 @@ const practice: Practice = {
     ro: 'Declanșatori emoționali + body scan.',
     en: 'Emotional triggers + body scan.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/body-scan.mp3', en: 'audioFiles/body-scan.mp3' },
   finished: false,
   lastPositionSec: 0,

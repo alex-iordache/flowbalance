@@ -25,6 +25,30 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      To make progress in any area of your life, sometimes you need to pause and carefully analyse how you handle
+      stressful situations. Are you aware of the physical reactions that each stressful situation brings up?
+    </p>
+    <p>
+      For today, make a list of the physical problems you experience when you feel stressed. Next to each pain or
+      symptom, note what strong emotions might trigger it (fear, anger, tension, etc.).
+    </p>
+    <p>
+      From today on, every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can
+      do that and then come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared
+      to your usual position, with your eyes closed. After you finish counting, remember a time when your body felt full
+      of vitality and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      In the evening, listen to this audio recording—it will help you disconnect from stressful situations in your life
+      and regain a state of relaxation. If you fall asleep before the recording ends, that’s perfectly fine.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-02',
   position: 2,
@@ -34,7 +58,7 @@ const practice: Practice = {
     ro: 'Observă reacțiile fizice la stres.',
     en: 'Notice your body’s stress reactions.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/deconectare-relaxare-vindecare.mp3', en: 'audioFiles/deconectare-relaxare-vindecare.mp3' },
   finished: false,
   lastPositionSec: 0,

@@ -20,6 +20,26 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      For today, remember that emotions are states that don’t last longer than about two minutes. What makes them
+      persist is our thinking—our mind repeating the same situation again and again.
+    </p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      In the evening, listen to this audio recording—it will help you notice tension stored in the body and relax tense
+      areas.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-04',
   position: 4,
@@ -29,7 +49,7 @@ const practice: Practice = {
     ro: 'Emoțiile trec; body scan seara.',
     en: 'Emotions pass; body scan in the evening.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/body-scan.mp3', en: 'audioFiles/body-scan.mp3' },
   finished: false,
   lastPositionSec: 0,

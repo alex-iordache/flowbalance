@@ -27,6 +27,32 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      Finally, look back and review the best habits you’ve learned—these will be your foundation when you feel stress or
+      worries taking over. Keep practising them daily, because every small win was once a difficult goal.
+    </p>
+    <p>At the end of the program, look at your daily schedule and notice whether you introduced:</p>
+    <p>– relaxation breaks where you do nothing</p>
+    <p>– at least 30 minutes where you laugh</p>
+    <p>– listening to your body and noticing tension</p>
+    <p>– doing something good for your body</p>
+    <p>– relaxing before bedtime</p>
+    <p>
+      From now on, every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do
+      that and then come back)—count in your mind from 50 down to 1. Keep your gaze about 20 degrees upward compared to
+      your usual position, with your eyes closed. After you finish counting, remember a time when your body felt full of
+      vitality and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      Listen to this audio recording—it will help you disconnect from stressful situations in your life and regain a
+      state of relaxation. If you fall asleep before the recording ends, that’s perfectly fine.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-14',
   position: 14,
@@ -36,7 +62,7 @@ const practice: Practice = {
     ro: 'Integrare și ritualuri.',
     en: 'Integration and rituals.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/deconectare-relaxare-vindecare.mp3', en: 'audioFiles/deconectare-relaxare-vindecare.mp3' },
   finished: false,
   lastPositionSec: 0,

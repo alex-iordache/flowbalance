@@ -44,6 +44,52 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      Learning gratitude is one of the best things you can do for your quality of life, first of all because you no
+      longer live from the idea of “filling a gap”, but from an awareness of abundance—which attracts even more good
+      things.
+    </p>
+    <p>Today I propose the following exercise:</p>
+    <p>
+      As you sit comfortably and read this text, take a deep breath, inhaling air down into the abdomen. Feel your chest
+      expand, your ribcage widen, and the abdomen move downward. Focus on these inner sensations.
+    </p>
+    <p>
+      Breathe two more times as described above. On the inhale, expand; on the exhale, release tension and relax.
+    </p>
+    <p>
+      What do you notice—comfort or discomfort? Ease or difficulty? Resistance? Boredom? Relaxation? You don’t need to
+      change anything; it’s enough to notice what’s happening in the moment you read these words.
+    </p>
+    <p>
+      On the next exhale, hold your breath for a fraction of a second. Can you feel your heartbeat? Where exactly? In
+      how many places? Where is it strong, and where is it barely a whisper? What is the rhythm and sensation like? Can
+      you hear it? Continue breathing. What sensations and emotions arise as you observe your heartbeat?
+    </p>
+    <p>
+      Bring attention to the place where you’re sitting. How do your muscles perceive the support beneath you? Where do
+      you feel pressure in your glutes and legs? How does your spine feel? There’s no need to change anything—just pay
+      attention.
+    </p>
+    <p>What does your skin feel? Do you feel any breeze? Does it feel cool, warm, humid?</p>
+    <p>What do you hear right now? What thoughts pass through your mind? Do you feel any constriction?</p>
+    <p>Can you go even deeper?</p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      Listen to this audio recording ONLY IF you have a physical issue that needs a stronger immune system. It will help
+      you identify physical problems and the emotional causes behind them.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-13',
   position: 13,
@@ -53,7 +99,7 @@ const practice: Practice = {
     ro: 'Recunoștință și observare profundă.',
     en: 'Gratitude + deeper noticing.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/vindecare.mp3', en: 'audioFiles/vindecare.mp3' },
   finished: false,
   lastPositionSec: 0,

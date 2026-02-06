@@ -27,6 +27,32 @@ const roDescription = (
   </>
 );
 
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      Music is a gift that heals us—first of all, our soul. Music influences our behaviour and mood. If you use an alarm
+      clock with a “stressful” melody, the transition from deep sleep to wakefulness happens abruptly and, most likely,
+      you’ll start your day feeling stressed. Surround yourself with the most beautiful music—the kind that makes your
+      soul vibrate with happiness.
+    </p>
+    <p>
+      For today, find an instrumental song you truly like, lie down, and listen with headphones. While you do this,
+      notice what states it brings up and how different parts of your body feel as you listen.
+    </p>
+    <p>
+      Every morning when you wake up—before getting out of bed (if you need to use the bathroom, you can do that and then
+      come back)—count in your mind from 100 down to 1. Keep your gaze about 20 degrees upward compared to your usual
+      position, with your eyes closed. After you finish counting, remember a time when your body felt full of vitality
+      and health, and visualise yourself walking as you did then.
+    </p>
+    <p>
+      In the evening, listen to this audio recording—it will help you connect with your emotions. If you fall asleep
+      before the recording ends, that’s perfectly fine.
+    </p>
+  </>
+);
+
 const practice: Practice = {
   id: 'Inner-Healing-Day-06',
   position: 6,
@@ -36,7 +62,7 @@ const practice: Practice = {
     ro: 'Muzică + conectare cu emoțiile.',
     en: 'Music + connect with emotions.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/conectarea-la-propriile-emotii.mp3', en: 'audioFiles/conectarea-la-propriile-emotii.mp3' },
   finished: false,
   lastPositionSec: 0,

@@ -7,7 +7,23 @@ const roDescription = (
     <p>Pentru ziua aceasta fă o listă cu ceea ce a fost bun pentru tine în ziua anterioară.</p>
     <p>Ascultă această înregistrare audio, care te va ajuta să vezi situația respectivă dintr-un alt unghi și să găsești soluția potrivită pentru tine.</p>
   </>
-)
+);
+
+const enDescription = (
+  <>
+    <p>Welcome,</p>
+    <p>
+      Kindness—whether given or received—is always a gift. It enriches both the one who gives and the one who receives.
+    </p>
+    <p>
+      For today, make a list of what was good for you yesterday.
+    </p>
+    <p>
+      Listen to this audio recording—it will help you see the situation from a different angle and find the right
+      solution for you.
+    </p>
+  </>
+);
 
 
 const practice: Practice = {
@@ -17,9 +33,9 @@ const practice: Practice = {
   name: { ro: 'Ziua 19', en: 'Day 19' },
   intro: {
     ro: 'Bunătatea, fie că este dăruită sau primită, este întotdeauna un dar, care îl va îmbogăți atât pe cel care d…',
-    en: 'AIT',
+    en: 'Reflect on kindness: write what was good for you yesterday.',
   },
-  description: { ro: roDescription, en: 'AIT' },
+  description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: 'audioFiles/trecerea-peste-obstacole.mp3', en: 'audioFiles/trecerea-peste-obstacole.mp3' },
   finished: false,
   lastPositionSec: 0,

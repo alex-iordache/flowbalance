@@ -54,4 +54,5 @@ nextjs-tailwind-ionic-capacitor-starter@*
 *.jks
 android/keystore.properties
 
+#my workspace
 data/workspace/

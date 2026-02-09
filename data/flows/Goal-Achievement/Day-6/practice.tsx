@@ -38,7 +38,7 @@ const practice: Practice = {
     en: 'Visualise your goal and the ripple effect of your success.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/vizualizarea-obiectului-personal.mp3', en: 'audioFiles/vizualizarea-obiectului-personal.mp3' },
+  audioUrl: { ro: 'audioFiles/vizualizarea-obiectului-personal.mp3', en: 'audioFilesEnAi/vizualizarea-obiectului-personal-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

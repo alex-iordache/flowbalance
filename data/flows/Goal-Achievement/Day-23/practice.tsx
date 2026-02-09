@@ -36,7 +36,7 @@ const practice: Practice = {
     en: 'Create more time for what you love: write 20 solutions.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/conectarea-la-propriul-intelept.mp3', en: 'audioFiles/conectarea-la-propriul-intelept.mp3' },
+  audioUrl: { ro: 'audioFiles/conectarea-la-propriul-intelept.mp3', en: 'audioFilesEnAi/conectarea-la-propriul-intelept-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

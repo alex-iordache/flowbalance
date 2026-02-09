@@ -38,7 +38,7 @@ const practice: Practice = {
     en: 'Set bold expectations and commit to 3 key actions today.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/vizualizarea-obiectului-personal.mp3', en: 'audioFiles/vizualizarea-obiectului-personal.mp3' },
+  audioUrl: { ro: 'audioFiles/vizualizarea-obiectului-personal.mp3', en: 'audioFilesEnAi/vizualizarea-obiectului-personal-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

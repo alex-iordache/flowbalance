@@ -47,7 +47,7 @@ const practice: Practice = {
   name: { ro: "Vizualizarea obiectivului personal", en: "Visualizing Your Personal Goal" },
   intro: { ro: "Clarifică ce vrei cu adevărat și ce pași te apropie de acel obiectiv.", en: "Clarify what you truly want and the steps that move you toward it." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/vizualizarea-obiectului-personal.mp3", en: "audioFiles/vizualizarea-obiectului-personal.mp3" },
+  audioUrl: { ro: "audioFiles/vizualizarea-obiectului-personal.mp3", en: "audioFilesEnAi/vizualizarea-obiectului-personal-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

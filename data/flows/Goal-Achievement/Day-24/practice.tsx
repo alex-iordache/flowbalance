@@ -35,7 +35,7 @@ const practice: Practice = {
     en: 'Set your goals first: commit to three key goals today.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/conectarea-la-propriul-intelept.mp3', en: 'audioFiles/conectarea-la-propriul-intelept.mp3' },
+  audioUrl: { ro: 'audioFiles/conectarea-la-propriul-intelept.mp3', en: 'audioFilesEnAi/conectarea-la-propriul-intelept-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

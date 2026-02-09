@@ -68,7 +68,7 @@ const practice: Practice = {
   name: { ro: "Vizualizarea obiectivului personal", en: "Visualizing Your Personal Goal" },
   intro: { ro: "Joaca poate face soluțiile să pară posibile—lucrează cu bani și control într-un mod sigur.", en: "Play can make solutions feel possible—work with money and control in a safe way." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/vizualizarea-obiectului-personal.mp3", en: "audioFiles/vizualizarea-obiectului-personal.mp3" },
+  audioUrl: { ro: "audioFiles/vizualizarea-obiectului-personal.mp3", en: "audioFilesEnAi/vizualizarea-obiectului-personal-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

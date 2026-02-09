@@ -39,7 +39,7 @@ const practice: Practice = {
     en: 'Today is your first step toward personal success.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/VECHI-analiza-propriei-vieti.mp3', en: 'audioFiles/VECHI-analiza-propriei-vieti.mp3' },
+  audioUrl: { ro: 'audioFiles/VECHI-analiza-propriei-vieti.mp3', en: 'audioFilesEnAi/analiza-vietii-personale-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

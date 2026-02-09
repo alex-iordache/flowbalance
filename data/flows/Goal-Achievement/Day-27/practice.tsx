@@ -37,7 +37,7 @@ const practice: Practice = {
     en: 'Ask two people where they see you as an expert.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/incredere.mp3', en: 'audioFiles/incredere.mp3' },
+  audioUrl: { ro: 'audioFiles/incredere.mp3', en: 'audioFilesEnAi/incredere-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

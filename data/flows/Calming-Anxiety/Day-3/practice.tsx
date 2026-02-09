@@ -40,7 +40,7 @@ const practice: Practice = {
     en: 'Chosen quality + “I deserve to…” at least 5 times; audio in the evening.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/calitatea-de-care-ai-nevoie.mp3', en: 'audioFiles/calitatea-de-care-ai-nevoie.mp3' },
+  audioUrl: { ro: 'audioFiles/calitatea-de-care-ai-nevoie.mp3', en: 'audioFilesEnAi/calitatea-de-care-ai-nevoie-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

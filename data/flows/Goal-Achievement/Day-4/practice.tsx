@@ -38,7 +38,7 @@ const practice: Practice = {
     en: 'Share your goals with someone you trust.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/VECHI-analiza-propriei-vieti.mp3', en: 'audioFiles/VECHI-analiza-propriei-vieti.mp3' },
+  audioUrl: { ro: 'audioFiles/VECHI-analiza-propriei-vieti.mp3', en: 'audioFilesEnAi/analiza-vietii-personale-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

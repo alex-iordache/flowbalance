@@ -39,7 +39,7 @@ const practice: Practice = {
     en: 'Practice choosing your response: reframe one negative thought today.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/trecerea-peste-obstacole.mp3', en: 'audioFiles/trecerea-peste-obstacole.mp3' },
+  audioUrl: { ro: 'audioFiles/trecerea-peste-obstacole.mp3', en: 'audioFilesEnAi/trecerea-peste-obstacole-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

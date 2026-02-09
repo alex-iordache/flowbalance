@@ -39,7 +39,7 @@ const practice: Practice = {
     en: 'List the mental programs and beliefs that support you.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/vizualizarea-obiectului-personal.mp3', en: 'audioFiles/vizualizarea-obiectului-personal.mp3' },
+  audioUrl: { ro: 'audioFiles/vizualizarea-obiectului-personal.mp3', en: 'audioFilesEnAi/vizualizarea-obiectului-personal-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

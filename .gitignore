@@ -53,3 +53,5 @@ nextjs-tailwind-ionic-capacitor-starter@*
 # android signing (do not commit)
 *.jks
 android/keystore.properties
+
+data/workspace/

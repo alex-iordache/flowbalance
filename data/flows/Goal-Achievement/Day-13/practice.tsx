@@ -37,7 +37,7 @@ const practice: Practice = {
     en: 'Practice self-appreciation and name what you value in yourself.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/incepe-ziua-cu-bucurie.mp3', en: 'audioFiles/incepe-ziua-cu-bucurie.mp3' },
+  audioUrl: { ro: 'audioFiles/incepe-ziua-cu-bucurie.mp3', en: 'audioFilesEnAi/incepe-ziua-cu-bucurie-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

@@ -39,7 +39,7 @@ const practice: Practice = {
     en: 'Choose one goal and define it as clearly as possible.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/vizualizarea-obiectului-personal.mp3', en: 'audioFiles/vizualizarea-obiectului-personal.mp3' },
+  audioUrl: { ro: 'audioFiles/vizualizarea-obiectului-personal.mp3', en: 'audioFilesEnAi/vizualizarea-obiectului-personal-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

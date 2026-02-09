@@ -37,7 +37,7 @@ const practice: Practice = {
     en: 'List your obstacles and practice shifting your perspective.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/trecerea-peste-obstacole.mp3', en: 'audioFiles/trecerea-peste-obstacole.mp3' },
+  audioUrl: { ro: 'audioFiles/trecerea-peste-obstacole.mp3', en: 'audioFilesEnAi/trecerea-peste-obstacole-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

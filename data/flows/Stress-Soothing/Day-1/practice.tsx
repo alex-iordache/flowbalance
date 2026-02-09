@@ -64,7 +64,7 @@ const practice: Practice = {
     en: 'Notice how stress appears in your life and how it shows up in body, mind, and emotions.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/trecerea-peste-obstacole.mp3', en: 'audioFiles/trecerea-peste-obstacole.mp3' },
+  audioUrl: { ro: 'audioFiles/trecerea-peste-obstacole.mp3', en: 'audioFilesEnAi/trecerea-peste-obstacole-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

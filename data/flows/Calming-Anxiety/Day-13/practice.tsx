@@ -39,7 +39,7 @@ const practice: Practice = {
     en: 'Make silly faces in the mirror until you laugh; audio at the start of the day.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/incepe-ziua-cu-bucurie.mp3', en: 'audioFiles/incepe-ziua-cu-bucurie.mp3' },
+  audioUrl: { ro: 'audioFiles/incepe-ziua-cu-bucurie.mp3', en: 'audioFilesEnAi/incepe-ziua-cu-bucurie-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

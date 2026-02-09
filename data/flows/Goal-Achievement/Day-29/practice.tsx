@@ -36,7 +36,7 @@ const practice: Practice = {
     en: 'Choose one postponed task and do it today.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/incredere.mp3', en: 'audioFiles/incredere.mp3' },
+  audioUrl: { ro: 'audioFiles/incredere.mp3', en: 'audioFilesEnAi/incredere-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

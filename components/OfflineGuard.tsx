@@ -19,10 +19,21 @@ async function probeOnline(timeoutMs: number): Promise<boolean> {
   // only tells us whether the *local* bundle is reachable, not whether the internet is up.
   // We specifically want to know if we can reach the remote app origin.
   const REMOTE_ORIGIN = 'https://www.flowbalance.app';
+  const ORIGIN = typeof window !== 'undefined' ? window.location.origin : REMOTE_ORIGIN;
+  const HOST = typeof window !== 'undefined' ? window.location.hostname : '';
+
+  // In local web dev (localhost), probing the remote origin is cross-origin and will fail due to CORS.
+  // For dev, just probe the current origin so the offline overlay doesn't mask the entire UI.
+  const isLocalDev =
+    HOST === 'localhost' || HOST === '127.0.0.1' || HOST === '0.0.0.0';
+
+  const targetOrigin = isLocalDev ? ORIGIN : REMOTE_ORIGIN;
   try {
     const controller = new AbortController();
     const t = window.setTimeout(() => controller.abort(), timeoutMs);
-    const url = `${REMOTE_ORIGIN}/favicon.ico?ping=${Date.now()}`;
+    // In dev, `favicon.ico` may not exist; probe a guaranteed Next asset instead.
+    const probePath = isLocalDev ? '/_next/static/chunks/webpack.js' : '/favicon.ico';
+    const url = `${targetOrigin}${probePath}?ping=${Date.now()}`;
     const res = await fetch(url, {
       method: 'HEAD',
       cache: 'no-store',

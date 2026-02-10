@@ -15,6 +15,7 @@ import ChunkLoadRecovery from './ChunkLoadRecovery';
 import OverlayManager from './OverlayManager';
 import OnboardingGuard from './OnboardingGuard';
 import OfflineGuard from './OfflineGuard';
+import ErrorBoundary from './ui/ErrorBoundary';
 
 setupIonicReact({});
 
@@ -43,31 +44,34 @@ const AppShell = () => {
 
   return (
     <AuthGuard>
-      <IonApp>
-        <IonReactRouter>
-          <DeepLinkReturnHandler />
-          <HardwareBackHandler />
-          <CategoryThemeSync />
-          <ChunkLoadRecovery />
-          <OfflineGuard />
-          <OnboardingGuard />
-          <OverlayManager />
-          <IonRouterOutlet id="main">
-            {/* Main app routes - protected by AuthGuard */}
-            <Route path="/home" component={Tabs} />
-            <Route path="/flows" component={Tabs} />
-            <Route path="/settings" component={Tabs} />
-            <Route path="/progress" component={Tabs} />
-            {/* IMPORTANT: keep this exact so it does not catch `/subscribe-web/*` return URLs on iOS */}
-            <Route path="/subscribe" component={Tabs} exact={true} />
+      <ErrorBoundary title="App error">
+        <IonApp>
+          <IonReactRouter>
+            <DeepLinkReturnHandler />
+            <HardwareBackHandler />
+            <CategoryThemeSync />
+            <ChunkLoadRecovery />
+            <OfflineGuard />
+            <OnboardingGuard />
+            <OverlayManager />
+            <IonRouterOutlet id="main">
+              {/* Main app routes - protected by AuthGuard */}
+              <Route path="/home" component={Tabs} />
+              <Route path="/flows" component={Tabs} />
+              <Route path="/settings" component={Tabs} />
+              <Route path="/progress" component={Tabs} />
+            <Route path="/practices" component={Tabs} />
+              {/* IMPORTANT: keep this exact so it does not catch `/subscribe-web/*` return URLs on iOS */}
+              <Route path="/subscribe" component={Tabs} exact={true} />
 
-            {/* Root route - redirects to home */}
-            <Route path="/" exact={true}>
-              <Redirect to="/home" />
-            </Route>
-          </IonRouterOutlet>
-        </IonReactRouter>
-      </IonApp>
+              {/* Root route - redirects to home */}
+              <Route path="/" exact={true}>
+                <Redirect to="/home" />
+              </Route>
+            </IonRouterOutlet>
+          </IonReactRouter>
+        </IonApp>
+      </ErrorBoundary>
     </AuthGuard>
   );
 };

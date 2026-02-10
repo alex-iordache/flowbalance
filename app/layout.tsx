@@ -46,18 +46,70 @@ export default function RootLayout({
       <html lang="en" suppressHydrationWarning>
         <body suppressHydrationWarning>
           {children}
+
+          {/* Capture early runtime errors that can cause a "blank purple screen" */}
+          <Script
+            id="fb-runtime-error-overlay"
+            strategy="beforeInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function () {
+                  function show(msg) {
+                    try {
+                      var id = '__fb_runtime_error_overlay__';
+                      var el = document.getElementById(id);
+                      if (!el) {
+                        el = document.createElement('div');
+                        el.id = id;
+                        el.style.position = 'fixed';
+                        el.style.zIndex = '2147483647';
+                        el.style.left = '0';
+                        el.style.right = '0';
+                        el.style.top = '0';
+                        el.style.bottom = '0';
+                        el.style.padding = '24px';
+                        el.style.background = 'rgba(42, 16, 70, 0.98)';
+                        el.style.color = '#fff';
+                        el.style.fontFamily = 'ui-sans-serif, system-ui, -apple-system';
+                        el.style.overflow = 'auto';
+                        el.innerHTML =
+                          '<div style="max-width: 960px; margin: 0 auto;">' +
+                            '<div style="font-size: 22px; font-weight: 700;">App runtime error</div>' +
+                            '<div style="margin-top: 10px; font-size: 14px; opacity: 0.9;">Paste this message into chat so we can fix it.</div>' +
+                            '<pre style="margin-top: 14px; white-space: pre-wrap; background: rgba(0,0,0,0.25); padding: 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.15);"></pre>' +
+                            '<button style="margin-top: 14px; padding: 10px 14px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.25); background: rgba(255,255,255,0.12); color: #fff; font-weight: 600;" onclick="location.reload()">Reload</button>' +
+                          '</div>';
+                        document.body.appendChild(el);
+                      }
+                      var pre = el.querySelector('pre');
+                      if (pre) pre.textContent = String(msg || 'Unknown error');
+                    } catch {}
+                  }
+
+                  window.addEventListener('error', function (e) {
+                    var m = e && e.error ? (e.error.stack || e.error.message || e.error) : (e.message || e);
+                    show(m);
+                  });
+                  window.addEventListener('unhandledrejection', function (e) {
+                    var r = e && e.reason ? (e.reason.stack || e.reason.message || e.reason) : e;
+                    show(r);
+                  });
+                })();
+              `,
+            }}
+          />
+
+          <Script
+            type="module"
+            src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.esm.js"
+            strategy="lazyOnload"
+          />
+          <Script
+            noModule
+            src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.js"
+            strategy="lazyOnload"
+          />
         </body>
-        
-        <Script
-          type="module"
-          src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.esm.js"
-          strategy="lazyOnload"
-        />
-        <Script
-          noModule
-          src="https://unpkg.com/ionicons@5.2.3/dist/ionicons/ionicons.js"
-          strategy="lazyOnload"
-        />
       </html>
     </ClerkProviderClient>
   );

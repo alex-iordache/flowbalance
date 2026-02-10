@@ -6,10 +6,10 @@ import { useHistory } from 'react-router-dom';
 
 import Store from '../../store';
 import { t, type Flow, type Language } from '../../data/flows';
-import { ONBOARDING_QUESTIONS, type OnboardingOptionId } from '../../data/onboardingQuestions';
-import { calculateCategoryScores, getDefaultFlowForCategory, getTop3Categories, type OnboardingAnswers } from '../../helpers/onboardingScoring';
+import onboardingNewForm from '../../data/onboardingNewForm.json';
+import { FLOW_CATEGORIES } from '../pages/flowsCatalog';
 import { saveOnboardingComplete } from '../../store/persistence';
-import { hideOverlay, setOnboardingRecommendations, setOnboardingStart, setSettings } from '../../store/actions';
+import { hideOverlay, setOnboardingRecommendedFlows, setOnboardingRecommendations, setOnboardingSelectedNeeds, setOnboardingStart, setSettings } from '../../store/actions';
 
 function firstPracticeId(flow: Flow): string | null {
   const practices = flow.practices ?? [];
@@ -66,49 +66,37 @@ export default function OnboardingOverlay() {
   const lang = Store.useState(s => s.settings.language) as Language;
   const isRo = lang === 'ro';
 
-  const [step, setStep] = useState<'lang' | 0 | 1 | 2 | 3 | 'splash'>('lang');
+  const [step, setStep] = useState<'lang' | 'needs' | 'splash'>('lang');
   const [selectedLang, setSelectedLang] = useState<Language>('en');
-  const [q1, setQ1] = useState<OnboardingAnswers['q1']>([]);
-  const [q2, setQ2] = useState<OnboardingAnswers['q2'] | null>(null);
-  const [q3, setQ3] = useState<OnboardingAnswers['q3'] | null>(null);
-  const [q4, setQ4] = useState<OnboardingAnswers['q4'] | null>(null);
+  const [selectedNeeds, setSelectedNeeds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [splashFading, setSplashFading] = useState(false);
 
+  const config = onboardingNewForm as unknown as {
+    options: Array<{
+      id: string;
+      label: { ro: string; en: string };
+      primary: { kind: 'flow' | 'category'; id: string };
+      secondary: { kind: 'flow' | 'category'; id: string };
+    }>;
+    constraints: { minSelections: number; maxSelections: number };
+    copy: {
+      page2Title: { ro: string; en: string };
+      page2Subtitle: { ro: string; en: string };
+      submit: { ro: string; en: string };
+    };
+  };
+
   const canNext = useMemo(() => {
     if (step === 'lang') return Boolean(selectedLang);
-    if (step === 0) return q1.length > 0 && q1.length <= 2;
-    if (step === 1) return Boolean(q2);
-    if (step === 2) return Boolean(q3);
-    if (step === 3) return Boolean(q4);
+    if (step === 'needs') return selectedNeeds.length >= config.constraints.minSelections;
     return false;
-  }, [step, selectedLang, q1.length, q2, q3, q4]);
-
-  const answers: OnboardingAnswers | null = useMemo(() => {
-    if (!q2 || !q3 || !q4) return null;
-    return { q1, q2, q3, q4 };
-  }, [q1, q2, q3, q4]);
-
-  const top3 = useMemo(() => {
-    if (!answers) return null;
-    const scores = calculateCategoryScores(answers);
-    return getTop3Categories(scores);
-  }, [answers]);
-
-  const title = isRo ? 'Hai să-ți recomandăm cel mai bun punct de start' : 'Let’s recommend the best place to start';
-  const subtitle = isRo
-    ? 'Răspunde la câteva întrebări scurte și îți vom sugera cu ce să începi.'
-    : 'Answer a few quick questions and we’ll suggest what to start with.';
-
-  const question = typeof step === 'number' ? ONBOARDING_QUESTIONS[step] : null;
+  }, [step, selectedLang, selectedNeeds.length, config.constraints.minSelections]);
 
   const goBack = () => {
     if (saving) return;
     if (step === 'lang') return;
-    if (typeof step === 'number') {
-      if (step === 0) return setStep('lang');
-      setStep((step - 1) as any);
-    }
+    if (step === 'needs') return setStep('lang');
   };
 
   const goNext = async () => {
@@ -118,28 +106,99 @@ export default function OnboardingOverlay() {
       // Apply language selection immediately; the whole app is language-based (UI + audio).
       const current = Store.getRawState().settings;
       setSettings({ ...(current as any), language: selectedLang } as any);
-      // Move to Q1
-      setStep(0);
+      // Move to Needs selection
+      setStep('needs');
       return;
     }
-    if (typeof step === 'number' && step < 3) setStep((step + 1) as any);
-    else if (step === 3) await onFinish();
+    if (step === 'needs') await onFinish();
+  };
+
+  const resolveRefToFlowId = (ref: { kind: 'flow' | 'category'; id: string }): string | null => {
+    if (ref.kind === 'flow') return flows.find(f => f.id === ref.id)?.id ?? ref.id;
+    const cat = FLOW_CATEGORIES.find(c => c.id === ref.id) ?? null;
+    if (!cat) return null;
+    const byId = new Map(flows.map(f => [f.id, f] as const));
+    for (const fid of cat.flowIds) {
+      if (byId.has(fid)) return fid;
+    }
+    return null;
+  };
+
+  const computeRecommendedFlowIds = () => {
+    const selectedSet = new Set(selectedNeeds);
+    const selectedInOrder = config.options.filter(o => selectedSet.has(o.id));
+
+    const resolved = selectedInOrder.map(o => ({
+      id: o.id,
+      primary: resolveRefToFlowId(o.primary),
+      secondary: resolveRefToFlowId(o.secondary),
+    }));
+
+    const out: string[] = [];
+    const add = (fid: string | null) => {
+      if (!fid) return;
+      if (!out.includes(fid)) out.push(fid);
+    };
+
+    if (resolved.length === 2) {
+      for (const r of resolved) {
+        add(r.primary);
+        add(r.secondary);
+      }
+    } else if (resolved.length === 3) {
+      add(resolved[0]?.primary ?? null);
+      add(resolved[0]?.secondary ?? null);
+      add(resolved[1]?.primary ?? null);
+      add(resolved[2]?.primary ?? null);
+      // If duplicates reduce the list, fill with remaining secondary flows in order
+      add(resolved[1]?.secondary ?? null);
+      add(resolved[2]?.secondary ?? null);
+    } else if (resolved.length >= 4) {
+      for (const r of resolved.slice(0, 4)) add(r.primary);
+      // Fill with secondaries if duplicates reduce count
+      for (const r of resolved.slice(0, 4)) {
+        if (out.length >= 4) break;
+        add(r.secondary);
+      }
+    }
+
+    // Final safety: always provide 4 deterministic recommendations if possible.
+    if (out.length < 4) {
+      const byId = new Map(flows.map(f => [f.id, f] as const));
+      for (const cat of FLOW_CATEGORIES) {
+        for (const fid of cat.flowIds) {
+          if (out.length >= 4) break;
+          if (!byId.has(fid)) continue;
+          add(fid);
+        }
+        if (out.length >= 4) break;
+      }
+    }
+
+    return out.slice(0, 4);
   };
 
   const onFinish = async () => {
     if (saving) return;
     if (!userId) return;
-    if (!top3 || !answers) return;
+    if (selectedNeeds.length < config.constraints.minSelections) return;
 
     setSaving(true);
     try {
-      const primary = top3[0] ?? 'emotional-regulation';
-      const flow = getDefaultFlowForCategory(primary, flows) ?? null;
+      const recommendedFlowIds = computeRecommendedFlowIds();
+      const flow = recommendedFlowIds[0] ? flows.find(f => f.id === recommendedFlowIds[0]) ?? null : null;
       const pid = flow ? firstPracticeId(flow) : null;
       const start = { flowId: flow?.id ?? null, practiceId: pid };
 
-      await saveOnboardingComplete(userId, top3, start);
-      setOnboardingRecommendations(top3);
+      await saveOnboardingComplete(
+        userId,
+        { selectedNeedIds: selectedNeeds, recommendedFlowIds, recommendedCategories: [] },
+        start,
+      );
+      setOnboardingSelectedNeeds(selectedNeeds);
+      setOnboardingRecommendedFlows(recommendedFlowIds);
+      // Legacy field: clear it so Home uses the new behavior.
+      setOnboardingRecommendations([]);
       setOnboardingStart(start.flowId ? { flowId: start.flowId, practiceId: start.practiceId } : null);
 
       // Show a short welcome splash, then fade away to reveal Home.
@@ -201,53 +260,30 @@ export default function OnboardingOverlay() {
       );
     }
 
-    if (!question) return null;
-
-    const qTitle = t(question.title, lang);
-    const qSubtitle = question.subtitle ? t(question.subtitle, lang) : '';
-
     return (
       <>
         <div className="text-white/80 text-[12px] md:text-[13px] tracking-wide uppercase">
-          {isRo ? 'FLOW: Mind & Heart Balance' : 'FLOW: Mind & Heart Balance'}
+          {isRo ? 'SETUP' : 'SETUP'}
         </div>
-        <div className="mt-3 text-white text-[20px] md:text-[26px] font-semibold leading-tight">{title}</div>
-        <div className="mt-2 text-white/75 text-[13px] md:text-[15px] leading-snug">{subtitle}</div>
-
-        <div className="mt-7">
-          <div className="text-white text-[16px] md:text-[20px] font-semibold leading-tight">{qTitle}</div>
-          {qSubtitle ? <div className="mt-1 text-white/70 text-[12px] md:text-[14px]">{qSubtitle}</div> : null}
+        <div className="mt-3 text-white text-[20px] md:text-[26px] font-semibold leading-tight">
+          {t(config.copy.page2Title as any, lang)}
+        </div>
+        <div className="mt-2 text-white/75 text-[13px] md:text-[15px] leading-snug">
+          {t(config.copy.page2Subtitle as any, lang)}
         </div>
 
-        <div className="mt-4 flex flex-col gap-3">
-          {question.options.map(opt => {
-            const label = t(opt.label, lang);
-            const id = opt.id as OnboardingOptionId;
-
-            const selected =
-              question.id === 'q1'
-                ? q1.includes(id as any)
-                : question.id === 'q2'
-                  ? q2 === (id as any)
-                  : question.id === 'q3'
-                    ? q3 === (id as any)
-                    : q4 === (id as any);
-
+        <div className="mt-6 flex flex-col gap-3">
+          {config.options.map(opt => {
+            const selected = selectedNeeds.includes(opt.id);
             const onClick = () => {
               if (saving) return;
-              if (question.id === 'q1') {
-                setQ1(prev => {
-                  if (prev.includes(id as any)) return prev.filter(x => x !== (id as any)) as any;
-                  if (prev.length >= question.maxSelections) return prev;
-                  return [...prev, id as any];
-                });
-                return;
-              }
-              if (question.id === 'q2') setQ2(id as any);
-              if (question.id === 'q3') setQ3(id as any);
-              if (question.id === 'q4') setQ4(id as any);
+              setSelectedNeeds(prev => {
+                if (prev.includes(opt.id)) return prev.filter(x => x !== opt.id);
+                if (prev.length >= config.constraints.maxSelections) return prev;
+                return [...prev, opt.id];
+              });
             };
-
+            const label = lang === 'ro' ? opt.label.ro : opt.label.en;
             return <OptionButton key={opt.id} label={label} selected={selected} onClick={onClick} />;
           })}
         </div>
@@ -287,9 +323,9 @@ export default function OnboardingOverlay() {
       <div className="min-h-full px-5 py-6 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
         <div className="flex items-center justify-between">
           <div className="text-white/70 text-[12px] md:text-[13px]">
-            {step === 'lang' ? '1/5' : typeof step === 'number' ? `${step + 2}/5` : '✓'}
+            {step === 'lang' ? '1/2' : step === 'needs' ? '2/2' : '✓'}
           </div>
-          {typeof step === 'number' && step >= 0 ? (
+          {step === 'needs' ? (
             <button type="button" onClick={goBack} className="text-white/80 text-[13px] md:text-[15px]">
               {isRo ? 'Înapoi' : 'Back'}
             </button>
@@ -311,8 +347,8 @@ export default function OnboardingOverlay() {
         >
           {step === 'lang'
             ? (isRo ? 'Continuă' : 'Continue')
-            : typeof step === 'number' && step < 3
-              ? (isRo ? 'Continuă' : 'Continue')
+            : step === 'needs'
+              ? t(config.copy.submit as any, lang)
               : (isRo ? 'Finalizează' : 'Finish')}
         </button>
       </div>

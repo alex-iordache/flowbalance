@@ -15,6 +15,8 @@ import Flows from './Flows';
 import FlowCategory from './FlowCategory';
 import FlowDetail from './FlowDetail';
 import Practice from './Practice';
+import StandalonePractices from './StandalonePractices';
+import StandalonePractice from './StandalonePractice';
 import Settings from './Settings';
 import MyProgress from './MyProgress';
 import Subscribe from './Subscribe';
@@ -52,6 +54,8 @@ const Tabs = () => {
             render={() => <Practice />}
             exact={true}
           />
+          <Route path="/practices" render={() => <StandalonePractices />} exact={true} />
+          <Route path="/practices/:audioId" render={() => <StandalonePractice />} exact={true} />
           <Route path="/settings/delete-account" render={() => <DeleteAccount />} exact={true} />
           <Route path="/settings" render={() => <Settings />} exact={true} />
           <Route path="/subscribe" render={() => <Subscribe />} exact={true} />

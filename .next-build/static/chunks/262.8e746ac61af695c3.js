@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[262],{3262:function(e,n,r){r.d(n,{openExternalUrl:function(){return a}});var t=r(6689);async function a(e){if(t.dV.isNativePlatform()){let{AppLauncher:n}=await r.e(571).then(r.bind(r,571));await n.openUrl({url:e})}else window.open(e,"_blank","noopener,noreferrer")}}}]);

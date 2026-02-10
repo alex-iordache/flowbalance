@@ -5,7 +5,7 @@ import { useEffect, useRef } from 'react';
 
 import Store from '../store';
 import { hasCompletedOnboarding, loadOnboardingComplete } from '../store/persistence';
-import { setOnboardingRecommendations, setOnboardingStart, showOverlay } from '../store/actions';
+import { setOnboardingRecommendedFlows, setOnboardingRecommendations, setOnboardingSelectedNeeds, setOnboardingStart, showOverlay } from '../store/actions';
 
 export default function OnboardingGuard() {
   const { isLoaded, userId, isSignedIn } = useAuth();
@@ -25,6 +25,10 @@ export default function OnboardingGuard() {
       if (completed) {
         const rec = await loadOnboardingComplete(userId);
         if (rec) {
+          // New onboarding (preferred)
+          setOnboardingSelectedNeeds(rec.selectedNeedIds ?? null);
+          setOnboardingRecommendedFlows(rec.recommendedFlowIds ?? null);
+          // Legacy onboarding (kept for backward compatibility)
           setOnboardingRecommendations(rec.recommendedCategories ?? []);
           setOnboardingStart(
             rec.startFlowId

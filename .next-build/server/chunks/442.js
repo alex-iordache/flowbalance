@@ -1,1 +1,0 @@
-"use strict";exports.id=442,exports.ids=[442],exports.modules={86442:(e,n,r)=>{r.d(n,{openExternalUrl:()=>t});var o=r(73800);async function t(e){if(o.dV.isNativePlatform()){let{AppLauncher:n}=await r.e(83).then(r.bind(r,58083));await n.openUrl({url:e})}else window.open(e,"_blank","noopener,noreferrer")}}};

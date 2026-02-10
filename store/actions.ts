@@ -112,6 +112,18 @@ export const setOnboardingRecommendations = (recommendedCategories: string[]) =>
   });
 };
 
+export const setOnboardingRecommendedFlows = (recommendedFlowIds: string[] | null) => {
+  Store.update(s => {
+    s.onboardingRecommendedFlowIds = recommendedFlowIds && Array.isArray(recommendedFlowIds) ? recommendedFlowIds : null;
+  });
+};
+
+export const setOnboardingSelectedNeeds = (needIds: string[] | null) => {
+  Store.update(s => {
+    s.onboardingSelectedNeedIds = needIds && Array.isArray(needIds) ? needIds : null;
+  });
+};
+
 export const setOnboardingStart = (start: { flowId: string; practiceId: string | null } | null) => {
   Store.update(s => {
     s.onboardingStart = start;

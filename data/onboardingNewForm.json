@@ -1,0 +1,134 @@
+{
+  "options": [
+    {
+      "id": "need_reduce_stress",
+      "label": {
+        "ro": "Am nevoie să reduc stresul și tensiunea interioară",
+        "en": "I need to reduce stress and inner tension"
+      },
+      "primary": { "kind": "flow", "id": "Stress-Soothing" },
+      "secondary": { "kind": "flow", "id": "Improve-Sleep" }
+    },
+    {
+      "id": "need_reduce_anxiety",
+      "label": {
+        "ro": "Am nevoie să reduc anxietatea, neliniștea sau atacurile de panică",
+        "en": "I need to reduce anxiety, restlessness, or panic attacks"
+      },
+      "primary": { "kind": "flow", "id": "Calming-Anxiety" },
+      "secondary": { "kind": "flow", "id": "Improve-Sleep" }
+    },
+    {
+      "id": "need_sleep_better",
+      "label": {
+        "ro": "Am nevoie să dorm mai bine și să mă odihnesc profund",
+        "en": "I need to sleep better and rest deeply"
+      },
+      "primary": { "kind": "flow", "id": "Improve-Sleep" },
+      "secondary": { "kind": "flow", "id": "Inner-Healing" }
+    },
+    {
+      "id": "need_emotional_regulation",
+      "label": {
+        "ro": "Am nevoie să îmi reglez emoțiile și să mă simt mai stabil interior",
+        "en": "I need to regulate my emotions and feel more stable inside"
+      },
+      "primary": { "kind": "category", "id": "heart-balance" },
+      "secondary": { "kind": "flow", "id": "Build-Self-Trust" }
+    },
+    {
+      "id": "need_body_tension_release",
+      "label": {
+        "ro": "Am nevoie să eliberez tensiunea din corp și disconfortul fizic",
+        "en": "I need to release body tension and physical discomfort"
+      },
+      "primary": { "kind": "flow", "id": "Inner-Healing" },
+      "secondary": { "kind": "flow", "id": "Stress-Soothing" }
+    },
+    {
+      "id": "need_healing_support",
+      "label": {
+        "ro": "Am nevoie să îmi susțin sănătatea corpului și procesele de vindecare",
+        "en": "I need to support my body’s health and healing processes"
+      },
+      "primary": { "kind": "flow", "id": "Inner-Healing" },
+      "secondary": { "kind": "flow", "id": "Improve-Sleep" }
+    },
+    {
+      "id": "need_calm_mind",
+      "label": {
+        "ro": "Am nevoie să îmi calmez mintea și gândurile repetitive",
+        "en": "I need to calm my mind and repetitive thoughts"
+      },
+      "primary": { "kind": "flow", "id": "Calming-Anxiety" },
+      "secondary": { "kind": "flow", "id": "Stress-Soothing" }
+    },
+    {
+      "id": "need_reconnect_self",
+      "label": {
+        "ro": "Am nevoie să mă reconectez cu mine și cu nevoile mele reale",
+        "en": "I need to reconnect with myself and my real needs"
+      },
+      "primary": { "kind": "flow", "id": "Stress-Soothing" },
+      "secondary": { "kind": "flow", "id": "Build-Self-Trust" }
+    },
+    {
+      "id": "need_motivation_energy",
+      "label": {
+        "ro": "Am nevoie să îmi recâștig motivația și energia pentru acțiune",
+        "en": "I need to regain motivation and energy to take action"
+      },
+      "primary": { "kind": "flow", "id": "Goal-Achievement" },
+      "secondary": { "kind": "category", "id": "heart-balance" }
+    },
+    {
+      "id": "need_goal_clarity",
+      "label": {
+        "ro": "Am nevoie să clarific obiectivele mele și să le duc la îndeplinire",
+        "en": "I need to clarify my goals and follow through"
+      },
+      "primary": { "kind": "flow", "id": "Goal-Achievement" },
+      "secondary": { "kind": "flow", "id": "Build-Self-Trust" }
+    },
+    {
+      "id": "need_reduce_compulsions",
+      "label": {
+        "ro": "Am nevoie să reduc poftele, comportamentele compulsive sau automatismele care mă epuizează.",
+        "en": "I need to reduce cravings, compulsive behaviors, or draining automatic patterns"
+      },
+      "primary": { "kind": "flow", "id": "Craving-Relief" },
+      "secondary": { "kind": "flow", "id": "Calming-Anxiety" }
+    },
+    {
+      "id": "need_money_relationship",
+      "label": {
+        "ro": "Am nevoie să îmi îmbunătățesc relația cu banii, siguranța financiară și deciziile legate de bani.",
+        "en": "I need to improve my relationship with money, financial safety, and money decisions"
+      },
+      "primary": { "kind": "flow", "id": "Healthy-Money-Mindset" },
+      "secondary": { "kind": "flow", "id": "Goal-Achievement" }
+    },
+    {
+      "id": "need_self_trust",
+      "label": {
+        "ro": "Am nevoie să am mai multă încredere în mine, să mă bazez pe deciziile mele și să îmi respect promisiunile personale.",
+        "en": "I need more self-trust, to rely on my decisions, and to keep my personal promises"
+      },
+      "primary": { "kind": "flow", "id": "Build-Self-Trust" },
+      "secondary": { "kind": "flow", "id": "Goal-Achievement" }
+    }
+  ],
+  "copy": {
+    "page2Title": {
+      "ro": "Cu ce ai vrea să începem?",
+      "en": "What would you like to focus on first?"
+    },
+    "page2Subtitle": {
+      "ro": "Alege între 2 și 4 opțiuni. Pe baza lor îți recomandăm flow-uri și exerciții scurte.",
+      "en": "Choose 2 to 4 options. Based on them, we’ll recommend flows and short exercises."
+    },
+    "submit": { "ro": "Continuă", "en": "Continue" }
+  },
+  "constraints": { "minSelections": 2, "maxSelections": 4 }
+}
+

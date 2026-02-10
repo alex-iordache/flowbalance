@@ -56,3 +56,5 @@ android/keystore.properties
 
 #my workspace
 data/workspace/
+
+.next-build/

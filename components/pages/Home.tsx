@@ -389,6 +389,7 @@ const Home = () => {
   const flows = Store.useState(s => s.flows);
   const onboardingStart = Store.useState(s => s.onboardingStart);
   const onboardingRecommendedCategories = Store.useState(s => s.onboardingRecommendedCategories);
+  const onboardingRecommendedFlowIds = Store.useState(s => s.onboardingRecommendedFlowIds);
   const [recommendedFlowIds, setRecommendedFlowIds] = useState<string[]>([]);
 
   const displayFirstNameFromClerk = useMemo(() => {
@@ -436,6 +437,19 @@ const Home = () => {
     const key = 'flow_recommended_flow_ids_v1';
 
     (async () => {
+      // Preferred: new onboarding produces flow IDs directly.
+      if (Array.isArray(onboardingRecommendedFlowIds) && onboardingRecommendedFlowIds.length) {
+        const byId = new Map(flows.map(f => [f.id, f] as const));
+        const ids = onboardingRecommendedFlowIds.filter(id => typeof id === 'string' && byId.has(id)).slice(0, 4);
+        if (!cancelled) setRecommendedFlowIds(ids);
+        try {
+          await Preferences.set({ key, value: JSON.stringify(ids) });
+        } catch {
+          // ignore
+        }
+        return;
+      }
+
       // If onboarding produced recommendations, prefer them and persist them.
       if (Array.isArray(onboardingRecommendedCategories) && onboardingRecommendedCategories.length) {
         const byId = new Map(flows.map(f => [f.id, f] as const));
@@ -494,12 +508,17 @@ const Home = () => {
     return () => {
       cancelled = true;
     };
-  }, [flows, onboardingRecommendedCategories]);
+  }, [flows, onboardingRecommendedCategories, onboardingRecommendedFlowIds]);
 
   const recommendedFlows = useMemo(() => {
     const byId = new Map(flows.map(f => [f.id, f] as const));
     return recommendedFlowIds.map(id => byId.get(id)).filter(Boolean) as Flow[];
   }, [flows, recommendedFlowIds]);
+
+  const practicesCtaCopy =
+    lang === 'ro'
+      ? 'Preferi exerciții scurte? Vezi o listă potrivită pentru tine.'
+      : 'Prefer short exercises? Browse a list picked for you.';
 
   return (
     <IonPage>
@@ -558,6 +577,19 @@ const Home = () => {
                     }}
                   />
                 ) : null}
+                <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => history.push('/practices')}
+                    className="w-full text-left rounded-2xl p-4 text-white bg-white/10 hover:bg-white/14 active:bg-white/18 transition-colors"
+                    style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+                  >
+                    <div className="text-white/90 text-[14px] md:text-[16px] font-semibold">{practicesCtaCopy}</div>
+                    <div className="text-white/70 text-[12px] md:text-[14px] mt-1">
+                      {lang === 'ro' ? 'Toate înregistrările, într-un singur loc.' : 'All recordings, in one place.'}
+                    </div>
+                  </button>
+                </div>
                 <div className="mt-1 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
                   <QuickActionCard
                     meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
@@ -595,6 +627,19 @@ const Home = () => {
                   }}
                 />
               ) : null}
+              <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
+                <button
+                  type="button"
+                  onClick={() => history.push('/practices')}
+                  className="w-full text-left rounded-2xl p-4 text-white bg-white/10 hover:bg-white/14 active:bg-white/18 transition-colors"
+                  style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+                >
+                  <div className="text-white/90 text-[14px] md:text-[16px] font-semibold">{practicesCtaCopy}</div>
+                  <div className="text-white/70 text-[12px] md:text-[14px] mt-1">
+                    {lang === 'ro' ? 'Toate înregistrările, într-un singur loc.' : 'All recordings, in one place.'}
+                  </div>
+                </button>
+              </div>
               <div className="mt-1 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
                 <QuickActionCard
                   meta={lang === 'ro' ? '5 min citire' : '5 min reading'}

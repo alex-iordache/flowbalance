@@ -1,1 +1,0 @@
-"use strict";exports.id=574,exports.ids=[574],exports.modules={75574:(e,r,t)=>{t.r(r),t.d(r,{default:()=>a});let a=(0,t(68570).createProxy)(String.raw`/Users/alexandru.iordache/FlowBalance/flowbalance/components/AppShell.tsx#default`)}};

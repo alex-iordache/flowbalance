@@ -19,6 +19,11 @@ type StoreProps = {
   isEditor: boolean;
   overlayType: 'onboarding' | 'offline' | null;
   overlayProps: Record<string, any> | null;
+  /** New onboarding: stable list of up to 4 recommended flow IDs for Home. */
+  onboardingRecommendedFlowIds: string[] | null;
+  /** New onboarding: selected need IDs (used to sort standalone practices). */
+  onboardingSelectedNeedIds: string[] | null;
+  /** Legacy onboarding (kept for backward compatibility). */
   onboardingRecommendedCategories: string[] | null;
   onboardingStart: { flowId: string; practiceId: string | null } | null;
 }
@@ -39,6 +44,8 @@ const Store = new PullStateStore<StoreProps>({
   isEditor: false,
   overlayType: null,
   overlayProps: null,
+  onboardingRecommendedFlowIds: null,
+  onboardingSelectedNeedIds: null,
   onboardingRecommendedCategories: null,
   onboardingStart: null,
 });

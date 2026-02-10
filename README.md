@@ -84,7 +84,7 @@ How updates roll out:
 This repo uses Ionic’s router for the in-app experience, and Next routes for auth + web-only pages.
 
 - **Main app shell**: `components/AppShell.tsx`
-  - Ionic routes: `/home`, `/flows`, `/progress`, `/settings`
+  - Ionic routes: `/home`, `/flows`, `/progress`, `/settings`, `/practices`
   - Note: `/subscribe` must be `exact` so it does **not** catch `/subscribe-web/*` return URLs on iOS.
 - **Next routes**:
   - `/sign-in` → `app/sign-in/[[...sign-in]]/page.tsx` (Clerk `<SignIn />`)
@@ -119,29 +119,48 @@ We use a **state-driven, reusable overlay system** for “full-screen interrupti
 
 New users (first sign-in) are required to complete a short questionnaire that:
 - starts with **language selection** (default: **English**)
-- produces **Top 3 flow categories**
-- configures the Home screen to show **Start here** + **Recommended for you (3 + 1 random)**.
+- then asks the user to pick **2–4 needs** (multi-select)
+- configures the Home screen to show **4 recommended flows** (deterministic).
 
 - **Guard**: `components/OnboardingGuard.tsx`
   - Runs after `SignedIn` and checks completion status per `userId`
   - If incomplete, it calls `showOverlay('onboarding')`
-  - If completed, it loads the saved onboarding record into Store (`onboardingRecommendedCategories`, `onboardingStart`) so Home can render the right cards
+  - If completed, it loads the saved onboarding record into Store (`onboardingRecommendedFlowIds`, `onboardingSelectedNeedIds`, `onboardingStart`) so Home can render the right cards
 - **UI**: `components/overlays/OnboardingOverlay.tsx`
-  - 4 questions, with Q1 allowing max 2 selections
   - First step: **language selection** (UI + audio language; can be changed later in Settings)
+  - Second step: **Needs selection** (min 2, max 4; no error toasts; simply can’t exceed max)
   - End: shows a short **Welcome** splash that fades away and reveals Home (no results screen)
-- **Question definitions**: `data/onboardingQuestions.ts`
-- **Scoring + mapping**: `helpers/onboardingScoring.ts`
-  - Scores categories: `emotional-regulation`, `performance-boost`, `mindset`, `stories`, `heart-balance`, `somatic-release`
-  - Deterministic tie-breaking + fallback: `emotional-regulation → heart-balance → somatic-release`
-  - Maps category → default Flow using `components/pages/flowsCatalog.ts` (`FLOW_CATEGORIES`)
+- **Config (editable JSON)**: `data/onboardingNewForm.json`
+  - Contains the 13 need options (RO/EN) and the **primary/secondary** mapping
+  - Supports `kind: "flow"` and `kind: "category"` references (categories resolve via `components/pages/flowsCatalog.ts`)
 - **Persistence**: `store/persistence.ts`
-  - `saveOnboardingComplete(userId, recommendedCategories, start)`
+  - `saveOnboardingComplete(userId, { selectedNeedIds, recommendedFlowIds, ... }, start)`
   - `hasCompletedOnboarding(userId)`
   - `loadOnboardingComplete(userId)`
   - Stored via Capacitor `Preferences` per user key (`onboarding_complete:<userId>`)
 
 ---
+
+## Standalone Practices (all audios, outside flows)
+
+We expose a “short exercises” library so users can browse **all unique audio recordings** outside the flow/day structure:
+
+- **Home CTA**: `components/pages/Home.tsx` → navigates to `/practices`
+- **List page**: `components/pages/StandalonePractices.tsx`
+  - Shows unique recordings (deduped by audio filename)
+  - Ordered by onboarding needs via a simple points system:
+    - Primary flow match: +2
+    - Secondary flow match: +1
+    - Ties break alphabetically (by localized title)
+- **Detail page**: `components/pages/StandalonePractice.tsx`
+  - Plays the audio and shows a contextual message referencing the program it belongs to
+  - Uses the existing `/api/audio` route for entitlement checks by passing a representative `{ flowId, practiceId }`
+- **Audio metadata (editable JSON)**:
+  - Titles: `data/audioTitles.json` (RO/EN)
+  - Aliases: `data/audioAliases.json` (e.g. maps legacy filenames to canonical titles)
+- **Index + sorting logic**: `helpers/standaloneAudioIndex.ts`
+  - Derives audio→flow membership from current flow/practice data (future-proof for new flows)
+  - Detects EN audio availability by scanning for `audioFilesEnAi/...` keys in practice data
 
 ## Offline UX (v1): remote-first with bundled fallback
 

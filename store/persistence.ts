@@ -155,7 +155,12 @@ export const loadAllPersistedState = async () => {
 type OnboardingCompleteRecord = {
   userId: string;
   completedAt: string; // ISO timestamp
-  recommendedCategories: string[];
+  /** New onboarding form (2-page): selected need IDs (min 2, max 4). */
+  selectedNeedIds?: string[];
+  /** New onboarding form: recommended flow IDs for Home (up to 4). */
+  recommendedFlowIds?: string[];
+  /** Legacy onboarding (kept for backward compatibility). */
+  recommendedCategories?: string[];
   startFlowId: string | null;
   startPracticeId: string | null;
 };
@@ -166,14 +171,26 @@ function onboardingKeyForUser(userId: string) {
 
 export async function saveOnboardingComplete(
   userId: string,
-  recommendedCategories: string[],
+  params: {
+    selectedNeedIds?: string[];
+    recommendedFlowIds?: string[];
+    recommendedCategories?: string[];
+  },
   start: { flowId: string | null; practiceId: string | null },
 ) {
   try {
     const rec: OnboardingCompleteRecord = {
       userId,
       completedAt: new Date().toISOString(),
-      recommendedCategories,
+      selectedNeedIds: Array.isArray(params.selectedNeedIds)
+        ? (params.selectedNeedIds.filter(x => typeof x === 'string') as string[])
+        : undefined,
+      recommendedFlowIds: Array.isArray(params.recommendedFlowIds)
+        ? (params.recommendedFlowIds.filter(x => typeof x === 'string') as string[])
+        : undefined,
+      recommendedCategories: Array.isArray(params.recommendedCategories)
+        ? (params.recommendedCategories.filter(x => typeof x === 'string') as string[])
+        : undefined,
       startFlowId: start.flowId,
       startPracticeId: start.practiceId,
     };
@@ -209,9 +226,15 @@ export async function loadOnboardingComplete(
     return {
       userId,
       completedAt: String(parsed.completedAt),
+      selectedNeedIds: Array.isArray((parsed as any).selectedNeedIds)
+        ? (((parsed as any).selectedNeedIds as any[]).filter(x => typeof x === 'string') as string[])
+        : undefined,
+      recommendedFlowIds: Array.isArray((parsed as any).recommendedFlowIds)
+        ? (((parsed as any).recommendedFlowIds as any[]).filter(x => typeof x === 'string') as string[])
+        : undefined,
       recommendedCategories: Array.isArray(parsed.recommendedCategories)
         ? (parsed.recommendedCategories.filter(x => typeof x === 'string') as string[])
-        : [],
+        : undefined,
       startFlowId: typeof parsed.startFlowId === 'string' ? parsed.startFlowId : null,
       startPracticeId: typeof parsed.startPracticeId === 'string' ? parsed.startPracticeId : null,
     };

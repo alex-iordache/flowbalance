@@ -37,7 +37,7 @@ const practice: Practice = {
     en: 'Celebrate your progress: list your accomplishments from this program.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/copilul-interior.mp3', en: 'audioFiles/copilul-interior.mp3' },
+  audioUrl: { ro: 'audioFiles/copilul-interior.mp3', en: 'audioFilesEnAi/copilul-interior-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

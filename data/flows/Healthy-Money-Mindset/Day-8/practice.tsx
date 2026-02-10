@@ -43,7 +43,7 @@ const practice: Practice = {
   name: { ro: "Capacitatea de a sta fără reacție", en: "Staying Without Reacting" },
   intro: { ro: "Construiește toleranța emoțională: bani, timp, spațiu între impuls și decizie.", en: "Build emotional tolerance: money, time, space between impulse and decision." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/economisirea-ca-grija-si-capacitatea-de-a-sta-fara-reactie.mp3", en: "audioFiles/economisirea-ca-grija-si-capacitatea-de-a-sta-fara-reactie.mp3" },
+  audioUrl: { ro: "audioFiles/economisirea-ca-grija-si-capacitatea-de-a-sta-fara-reactie.mp3", en: "audioFilesEnAi/economisirea-ca-grija-si-capacitatea-de-a-sta-fara-reactie-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

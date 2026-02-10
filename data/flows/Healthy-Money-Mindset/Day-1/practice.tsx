@@ -57,7 +57,7 @@ const practice: Practice = {
   name: { ro: "Abundența care s-a format în timp", en: "Abundance Built Over Time" },
   intro: { ro: "Observă abundența deja prezentă în viața ta—dincolo de cifre.", en: "Notice the abundance already present in your life—beyond numbers." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/abundenta-care-s-a-transformat-in-timp.mp3", en: "audioFiles/abundenta-care-s-a-transformat-in-timp.mp3" },
+  audioUrl: { ro: "audioFiles/abundenta-care-s-a-transformat-in-timp.mp3", en: "audioFilesEnAi/abundenta-care-s-a-transformat-in-timp-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

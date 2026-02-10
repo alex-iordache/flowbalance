@@ -63,7 +63,7 @@ const practice: Practice = {
   name: { ro: "Modele de prosperitate și oglindirea lor", en: "Prosperity Models and Their Reflection" },
   intro: { ro: "Observă ce înseamnă prosperitatea pentru tine și ce poți integra în mod real.", en: "Notice what prosperity means to you and what you can realistically integrate." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/modele-de-prosperitate-si-oglindirea-lor.mp3", en: "audioFiles/modele-de-prosperitate-si-oglindirea-lor.mp3" },
+  audioUrl: { ro: "audioFiles/modele-de-prosperitate-si-oglindirea-lor.mp3", en: "audioFilesEnAi/modele-de-prosperitate-si-oglindirea-lor-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

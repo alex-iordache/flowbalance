@@ -49,7 +49,7 @@ const practice: Practice = {
   name: { ro: "Economisirea ca grijă", en: "Saving as Care" },
   intro: { ro: "Antrenează mintea să vadă economisirea ca protecție și grijă de sine.", en: "Train your mind to see saving as protection and self-care." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/economisirea-ca-grija-si-capacitatea-de-a-sta-fara-reactie.mp3", en: "audioFiles/economisirea-ca-grija-si-capacitatea-de-a-sta-fara-reactie.mp3" },
+  audioUrl: { ro: "audioFiles/economisirea-ca-grija-si-capacitatea-de-a-sta-fara-reactie.mp3", en: "audioFilesEnAi/economisirea-ca-grija-si-capacitatea-de-a-sta-fara-reactie-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

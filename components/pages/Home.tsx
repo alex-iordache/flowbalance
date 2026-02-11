@@ -581,11 +581,16 @@ const Home = () => {
                   <button
                     type="button"
                     onClick={() => history.push('/practices')}
-                    className="w-full text-left rounded-2xl p-4 text-white bg-white/10 hover:bg-white/14 active:bg-white/18 transition-colors"
-                    style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+                    className="w-full text-left rounded-2xl p-4 transition-transform hover:-translate-y-[1px] active:translate-y-0"
+                    style={{
+                      background:
+                        'linear-gradient(180deg, rgba(251, 191, 36, 0.96) 0%, rgba(245, 158, 11, 0.92) 100%)',
+                      border: '1px solid rgba(251, 191, 36, 0.95)',
+                      boxShadow: '0 10px 28px rgba(245, 158, 11, 0.28)',
+                    }}
                   >
-                    <div className="text-white/90 text-[14px] md:text-[16px] font-semibold">{practicesCtaCopy}</div>
-                    <div className="text-white/70 text-[12px] md:text-[14px] mt-1">
+                    <div className="text-[#2a1150] text-[14px] md:text-[16px] font-extrabold">{practicesCtaCopy}</div>
+                    <div className="text-[#2a1150]/80 text-[12px] md:text-[14px] mt-1">
                       {lang === 'ro' ? 'Toate înregistrările, într-un singur loc.' : 'All recordings, in one place.'}
                     </div>
                   </button>
@@ -631,11 +636,16 @@ const Home = () => {
                 <button
                   type="button"
                   onClick={() => history.push('/practices')}
-                  className="w-full text-left rounded-2xl p-4 text-white bg-white/10 hover:bg-white/14 active:bg-white/18 transition-colors"
-                  style={{ border: '1px solid rgba(255,255,255,0.12)' }}
+                  className="w-full text-left rounded-2xl p-4 transition-transform hover:-translate-y-[1px] active:translate-y-0"
+                  style={{
+                    background:
+                      'linear-gradient(180deg, rgba(251, 191, 36, 0.96) 0%, rgba(245, 158, 11, 0.92) 100%)',
+                    border: '1px solid rgba(251, 191, 36, 0.95)',
+                    boxShadow: '0 10px 28px rgba(245, 158, 11, 0.28)',
+                  }}
                 >
-                  <div className="text-white/90 text-[14px] md:text-[16px] font-semibold">{practicesCtaCopy}</div>
-                  <div className="text-white/70 text-[12px] md:text-[14px] mt-1">
+                  <div className="text-[#2a1150] text-[14px] md:text-[16px] font-extrabold">{practicesCtaCopy}</div>
+                  <div className="text-[#2a1150]/80 text-[12px] md:text-[14px] mt-1">
                     {lang === 'ro' ? 'Toate înregistrările, într-un singur loc.' : 'All recordings, in one place.'}
                   </div>
                 </button>

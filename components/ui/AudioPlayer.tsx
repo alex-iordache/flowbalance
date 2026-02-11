@@ -186,13 +186,6 @@ export default function AudioPlayer({
   // Ring styles
   const ringMode: 'idle' | 'paused' | 'playing' = isPlaying ? 'playing' : hasStarted ? 'paused' : 'idle';
 
-  const ringBorderStyle = useMemo(() => {
-    // User wants a clear white solid border; glow is separate.
-    return {
-      borderColor: 'rgba(255,255,255,0.55)',
-    } as const;
-  }, []);
-
   const ringClass =
     ringMode === 'playing'
       ? 'fb-ring fb-ring--playing'
@@ -200,14 +193,8 @@ export default function AudioPlayer({
         ? 'fb-ring fb-ring--paused'
         : 'fb-ring fb-ring--idle';
 
-  const statusLabel =
-    status === 'loading'
-      ? 'Loading…'
-      : status === 'error'
-        ? 'Audio failed to play'
-        : status === 'ended'
-          ? 'Finished'
-          : '';
+  // Avoid UI flicker/CLS on play: only surface persistent errors.
+  const statusLabel = status === 'error' ? 'Audio failed to play' : '';
 
   // Default card UI (kept for other screens / future use)
   const cardUi = (
@@ -259,58 +246,9 @@ export default function AudioPlayer({
     </div>
   );
 
+  // Minimal (no halo, no background, no circles) UI for Practice pages.
   const floatingUi = (
-    <div
-      className="w-full h-full flex items-center justify-center"
-      style={{
-        // Layout is controlled by the parent container (Practice page).
-      }}
-    >
-      <style>{`
-        /* Keep it simple (like your snippet):
-           - border stays solid white
-           - glow is only box-shadow OUTSIDE the circle
-           - playing animates COLORS only (no growth/shrink) */
-        .fb-ring {
-          border-radius: 9999px;
-          border: 1px solid rgba(255,255,255,0.60);
-          background: transparent;
-          transition: box-shadow 2000ms ease;
-          will-change: box-shadow;
-        }
-
-        .fb-ring--idle {
-          box-shadow: 0 0 10px 4px rgba(255,255,255,0.22);
-        }
-
-        .fb-ring--paused {
-          box-shadow:
-            0 0 12px 2px rgba(253, 159, 71, 0.55),
-            0 0 26px 10px rgba(245, 158, 11, 0.18);
-        }
-
-        @keyframes fbGlowColors {
-          0% {
-            box-shadow:
-              0 0 12px 2px rgba(246, 0, 0, 0.55),
-              0 0 26px 10px rgba(255, 132, 0, 0.18);
-          }
-          50% {
-            box-shadow:
-              0 0 12px 2px rgba(255, 120, 0, 0.55),
-              0 0 26px 10px rgba(255, 64, 64, 0.18);
-          }
-          100% {
-            box-shadow:
-              0 0 12px 2px rgba(246, 0, 0, 0.55),
-              0 0 26px 10px rgba(255, 132, 0, 0.18);
-          }
-        }
-
-        .fb-ring--playing {
-          animation: fbGlowColors 2.4s linear infinite;
-        }
-      `}</style>
+    <div className="w-full h-full flex items-center justify-center">
       {/* Keep audio in DOM but visually hidden */}
       <audio
         ref={audioRef}
@@ -318,107 +256,68 @@ export default function AudioPlayer({
         style={{ position: 'absolute', left: -9999, width: 1, height: 1, opacity: 0 }}
       />
 
-      <div
-        className={`${ringClass} flex flex-col items-center justify-between relative`}
-        style={{
-          // Square player: width and height should match (constrained by viewport)
-          // Also respect parent constraints (e.g. 40% height container on Practice page)
-          width: 'min(100%, 70vw, 70vh, 420px)',
-          height: 'min(100%, 70vw, 70vh, 420px)',
-          padding: 14, // ring thickness area
-          // keep your nice outer transparency effect (subtle)
-          backgroundColor: 'rgba(255,255,255,0.06)',
-          ...ringBorderStyle,
-        }}
-      >
-        {/* Inner content area (no background fill) */}
-        <div
-          className="w-full h-full rounded-full flex flex-col items-center justify-center"
+      <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl px-6 flex flex-col items-center text-center gap-4">
+        <div className="w-full">
+          {title ? (
+            <div className="text-white font-semibold text-base md:text-lg leading-snug line-clamp-2">{title}</div>
+          ) : null}
+          {subtitle ? <div className="text-white/75 text-xs md:text-sm mt-1">{subtitle}</div> : null}
+          {statusLabel ? <div className="text-white/80 text-xs mt-2">{statusLabel}</div> : null}
+        </div>
+
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={isPlaying ? 'Pause' : 'Play'}
+          className="text-white flex items-center justify-center"
           style={{
-            // Use responsive padding so content always stays inside the circle.
-            padding: 'clamp(16px, 4.5vw, 34px)',
-            boxSizing: 'border-box',
-            gap: 'clamp(12px, 2.8vw, 18px)',
+            width: 76,
+            height: 76,
+            background: 'transparent',
+            border: 'none',
+            padding: 0,
           }}
         >
-          <div className="w-full text-center">
-            {title ? (
-              <div
-                className="text-white font-semibold text-base md:text-lg truncate"
-                style={{ textShadow: '0 2px 14px rgba(0,0,0,0.35)' }}
-              >
-                {title}
-              </div>
-            ) : null}
-            {subtitle ? (
-              <div
-                className="text-white/80 text-xs md:text-sm truncate mt-1"
-                style={{ textShadow: '0 2px 14px rgba(0,0,0,0.35)' }}
-              >
-                {subtitle}
-              </div>
-            ) : null}
-          </div>
+          {isPlaying ? PauseIcon : PlayIcon}
+        </button>
 
-          <button
-            type="button"
-            onClick={toggle}
-            aria-label={isPlaying ? 'Pause' : 'Play'}
-            className="text-white flex items-center justify-center"
+        <div className="w-full flex flex-col items-center" style={{ maxWidth: '100%' }}>
+          <div
+            className="h-2 rounded-full overflow-hidden cursor-pointer"
+            role="slider"
+            aria-label="Seek"
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={Math.round(progressPct)}
+            tabIndex={0}
             style={{
-              width: 76,
-              height: 76,
-              background: 'transparent',
-              border: 'none',
-              padding: 0,
+              width: '92%',
+              background: 'rgba(255,255,255,0.18)',
+            }}
+            onClick={(e) => {
+              const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+              const pct = ((e.clientX - rect.left) / rect.width) * 100;
+              seekToPct(pct);
             }}
           >
-            <span className="text-white" style={{ filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.25))' }}>
-              {isPlaying ? PauseIcon : PlayIcon}
-            </span>
-          </button>
-
-          <div className="w-full flex flex-col items-center" style={{ maxWidth: '100%' }}>
             <div
-              className="h-2 rounded-full overflow-hidden cursor-pointer"
-              role="slider"
-              aria-label="Seek"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={Math.round(progressPct)}
-              tabIndex={0}
+              className="h-2 rounded-full"
               style={{
-                width: '80%', // 20% shorter
-                background: 'rgba(255,255,255,0.18)',
-                boxShadow: '0 0 14px rgba(0,0,0,0.22)',
+                width: `${progressPct}%`,
+                background: 'rgba(255,255,255,0.85)',
               }}
-              onClick={(e) => {
-                const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-                const pct = ((e.clientX - rect.left) / rect.width) * 100;
-                seekToPct(pct);
-              }}
-            >
-              <div
-                className="h-2 rounded-full"
-                style={{
-                  width: `${progressPct}%`,
-                  background: 'rgba(255,255,255,0.85)',
-                  boxShadow: '0 0 16px rgba(255,255,255,0.25)',
-                }}
-              />
-            </div>
+            />
+          </div>
 
-            <div
-              className="flex items-center justify-between text-white/85 text-xs mt-2 select-none"
-              style={{
-                textShadow: '0 2px 14px rgba(0,0,0,0.35)',
-                fontVariantNumeric: 'tabular-nums',
-                width: '80%',
-              }}
-            >
-              <span>{formatTime(current)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
+          <div
+            className="flex items-center justify-between text-white/85 text-xs mt-2 select-none"
+            style={{
+              fontVariantNumeric: 'tabular-nums',
+              width: '92%',
+            }}
+          >
+            <span>{formatTime(current)}</span>
+            <span>{formatTime(duration)}</span>
           </div>
         </div>
       </div>

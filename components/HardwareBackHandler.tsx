@@ -46,6 +46,13 @@ export default function HardwareBackHandler() {
             return;
           }
 
+          // Standalone practices detail: if opened without a back stack (e.g. deep link / WebView oddities),
+          // go back to the practices list instead of Home.
+          if (location.pathname.startsWith('/practices/')) {
+            ionRouter.push('/practices', 'back');
+            return;
+          }
+
           if (ionRouter.canGoBack()) {
             ionRouter.goBack();
             return;

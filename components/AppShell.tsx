@@ -54,7 +54,7 @@ const AppShell = () => {
             <OfflineGuard />
             <OnboardingGuard />
             <OverlayManager />
-            <IonRouterOutlet id="main">
+            <IonRouterOutlet id="main" animated={false}>
               {/* Main app routes - protected by AuthGuard */}
               <Route path="/home" component={Tabs} />
               <Route path="/flows" component={Tabs} />

@@ -35,7 +35,7 @@ const Tabs = () => {
 
   return (
     <IonTabs>
-      <IonRouterOutlet>
+      <IonRouterOutlet animated={false}>
         <Switch>
           <Route path="/home" render={() => <Home />} exact={true} />
           <Route path="/flows" render={() => <Flows />} exact={true} />

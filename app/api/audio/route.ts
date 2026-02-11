@@ -1,10 +1,13 @@
-import { auth } from '@clerk/nextjs/server';
+import { auth, clerkClient } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
-import { defaultFlows } from '../../../data/flows';
 import { fetchR2Object } from '../../../lib/r2';
 
 export const runtime = 'nodejs';
+
+const TRIAL_MS = 72 * 60 * 60 * 1000;
+const TRIAL_CACHE_TTL_MS = 5 * 60 * 1000;
+const trialCache = new Map<string, { trialUntilMs: number; checkedAtMs: number }>();
 
 function normalizeAudioKey(input: string): string | null {
   let k = input.trim();
@@ -31,28 +34,28 @@ function normalizeAudioKey(input: string): string | null {
   return k;
 }
 
-function computePracticeAccess(params: {
-  flowId?: string | null;
-  practiceId?: string | null;
-  userId: string | null;
-  orgId: string | null;
-  hasPro: boolean;
-}): boolean {
-  const { flowId, practiceId, userId, orgId, hasPro } = params;
+async function computeTrialActive(userId: string): Promise<boolean> {
+  const now = Date.now();
+  const cached = trialCache.get(userId);
+  if (cached && now - cached.checkedAtMs < TRIAL_CACHE_TTL_MS) {
+    return now < cached.trialUntilMs;
+  }
 
-  // Org users and Pro users: full access.
-  if (userId && (orgId || hasPro)) return true;
+  const client = await clerkClient();
+  const u = await client.users.getUser(userId);
+  let createdAt = (u as unknown as { createdAt?: number }).createdAt;
+  if (typeof createdAt !== 'number') {
+    // Cache a "no trial" result briefly to avoid repeated backend calls.
+    trialCache.set(userId, { trialUntilMs: 0, checkedAtMs: now });
+    return false;
+  }
 
-  // No IDs: we can't map to the "free preview" rule.
-  if (!flowId || !practiceId) return false;
+  // Clerk backend User.createdAt is a number; treat it as ms, but accept seconds defensively.
+  if (createdAt > 0 && createdAt < 1_000_000_000_000) createdAt *= 1000;
 
-  const flowIndex = defaultFlows.findIndex((f) => f.id === flowId);
-  if (flowIndex < 0) return false;
-  const practiceIndex = defaultFlows[flowIndex]?.practices?.findIndex((p) => p.id === practiceId) ?? -1;
-  if (practiceIndex < 0) return false;
-
-  // Mirror client rule: first practice of first flow is free.
-  return flowIndex === 0 && practiceIndex === 0;
+  const trialUntilMs = createdAt + TRIAL_MS;
+  trialCache.set(userId, { trialUntilMs, checkedAtMs: now });
+  return now < trialUntilMs;
 }
 
 export async function GET(request: Request) {
@@ -65,6 +68,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: 'Invalid key' }, { status: 400 });
   }
 
+  // Keep these params for compatibility (analytics/debug), but access is now trial-based for normal users.
   const flowId = url.searchParams.get('flowId');
   const practiceId = url.searchParams.get('practiceId');
 
@@ -78,7 +82,16 @@ export async function GET(request: Request) {
   const hasFn = (authResult as unknown as { has?: (p: unknown) => boolean }).has;
   const hasPro = typeof hasFn === 'function' ? (hasFn({ plan: 'pro_user' }) as boolean) : false;
 
-  const hasAccess = computePracticeAccess({ flowId, practiceId, userId, orgId, hasPro });
+  // Org users and Pro users: full access.
+  let hasAccess = Boolean(userId && (orgId || hasPro));
+  // Normal users: 3-day full access trial from Clerk account creation date.
+  if (!hasAccess && userId) {
+    try {
+      hasAccess = await computeTrialActive(userId);
+    } catch {
+      hasAccess = false;
+    }
+  }
 
   if (!hasAccess) {
     // Differentiate "not logged in" vs "no entitlement" where possible.

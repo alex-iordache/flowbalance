@@ -47,7 +47,7 @@ const practice: Practice = {
   name: { ro: "Claritate și rezolvare interioară", en: "Clarity and Inner Resolution" },
   intro: { ro: "Recunoaște tiparele și alege pași mici, clari, pe care îi poți susține.", en: "Recognize patterns and choose small, clear steps you can sustain." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/claritate-si-rezolvarea-interioara.mp3", en: "audioFiles/claritate-si-rezolvarea-interioara.mp3" },
+  audioUrl: { ro: "audioFiles/claritate-si-rezolvarea-interioara.mp3", en: "audioFilesEnAi/claritate-si-rezolvarea-interioara-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

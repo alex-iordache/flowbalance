@@ -43,7 +43,7 @@ const practice: Practice = {
   name: { ro: "Integrare: obiective, încredere și rezolvare", en: "Integration: Goals, Trust, and Resolution" },
   intro: { ro: "Integrează: ce păstrezi, ce alegi diferit, ce duci mai departe cu stabilitate.", en: "Integrate: what you keep, what you choose differently, what you carry forward with steadiness." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/integrare-obiective-incredere-si-rezolvare.mp3", en: "audioFiles/integrare-obiective-incredere-si-rezolvare.mp3" },
+  audioUrl: { ro: "audioFiles/integrare-obiective-incredere-si-rezolvare.mp3", en: "audioFilesEnAi/integrare-obiective-incredere-si-rezolvare-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

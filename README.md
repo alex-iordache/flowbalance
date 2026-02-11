@@ -525,7 +525,11 @@ NEXT_PUBLIC_WEB_BASE_URL=https://www.flowbalance.app
 ## Private audio (Cloudflare R2)
 
 Audio is served via a **gated streaming endpoint**: `GET /api/audio?...` which:
-- checks Clerk auth + entitlement (free preview = first practice of first flow)
+- checks Clerk auth + entitlement:
+  - **Org users**: full access
+  - **Pro users (`pro_user`)**: full access
+  - **Normal users (non-org, non-pro)**: **3-day full-access trial** from Clerk `user.createdAt`
+  - After trial expires, audio is gated (Premium)
 - streams the mp3 from **private R2** using AWS SigV4 (supports `Range` for seeking)
 
 ### Security note (important)

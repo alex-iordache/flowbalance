@@ -1,10 +1,10 @@
 'use client';
 
-import { useAuth } from '@clerk/nextjs';
+import { useAuth, useUser } from '@clerk/nextjs';
 
 export interface AccessControlResult {
   hasFullAccess: boolean;
-  userType: 'guest' | 'organization' | 'free' | 'pro';
+  userType: 'guest' | 'organization' | 'free' | 'pro' | 'trial';
   isAuthenticated: boolean;
   organization: string | null;
   plan: string | null;
@@ -22,6 +22,7 @@ export interface AccessControlResult {
  */
 export function useAccessControl(): AccessControlResult {
   const { has, userId, orgId } = useAuth();
+  const { user } = useUser();
 
   // Check if user is authenticated
   const isAuthenticated = !!userId;
@@ -52,6 +53,21 @@ export function useAccessControl(): AccessControlResult {
         isAuthenticated: true,
         organization: null,
         plan: 'pro_user',
+      };
+    }
+
+    // 3-day trial for normal users (non-org, non-pro) based on Clerk account creation date.
+    // NOTE: `user.createdAt` is a Date in Clerk's frontend User resource.
+    const createdAtMs = user?.createdAt ? user.createdAt.getTime() : null;
+    const trialMs = 72 * 60 * 60 * 1000;
+    const trialActive = typeof createdAtMs === 'number' && Date.now() < createdAtMs + trialMs;
+    if (trialActive) {
+      return {
+        hasFullAccess: true,
+        userType: 'trial',
+        isAuthenticated: true,
+        organization: null,
+        plan: hasFreePlan ? 'free_user' : null,
       };
     }
 
@@ -100,19 +116,13 @@ export function usePracticeAccess(
   flowIndex: number,
   practiceIndex: number
 ): boolean {
-  const { hasFullAccess, userType } = useAccessControl();
+  const { hasFullAccess } = useAccessControl();
 
   // Full access users can access everything
   if (hasFullAccess) {
     return true;
   }
 
-  // First practice of first flow is free for everyone
-  // (flowIndex === 0 && practiceIndex === 0)
-  if (flowIndex === 0 && practiceIndex === 0) {
-    return true;
-  }
-
-  // All other practices require full access
+  // After trial expires, everything is Premium for normal users.
   return false;
 }

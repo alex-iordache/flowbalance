@@ -64,13 +64,18 @@ export default function OnboardingOverlay() {
   const { userId } = useAuth();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
-  const isRo = lang === 'ro';
 
   const [step, setStep] = useState<'lang' | 'needs' | 'splash'>('lang');
-  const [selectedLang, setSelectedLang] = useState<Language>('en');
+  // Default onboarding language: Romanian.
+  const [selectedLang, setSelectedLang] = useState<Language>('ro');
   const [selectedNeeds, setSelectedNeeds] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [splashFading, setSplashFading] = useState(false);
+
+  // While selecting language, the UI should reflect the current selection immediately
+  // (even before we persist it to Settings).
+  const uiLang: Language = step === 'lang' ? selectedLang : lang;
+  const isRo = uiLang === 'ro';
 
   const config = onboardingNewForm as unknown as {
     options: Array<{
@@ -246,14 +251,14 @@ export default function OnboardingOverlay() {
 
           <div className="mt-6 flex flex-col gap-3">
             <OptionButton
-              label="English"
-              selected={selectedLang === 'en'}
-              onClick={() => setSelectedLang('en')}
-            />
-            <OptionButton
               label="Română"
               selected={selectedLang === 'ro'}
               onClick={() => setSelectedLang('ro')}
+            />
+            <OptionButton
+              label="English"
+              selected={selectedLang === 'en'}
+              onClick={() => setSelectedLang('en')}
             />
           </div>
         </>

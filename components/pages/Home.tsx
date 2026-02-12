@@ -600,7 +600,7 @@ const Home = () => {
                     meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
                     title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}
                     metaIcon={bookOutline}
-                    onClick={() => history.push('/flows')}
+                    onClick={() => history.push(`/practices/${encodeURIComponent('relaxare-prin-respiratie.mp3')}`)}
                   />
                 </div>
               </div>
@@ -655,7 +655,7 @@ const Home = () => {
                   meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
                   title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}
                   metaIcon={bookOutline}
-                  onClick={() => history.push('/flows')}
+                  onClick={() => history.push(`/practices/${encodeURIComponent('relaxare-prin-respiratie.mp3')}`)}
                 />
               </div>
             </div>

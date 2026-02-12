@@ -56,7 +56,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
   },
   {
     id: 'heart-balance',
-    title: { ro: 'Echilibru al inimii', en: 'Heart Balance' },
+    title: { ro: 'Echilibrul inimii', en: 'Heart Balance' },
     flowIds: [
       'Heartful-Gratitude',
       'Boost-Motivation',

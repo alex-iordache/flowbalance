@@ -83,6 +83,8 @@ export default function OnboardingOverlay() {
       label: { ro: string; en: string };
       primary: { kind: 'flow' | 'category'; id: string };
       secondary: { kind: 'flow' | 'category'; id: string };
+      third?: { kind: 'flow' | 'category'; id: string };
+      fourth?: { kind: 'flow' | 'category'; id: string };
     }>;
     constraints: { minSelections: number; maxSelections: number };
     copy: {
@@ -135,8 +137,12 @@ export default function OnboardingOverlay() {
 
     const resolved = selectedInOrder.map(o => ({
       id: o.id,
-      primary: resolveRefToFlowId(o.primary),
-      secondary: resolveRefToFlowId(o.secondary),
+      picks: [
+        resolveRefToFlowId(o.primary),
+        resolveRefToFlowId(o.secondary),
+        o.third ? resolveRefToFlowId(o.third) : null,
+        o.fourth ? resolveRefToFlowId(o.fourth) : null,
+      ] as Array<string | null>,
     }));
 
     const out: string[] = [];
@@ -145,38 +151,16 @@ export default function OnboardingOverlay() {
       if (!out.includes(fid)) out.push(fid);
     };
 
-    if (resolved.length === 2) {
+    // Round-robin across selected needs:
+    // 1st: all primaries (in selection order), then
+    // 2nd: all secondaries, then
+    // 3rd: all thirds, then
+    // 4th: all fourths,
+    // until we have 4 unique flow IDs.
+    for (let rank = 0; rank < 4; rank++) {
       for (const r of resolved) {
-        add(r.primary);
-        add(r.secondary);
-      }
-    } else if (resolved.length === 3) {
-      add(resolved[0]?.primary ?? null);
-      add(resolved[0]?.secondary ?? null);
-      add(resolved[1]?.primary ?? null);
-      add(resolved[2]?.primary ?? null);
-      // If duplicates reduce the list, fill with remaining secondary flows in order
-      add(resolved[1]?.secondary ?? null);
-      add(resolved[2]?.secondary ?? null);
-    } else if (resolved.length >= 4) {
-      for (const r of resolved.slice(0, 4)) add(r.primary);
-      // Fill with secondaries if duplicates reduce count
-      for (const r of resolved.slice(0, 4)) {
-        if (out.length >= 4) break;
-        add(r.secondary);
-      }
-    }
-
-    // Final safety: always provide 4 deterministic recommendations if possible.
-    if (out.length < 4) {
-      const byId = new Map(flows.map(f => [f.id, f] as const));
-      for (const cat of FLOW_CATEGORIES) {
-        for (const fid of cat.flowIds) {
-          if (out.length >= 4) break;
-          if (!byId.has(fid)) continue;
-          add(fid);
-        }
-        if (out.length >= 4) break;
+        add(r.picks[rank] ?? null);
+        if (out.length >= 4) return out.slice(0, 4);
       }
     }
 

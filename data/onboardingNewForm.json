@@ -7,7 +7,9 @@
         "en": "I need to reduce stress and inner tension"
       },
       "primary": { "kind": "flow", "id": "Stress-Soothing" },
-      "secondary": { "kind": "flow", "id": "Improve-Sleep" }
+      "secondary": { "kind": "flow", "id": "Improve-Sleep" },
+      "third": { "kind": "flow", "id": "Calming-Anxiety" },
+      "fourth": { "kind": "flow", "id": "Heartful-Gratitude" }
     },
     {
       "id": "need_reduce_anxiety",
@@ -16,7 +18,9 @@
         "en": "I need to reduce anxiety, restlessness, or panic attacks"
       },
       "primary": { "kind": "flow", "id": "Calming-Anxiety" },
-      "secondary": { "kind": "flow", "id": "Improve-Sleep" }
+      "secondary": { "kind": "flow", "id": "Improve-Sleep" },
+      "third": { "kind": "flow", "id": "Stress-Soothing" },
+      "fourth": { "kind": "flow", "id": "Boost-Motivation" }
     },
     {
       "id": "need_sleep_better",
@@ -25,7 +29,9 @@
         "en": "I need to sleep better and rest deeply"
       },
       "primary": { "kind": "flow", "id": "Improve-Sleep" },
-      "secondary": { "kind": "flow", "id": "Inner-Healing" }
+      "secondary": { "kind": "flow", "id": "Inner-Healing" },
+      "third": { "kind": "flow", "id": "Stress-Soothing" },
+      "fourth": { "kind": "flow", "id": "Self-Compassion" }
     },
     {
       "id": "need_emotional_regulation",
@@ -33,8 +39,10 @@
         "ro": "Am nevoie să îmi reglez emoțiile și să mă simt mai stabil interior",
         "en": "I need to regulate my emotions and feel more stable inside"
       },
-      "primary": { "kind": "category", "id": "heart-balance" },
-      "secondary": { "kind": "flow", "id": "Build-Self-Trust" }
+      "primary": { "kind": "flow", "id": "Daily-Heart-Lift" },
+      "secondary": { "kind": "flow", "id": "Stress-Soothing" },
+      "third": { "kind": "flow", "id": "Improve-Sleep" },
+      "fourth": { "kind": "flow", "id": "Inner-Healing" }
     },
     {
       "id": "need_body_tension_release",
@@ -43,7 +51,9 @@
         "en": "I need to release body tension and physical discomfort"
       },
       "primary": { "kind": "flow", "id": "Inner-Healing" },
-      "secondary": { "kind": "flow", "id": "Stress-Soothing" }
+      "secondary": { "kind": "flow", "id": "Stress-Soothing" },
+      "third": { "kind": "flow", "id": "Improve-Sleep" },
+      "fourth": { "kind": "flow", "id": "Heartful-Gratitude" }
     },
     {
       "id": "need_healing_support",
@@ -52,7 +62,9 @@
         "en": "I need to support my body’s health and healing processes"
       },
       "primary": { "kind": "flow", "id": "Inner-Healing" },
-      "secondary": { "kind": "flow", "id": "Improve-Sleep" }
+      "secondary": { "kind": "flow", "id": "Improve-Sleep" },
+      "third": { "kind": "flow", "id": "Stress-Soothing" },
+      "fourth": { "kind": "flow", "id": "Boost-Motivation" }
     },
     {
       "id": "need_calm_mind",
@@ -61,7 +73,9 @@
         "en": "I need to calm my mind and repetitive thoughts"
       },
       "primary": { "kind": "flow", "id": "Calming-Anxiety" },
-      "secondary": { "kind": "flow", "id": "Stress-Soothing" }
+      "secondary": { "kind": "flow", "id": "Stress-Soothing" },
+      "third": { "kind": "flow", "id": "Improve-Sleep" },
+      "fourth": { "kind": "flow", "id": "Self-Compassion" }
     },
     {
       "id": "need_reconnect_self",
@@ -70,7 +84,9 @@
         "en": "I need to reconnect with myself and my real needs"
       },
       "primary": { "kind": "flow", "id": "Stress-Soothing" },
-      "secondary": { "kind": "flow", "id": "Build-Self-Trust" }
+      "secondary": { "kind": "flow", "id": "Goal-Achievement" },
+      "third": { "kind": "flow", "id": "Daily-Heart-Lift" },
+      "fourth": { "kind": "flow", "id": "Healthy-Money-Mindset" }
     },
     {
       "id": "need_motivation_energy",
@@ -79,7 +95,9 @@
         "en": "I need to regain motivation and energy to take action"
       },
       "primary": { "kind": "flow", "id": "Goal-Achievement" },
-      "secondary": { "kind": "category", "id": "heart-balance" }
+      "secondary": { "kind": "flow", "id": "Build-Self-Trust" },
+      "third": { "kind": "flow", "id": "Stress-Soothing" },
+      "fourth": { "kind": "flow", "id": "Healthy-Money-Mindset" }
     },
     {
       "id": "need_goal_clarity",
@@ -88,7 +106,9 @@
         "en": "I need to clarify my goals and follow through"
       },
       "primary": { "kind": "flow", "id": "Goal-Achievement" },
-      "secondary": { "kind": "flow", "id": "Build-Self-Trust" }
+      "secondary": { "kind": "flow", "id": "Build-Self-Trust" },
+      "third": { "kind": "flow", "id": "Healthy-Money-Mindset" },
+      "fourth": { "kind": "flow", "id": "Heartful-Gratitude" }
     },
     {
       "id": "need_reduce_compulsions",
@@ -97,7 +117,9 @@
         "en": "I need to reduce cravings, compulsive behaviors, or draining automatic patterns"
       },
       "primary": { "kind": "flow", "id": "Craving-Relief" },
-      "secondary": { "kind": "flow", "id": "Calming-Anxiety" }
+      "secondary": { "kind": "flow", "id": "Calming-Anxiety" },
+      "third": { "kind": "flow", "id": "Boost-Motivation" },
+      "fourth": { "kind": "flow", "id": "Stress-Soothing" }
     },
     {
       "id": "need_money_relationship",
@@ -106,7 +128,9 @@
         "en": "I need to improve my relationship with money, financial safety, and money decisions"
       },
       "primary": { "kind": "flow", "id": "Healthy-Money-Mindset" },
-      "secondary": { "kind": "flow", "id": "Goal-Achievement" }
+      "secondary": { "kind": "flow", "id": "Goal-Achievement" },
+      "third": { "kind": "flow", "id": "Self-Compassion" },
+      "fourth": { "kind": "flow", "id": "Stress-Soothing" }
     },
     {
       "id": "need_self_trust",
@@ -115,7 +139,9 @@
         "en": "I need more self-trust, to rely on my decisions, and to keep my personal promises"
       },
       "primary": { "kind": "flow", "id": "Build-Self-Trust" },
-      "secondary": { "kind": "flow", "id": "Goal-Achievement" }
+      "secondary": { "kind": "flow", "id": "Goal-Achievement" },
+      "third": { "kind": "flow", "id": "Healthy-Money-Mindset" },
+      "fourth": { "kind": "flow", "id": "Stress-Soothing" }
     }
   ],
   "copy": {

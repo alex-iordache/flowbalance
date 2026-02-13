@@ -127,6 +127,9 @@ export type NewOnboardingOption = {
   label: { ro: string; en: string };
   primary: NeedFlowRef;
   secondary: NeedFlowRef;
+  /** Optional additional recommendations (used for Home flow recommendations). */
+  third?: NeedFlowRef;
+  fourth?: NeedFlowRef;
 };
 
 export type NewOnboardingConfig = {

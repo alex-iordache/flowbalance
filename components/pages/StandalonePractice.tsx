@@ -8,7 +8,6 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
-  IonTitle,
   IonToolbar,
 } from '@ionic/react';
 import { chevronBackOutline, settingsOutline, lockClosedOutline } from 'ionicons/icons';
@@ -21,6 +20,7 @@ import AudioPlayer from '../ui/AudioPlayer';
 import { getAudioSrc } from '../../helpers/getAudioSrc';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { buildAudioUsageIndex, getAudioKeyForLanguage, pickContextFlowId } from '../../helpers/standaloneAudioIndex';
+import Logo from '../ui/Logo';
 
 function getSubscribePending(): boolean {
   try {
@@ -236,20 +236,43 @@ export default function StandalonePractice() {
     return (
       <IonPage>
         <IonHeader>
-          <IonToolbar>
+          <IonToolbar style={{ position: 'relative' }}>
+            {/* Dead-center logo (independent of left/right icons) */}
+            <div
+              className="pointer-events-none"
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <Logo />
+            </div>
+
             <IonButtons slot="start">
               <IonBackButton defaultHref="/practices" icon={chevronBackOutline} text="" style={{ '--color': '#4E5B4F' } as any} />
             </IonButtons>
-            <IonTitle>{isRo ? 'Exercițiu' : 'Exercise'}</IonTitle>
             <IonButtons slot="end">
               <IonIcon icon={lockClosedOutline} className="text-2xl" />
             </IonButtons>
           </IonToolbar>
         </IonHeader>
-        <IonContent className="ion-padding">
-          <MessageBox>
-            <p>{isRo ? 'Nu am găsit această înregistrare.' : "We couldn't find this recording."}</p>
-          </MessageBox>
+        <IonContent fullscreen={true}>
+          <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
+            <div
+              className="text-[26px] md:text-[30px] leading-tight text-center"
+              style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+            >
+              {isRo ? 'Exercițiu' : 'Exercise'}
+            </div>
+            <div className="mt-4" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+            <div className="mt-4">
+              <MessageBox>
+                <p>{isRo ? 'Nu am găsit această înregistrare.' : "We couldn't find this recording."}</p>
+              </MessageBox>
+            </div>
+          </div>
         </IonContent>
       </IonPage>
     );
@@ -265,11 +288,23 @@ export default function StandalonePractice() {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar style={{ position: 'relative' }}>
+          {/* Dead-center logo (independent of left/right icons) */}
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
+
           <IonButtons slot="start">
             <IonBackButton defaultHref="/practices" icon={chevronBackOutline} text="" style={{ '--color': '#4E5B4F' } as any} />
           </IonButtons>
-          <IonTitle className="text-base md:text-lg font-bold truncate">{title}</IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
               <IonIcon icon={settingsOutline} className="text-2xl" />
@@ -278,7 +313,7 @@ export default function StandalonePractice() {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true} scrollY={true}>
-        <div className="p-4 md:p-6 flex flex-col gap-4">
+        <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-4">
           <div className="flex items-center justify-center" style={{ minHeight: '42vh' }}>
             <AudioPlayer src={src} title={title} subtitle={flowName || undefined} variant="floatingCircle" />
           </div>

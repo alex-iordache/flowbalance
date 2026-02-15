@@ -6,7 +6,6 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
-  IonTitle,
   IonToolbar,
 } from '@ionic/react';
 import { useParams, useHistory } from 'react-router-dom';
@@ -14,11 +13,12 @@ import { useState, useEffect } from 'react';
 
 import Store from '../../store';
 import * as actions from '../../store/actions';
-import { chevronBackOutline, settingsOutline, lockClosedOutline } from 'ionicons/icons';
+import { chevronBackOutline, settingsOutline } from 'ionicons/icons';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { t, type Language } from '../../data/flows';
 import AudioPlayer from '../ui/AudioPlayer';
 import { getAudioSrc } from '../../helpers/getAudioSrc';
+import Logo from '../ui/Logo';
 
 function isDayPrefixedTitle(value: string): boolean {
   const v = (value ?? '').trim();
@@ -102,8 +102,23 @@ const Practice = () => {
     return (
       <IonPage>
         <IonHeader>
-          <IonToolbar>
-            <IonTitle>{isRo ? 'În curând' : 'Coming soon'}</IonTitle>
+          <IonToolbar style={{ position: 'relative' }}>
+            {/* Dead-center logo (independent of left/right icons) */}
+            <div
+              className="pointer-events-none"
+              style={{
+                position: 'absolute',
+                left: '50%',
+                top: '50%',
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <Logo />
+            </div>
+
+            <IonButtons slot="start">
+              <IonBackButton defaultHref="/flows" icon={chevronBackOutline} text="" style={{ '--color': '#4E5B4F' } as any} />
+            </IonButtons>
             <IonButtons slot="end">
               <IonButton routerLink="/settings" routerDirection="none">
                 <IonIcon icon={settingsOutline} className="text-2xl" />
@@ -179,7 +194,20 @@ const Practice = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar style={{ position: 'relative' }}>
+          {/* Dead-center logo (independent of left/right icons) */}
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
+
           <IonButtons slot="start">
             <IonBackButton
               defaultHref={flowId ? `/flows/${flowId}` : '/flows'}
@@ -188,10 +216,6 @@ const Practice = () => {
               style={{ '--color': '#4E5B4F' } as any}
             />
           </IonButtons>
-          <IonTitle className="text-base font-bold truncate">
-            {displayTitle}
-            {!hasAccess && <IonIcon icon={lockClosedOutline} className="ml-2" />}
-          </IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
               <IonIcon icon={settingsOutline} className="text-2xl" />
@@ -215,11 +239,11 @@ const Practice = () => {
           {/* Show content only if user has access */}
           {hasAccess ? (
             <div className="flex-1 min-h-0 flex flex-col gap-3">
-              {/* 60%: Scrollable text box */}
+              {/* Scrollable text box (smaller, so player has more room) */}
               <div
-                className="fb-scrollbar overflow-auto p-1"
+                className="fb-scrollbar overflow-auto p-1 text-[13px] md:text-[14px]"
                 style={{
-                  flex: 6,
+                  flex: 5,
                   minHeight: 0,
                   backgroundColor: 'transparent',
                   border: 'none',
@@ -239,12 +263,14 @@ const Practice = () => {
                 ) : null}
               </div>
 
-              {/* 40%: Player area */}
+              <div className="mt-1" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+
+              {/* Player area */}
               {practice && t(practice.audioUrl, lang) ? (
                 <div
                   className="flex items-center justify-center"
                   style={{
-                    flex: 4,
+                    flex: 5,
                     minHeight: 0,
                   }}
                 >

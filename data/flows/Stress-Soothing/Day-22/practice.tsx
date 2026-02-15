@@ -39,7 +39,7 @@ const practice: Practice = {
     en: 'What helps you sleep well; body scan before bed.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/body-scan.mp3', en: 'audioFiles/body-scan.mp3' },
+  audioUrl: { ro: 'audioFiles/body-scan.mp3', en: 'audioFilesEnAi/body-scan-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

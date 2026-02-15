@@ -118,7 +118,7 @@ const practice: Practice = {
     en: "Understand sleep’s impact and use a simple exercise when you can’t fall asleep.",
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/cum-trec-peste-insomnie.mp3", en: "audioFiles/cum-trec-peste-insomnie.mp3" },
+  audioUrl: { ro: "audioFiles/cum-trec-peste-insomnie.mp3", en: "audioFilesEnAi/cum-trec-peste-insomnie-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

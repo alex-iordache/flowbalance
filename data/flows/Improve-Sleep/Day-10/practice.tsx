@@ -74,7 +74,7 @@ const practice: Practice = {
     en: "Calm the mind with a simple posture and enter deep relaxation.",
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/marea.mp3", en: "audioFiles/marea.mp3" },
+  audioUrl: { ro: "audioFiles/marea.mp3", en: "audioFilesEnAi/marea-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

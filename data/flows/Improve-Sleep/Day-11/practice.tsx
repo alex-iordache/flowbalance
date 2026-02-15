@@ -88,7 +88,7 @@ const practice: Practice = {
     en: "Bring attention into the body and notice sensations without changing anything.",
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/bagaje.mp3", en: "audioFiles/bagaje.mp3" },
+  audioUrl: { ro: "audioFiles/bagaje.mp3", en: "audioFilesEnAi/bagaje-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

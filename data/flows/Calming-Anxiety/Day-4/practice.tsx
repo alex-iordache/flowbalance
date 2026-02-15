@@ -42,7 +42,7 @@ const practice: Practice = {
   description: { ro: roDescription, en: enDescription },
   audioUrl: {
     ro: 'audioFiles/calmarea-anxietatii-transformarea-senzatiilor-interioare.mp3',
-    en: 'audioFiles/calmarea-anxietatii-transformarea-senzatiilor-interioare.mp3',
+    en: 'audioFilesEnAi/calmarea-anxietatii-transformarea-senzatiilor-interioare-en.mp3',
   },
   finished: false,
   lastPositionSec: 0,

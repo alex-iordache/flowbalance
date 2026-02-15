@@ -41,7 +41,7 @@ const practice: Practice = {
     en: 'Humour and laughter: at least 30 minutes that bring laughter.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/relaxare-prin-respiratie.mp3', en: 'audioFiles/relaxare-prin-respiratie.mp3' },
+  audioUrl: { ro: 'audioFiles/relaxare-prin-respiratie.mp3', en: 'audioFilesEnAi/relaxare-prin-respiratie-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

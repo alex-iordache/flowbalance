@@ -85,7 +85,7 @@ const practice: Practice = {
     en: "Notice how alcohol affects sleep and adjust the timing.",
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/coplesit-de-griji.mp3", en: "audioFiles/coplesit-de-griji.mp3" },
+  audioUrl: { ro: "audioFiles/coplesit-de-griji.mp3", en: "audioFilesEnAi/coplesit-de-griji-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

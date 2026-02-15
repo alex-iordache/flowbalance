@@ -46,7 +46,7 @@ const practice: Practice = {
   description: { ro: roDescription, en: enDescription },
   audioUrl: {
     ro: 'audioFiles/anxietate-gandurile-care-vin-si-pleaca.mp3',
-    en: 'audioFiles/anxietate-gandurile-care-vin-si-pleaca.mp3',
+    en: 'audioFilesEnAi/anxietate-gandurile-care-vin-si-pleaca-en.mp3',
   },
   finished: false,
   lastPositionSec: 0,

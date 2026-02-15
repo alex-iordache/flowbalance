@@ -61,7 +61,7 @@ const practice: Practice = {
     en: 'Mind–emotion–body link.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/vindecare.mp3', en: 'audioFiles/vindecare.mp3' },
+  audioUrl: { ro: 'audioFiles/vindecare.mp3', en: 'audioFilesEnAi/vindecare-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

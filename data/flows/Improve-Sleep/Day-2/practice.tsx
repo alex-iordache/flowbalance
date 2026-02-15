@@ -82,7 +82,7 @@ const practice: Practice = {
     en: "Set consistent sleep hours and build an evening ritual.",
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/body-scan.mp3", en: "audioFiles/body-scan.mp3" },
+  audioUrl: { ro: "audioFiles/body-scan.mp3", en: "audioFilesEnAi/body-scan-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

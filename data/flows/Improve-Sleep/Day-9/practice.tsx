@@ -93,7 +93,7 @@ const practice: Practice = {
   description: { ro: roDescription, en: enDescription },
   audioUrl: {
     ro: "audioFiles/deconectare-relaxare-vindecare-gradina-cunoasterii.mp3",
-    en: "audioFiles/deconectare-relaxare-vindecare-gradina-cunoasterii.mp3",
+    en: "audioFilesEnAi/deconectare-relaxare-vindecare-gradina-cunoasterii-en.mp3",
   },
 
   finished: false,

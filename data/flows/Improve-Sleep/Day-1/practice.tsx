@@ -87,7 +87,7 @@ const practice: Practice = {
     en: "Set your sleep goal and start with a body scan to release tension.",
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/body-scan.mp3", en: "audioFiles/body-scan.mp3" },
+  audioUrl: { ro: "audioFiles/body-scan.mp3", en: "audioFilesEnAi/body-scan-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

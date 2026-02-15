@@ -109,7 +109,7 @@ const practice: Practice = {
     en: '8-step awareness exercise before bed; relaxation audio.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/furtuna.mp3', en: 'audioFiles/furtuna.mp3' },
+  audioUrl: { ro: 'audioFiles/furtuna.mp3', en: 'audioFilesEnAi/furtuna-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

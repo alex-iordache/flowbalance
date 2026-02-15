@@ -69,7 +69,7 @@ const practice: Practice = {
     en: 'Breathing pause: 3 deep breaths with each stressor.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/relaxare-prin-respiratie.mp3', en: 'audioFiles/relaxare-prin-respiratie.mp3' },
+  audioUrl: { ro: 'audioFiles/relaxare-prin-respiratie.mp3', en: 'audioFilesEnAi/relaxare-prin-respiratie-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

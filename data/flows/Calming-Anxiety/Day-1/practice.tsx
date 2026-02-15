@@ -70,7 +70,7 @@ const practice: Practice = {
     en: 'Your qualities with evidence + conscious walking; body scan in the evening.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/body-scan.mp3', en: 'audioFiles/body-scan.mp3' },
+  audioUrl: { ro: 'audioFiles/body-scan.mp3', en: 'audioFilesEnAi/body-scan-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

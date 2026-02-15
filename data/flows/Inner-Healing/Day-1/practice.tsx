@@ -49,7 +49,7 @@ const practice: Practice = {
     en: 'Affirmations + evening relaxation.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/deconectare-relaxare-vindecare.mp3', en: 'audioFiles/deconectare-relaxare-vindecare.mp3' },
+  audioUrl: { ro: 'audioFiles/deconectare-relaxare-vindecare.mp3', en: 'audioFilesEnAi/deconectare-relaxare-vindecare-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

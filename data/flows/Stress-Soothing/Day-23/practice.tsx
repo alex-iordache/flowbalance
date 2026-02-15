@@ -47,7 +47,7 @@ const practice: Practice = {
     en: 'Disconnect and sleep ritual (min. 7h); body scan in the evening.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/body-scan.mp3', en: 'audioFiles/body-scan.mp3' },
+  audioUrl: { ro: 'audioFiles/body-scan.mp3', en: 'audioFilesEnAi/body-scan-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

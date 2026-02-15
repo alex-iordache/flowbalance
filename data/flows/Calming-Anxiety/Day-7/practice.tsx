@@ -64,7 +64,7 @@ const practice: Practice = {
     en: '10 things to be grateful for + conscious walking; emotional baggage audio.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/bagaje.mp3', en: 'audioFiles/bagaje.mp3' },
+  audioUrl: { ro: 'audioFiles/bagaje.mp3', en: 'audioFilesEnAi/bagaje-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

@@ -34,7 +34,7 @@ const practice: Practice = {
     en: 'Gratitude list for what you have in your life.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/relaxare-prin-respiratie.mp3', en: 'audioFiles/relaxare-prin-respiratie.mp3' },
+  audioUrl: { ro: 'audioFiles/relaxare-prin-respiratie.mp3', en: 'audioFilesEnAi/relaxare-prin-respiratie-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

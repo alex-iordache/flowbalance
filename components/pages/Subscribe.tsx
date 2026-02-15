@@ -385,10 +385,10 @@ export default function Subscribe() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="text-white">{isRo ? 'Abonament Flow Pro' : 'Subscribe to Flow Pro'}</IonTitle>
+          <IonTitle>{isRo ? 'Abonament Flow Pro' : 'Subscribe to Flow Pro'}</IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
-              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+              <IonIcon icon={settingsOutline} className="text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
@@ -511,20 +511,21 @@ export default function Subscribe() {
         {waitingForPayment ? (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
             <div
-              className="w-full max-w-sm md:max-w-md rounded-2xl p-5 text-white"
+              className="w-full max-w-sm md:max-w-md rounded-2xl p-5"
               style={{
-                backgroundColor: 'rgba(125, 99, 255, 0.92)',
-                boxShadow: 'inset 0 10px 22px rgba(0,0,0,0.14), inset 0 -10px 22px rgba(0,0,0,0.14)',
+                backgroundColor: '#FBF7F2',
+                border: '1px solid rgba(232, 222, 211, 0.85)',
+                boxShadow: '0 14px 40px rgba(120, 95, 70, 0.18)',
                 backdropFilter: 'blur(10px)',
               }}
             >
               <div className="flex items-center gap-3">
-                <IonSpinner name="crescent" className="text-white" />
-                <div className="font-semibold">
+                <IonSpinner name="crescent" style={{ color: '#4E5B4F' }} />
+                <div className="font-semibold" style={{ color: '#4E5B4F' }}>
                   {isRo ? 'Așteptăm confirmarea plății…' : 'Waiting for payment confirmation…'}
                 </div>
               </div>
-              <div className="text-sm text-white/85 mt-2">
+              <div className="text-sm mt-2" style={{ color: '#7A746C' }}>
                 {isRo
                   ? 'Poate dura câteva secunde. Te întoarcem automat în aplicație când abonamentul se activează.'
                   : 'This can take a few seconds. We’ll return you automatically once your subscription activates.'}
@@ -533,7 +534,7 @@ export default function Subscribe() {
                 <IonButton
                   expand="block"
                   fill="solid"
-                  style={{ '--background': 'rgba(255,255,255,0.14)', '--color': '#fff' } as any}
+                  style={{ '--background': '#ffffff', '--color': '#3b1b6a' } as any}
                   onClick={() => {
                     setPaymentPending(false);
                     setWaitingForPayment(false);

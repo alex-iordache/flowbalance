@@ -36,5 +36,6 @@ export const FLOW_THEMES: Record<FlowThemeNumber, FlowTheme> = {
   6: { bg: '#0a7ea5', cardGradient: CARD_OVERLAY },
 };
 
-export const DEFAULT_APP_BG = '#7d63ff';
+// Warm redesign default background (used when no category is resolved).
+export const DEFAULT_APP_BG = '#F4EFE8';
 export const DEFAULT_CARD_GRADIENT = CARD_OVERLAY;

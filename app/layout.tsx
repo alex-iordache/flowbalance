@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
+import { Cormorant_Garamond, Inter, Montserrat } from 'next/font/google';
 import ClerkProviderClient from '../components/ClerkProviderClient';
 
 import 'tailwindcss/tailwind.css';
@@ -21,6 +22,28 @@ import '@ionic/react/css/display.css';
 
 import '../styles/global.css';
 import '../styles/variables.css';
+
+const fontInter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+// Headings/brand font (requested): Montserrat
+const fontTitle = Montserrat({
+  subsets: ['latin'],
+  weight: ['300', '500', '600', '700'],
+  variable: '--font-title',
+  display: 'swap',
+});
+
+// Logo font (original in our implementation): Cormorant Garamond
+const fontLogo = Cormorant_Garamond({
+  subsets: ['latin'],
+  weight: ['500', '600'],
+  variable: '--font-logo',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'Flow - Find Your Balance',
@@ -44,7 +67,11 @@ export default function RootLayout({
   return (
     <ClerkProviderClient>
       <html lang="en" suppressHydrationWarning>
-        <body suppressHydrationWarning>
+        <body
+          suppressHydrationWarning
+          className={[fontInter.variable, fontTitle.variable, fontLogo.variable].join(' ')}
+          style={{ fontFamily: 'var(--font-title), var(--font-inter), ui-sans-serif, system-ui, -apple-system' }}
+        >
           {children}
 
           {/* Capture early runtime errors that can cause a "blank purple screen" */}

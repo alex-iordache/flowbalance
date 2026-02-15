@@ -196,9 +196,24 @@ export default function AudioPlayer({
   // Avoid UI flicker/CLS on play: only surface persistent errors.
   const statusLabel = status === 'error' ? 'Audio failed to play' : '';
 
+  // Redesign: warm “ink” palette (brownish near-black).
+  const ink = '#3B3126';
+  const inkMuted = 'rgba(59, 49, 38, 0.72)';
+  const inkSubtle = 'rgba(59, 49, 38, 0.52)';
+  const trackBg = 'rgba(59, 49, 38, 0.18)';
+  const fillBg = 'rgba(59, 49, 38, 0.88)';
+
   // Default card UI (kept for other screens / future use)
   const cardUi = (
-    <div className="w-full rounded-2xl bg-black/20 shadow-xl p-4">
+    <div
+      className="w-full rounded-2xl p-4"
+      style={{
+        backgroundColor: '#FBF7F2',
+        border: '1px solid rgba(232, 222, 211, 0.85)',
+        boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
+        color: ink,
+      }}
+    >
       {/* Keep audio in DOM but visually hidden */}
       <audio
         ref={audioRef}
@@ -208,14 +223,30 @@ export default function AudioPlayer({
 
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          {title ? <div className="text-white font-semibold truncate">{title}</div> : null}
-          {subtitle ? <div className="text-white/70 text-xs truncate mt-0.5">{subtitle}</div> : null}
-          {statusLabel ? <div className="text-white/80 text-xs mt-1">{statusLabel}</div> : null}
+          {title ? (
+            <div className="font-semibold truncate" style={{ color: ink }}>
+              {title}
+            </div>
+          ) : null}
+          {subtitle ? (
+            <div className="text-xs truncate mt-0.5" style={{ color: inkMuted }}>
+              {subtitle}
+            </div>
+          ) : null}
+          {statusLabel ? (
+            <div className="text-xs mt-1" style={{ color: inkMuted }}>
+              {statusLabel}
+            </div>
+          ) : null}
         </div>
         <button
           type="button"
           onClick={toggle}
-          className="shrink-0 px-5 py-2 rounded-full bg-white/20 hover:bg-white/30 active:bg-white/35 text-white text-sm font-semibold"
+          className="shrink-0 px-5 py-2 rounded-full text-sm font-semibold"
+          style={{
+            backgroundColor: 'rgba(59, 49, 38, 0.10)',
+            color: ink,
+          }}
         >
           {isPlaying ? PauseIcon : PlayIcon}
         </button>
@@ -223,22 +254,23 @@ export default function AudioPlayer({
 
       <div className="mt-4">
         <div
-          className="w-full h-3 rounded-full bg-white/20 overflow-hidden cursor-pointer"
+          className="w-full h-3 rounded-full overflow-hidden cursor-pointer"
           role="slider"
           aria-label="Seek"
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={Math.round(progressPct)}
           tabIndex={0}
+          style={{ backgroundColor: trackBg }}
           onClick={(e) => {
             const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
             const pct = ((e.clientX - rect.left) / rect.width) * 100;
             seekToPct(pct);
           }}
         >
-          <div className="h-3 bg-white/80 rounded-full" style={{ width: `${progressPct}%` }} />
+          <div className="h-3 rounded-full" style={{ width: `${progressPct}%`, backgroundColor: fillBg }} />
         </div>
-        <div className="flex items-center justify-between text-white/80 text-xs mt-2">
+        <div className="flex items-center justify-between text-xs mt-2" style={{ color: inkMuted }}>
           <span>{formatTime(current)}</span>
           <span>{formatTime(duration)}</span>
         </div>
@@ -259,23 +291,34 @@ export default function AudioPlayer({
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl px-6 flex flex-col items-center text-center gap-4">
         <div className="w-full">
           {title ? (
-            <div className="text-white font-semibold text-base md:text-lg leading-snug line-clamp-2">{title}</div>
+            <div className="font-semibold text-base md:text-lg leading-snug line-clamp-2" style={{ color: ink }}>
+              {title}
+            </div>
           ) : null}
-          {subtitle ? <div className="text-white/75 text-xs md:text-sm mt-1">{subtitle}</div> : null}
-          {statusLabel ? <div className="text-white/80 text-xs mt-2">{statusLabel}</div> : null}
+          {subtitle ? (
+            <div className="text-xs md:text-sm mt-1" style={{ color: inkMuted }}>
+              {subtitle}
+            </div>
+          ) : null}
+          {statusLabel ? (
+            <div className="text-xs mt-2" style={{ color: inkSubtle }}>
+              {statusLabel}
+            </div>
+          ) : null}
         </div>
 
         <button
           type="button"
           onClick={toggle}
           aria-label={isPlaying ? 'Pause' : 'Play'}
-          className="text-white flex items-center justify-center"
+          className="flex items-center justify-center"
           style={{
             width: 76,
             height: 76,
             background: 'transparent',
             border: 'none',
             padding: 0,
+            color: ink,
           }}
         >
           {isPlaying ? PauseIcon : PlayIcon}
@@ -292,7 +335,7 @@ export default function AudioPlayer({
             tabIndex={0}
             style={{
               width: '92%',
-              background: 'rgba(255,255,255,0.18)',
+              background: trackBg,
             }}
             onClick={(e) => {
               const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
@@ -304,16 +347,17 @@ export default function AudioPlayer({
               className="h-2 rounded-full"
               style={{
                 width: `${progressPct}%`,
-                background: 'rgba(255,255,255,0.85)',
+                background: fillBg,
               }}
             />
           </div>
 
           <div
-            className="flex items-center justify-between text-white/85 text-xs mt-2 select-none"
+            className="flex items-center justify-between text-xs mt-2 select-none"
             style={{
               fontVariantNumeric: 'tabular-nums',
               width: '92%',
+              color: inkMuted,
             }}
           >
             <span>{formatTime(current)}</span>

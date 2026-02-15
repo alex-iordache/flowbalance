@@ -7,17 +7,16 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
-  IonTitle,
   IonToolbar,
 } from '@ionic/react';
 import { useIonRouter } from '@ionic/react';
 import { useParams } from 'react-router-dom';
 import { chevronBackOutline, settingsOutline } from 'ionicons/icons';
-import { useState } from 'react';
 
 import Store from '../../store';
 import { t, type Flow, type Language } from '../../data/flows';
 import { FLOW_CATEGORIES } from './flowsCatalog';
+import Logo from '../ui/Logo';
 
 const FlowRow = ({
   flow,
@@ -30,26 +29,48 @@ const FlowRow = ({
   onOpen: (flow: Flow) => void;
   disabled: boolean;
 }) => {
+  const accent = '#CDAF87';
+  const totalPractices = flow.practices?.length ?? 0;
+  const completedPractices = flow.practices?.filter(p => p.finished).length ?? 0;
+  const pct = totalPractices === 0 ? 0 : Math.round((completedPractices / totalPractices) * 100);
   return (
     <div
       onClick={disabled ? undefined : () => onOpen(flow)}
-      className={`flow-entry flex flex-row items-start p-4 rounded-[20px] w-full gap-4 ${
+      className={`flow-entry relative flex flex-row items-center pl-3.5 pr-4 py-3 rounded-[16px] w-full gap-3.5 ${
         disabled ? 'cursor-default opacity-90 pointer-events-none' : 'cursor-pointer'
       }`}
       style={{
-        backgroundColor: 'var(--fb-bg)',
-        backgroundImage: 'var(--fb-card-gradient)',
-        boxShadow:
-          'inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -10px 22px rgba(0,0,0,0.14)',
+        backgroundColor: '#FBF7F2',
+        border: '1px solid rgba(232, 222, 211, 0.85)',
+        boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
       }}
     >
+      {/* Accent bar: flush on the left border */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: 3,
+          height: 66,
+          backgroundColor: accent,
+          opacity: 0.75,
+          borderRadius: 999,
+        }}
+      />
+
       <img
-        className="object-contain w-24 h-24 rounded-2xl flex-shrink-0 md:w-48 md:h-48 self-start"
+        className="object-cover w-[78px] h-[78px] rounded-2xl flex-shrink-0"
         src={t(flow.image, lang)}
         alt={t(flow.name, lang)}
       />
-      <div className="flex flex-col justify-between flex-1 leading-normal min-w-0">
-        <h5 className="mt-0 mb-2 text-xl md:text-2xl font-bold tracking-tight text-white leading-tight">
+      <div className="flex flex-col flex-1 leading-normal min-w-0">
+        <h5
+          className="mt-0 mb-1 text-[18px] leading-tight truncate"
+          style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+        >
           {t(flow.name, lang)}
           {flow.comingSoon ? (
             <IonBadge color="medium" className="ml-2 align-middle">
@@ -57,7 +78,25 @@ const FlowRow = ({
             </IonBadge>
           ) : null}
         </h5>
-        <p className="mb-0 text-sm md:text-base text-white">{t(flow.intro, lang)}</p>
+        <div className="text-[13px] leading-snug line-clamp-2" style={{ color: '#7A746C' }}>
+          {t(flow.intro, lang)}
+        </div>
+
+        <div className="mt-1 text-[12px]" style={{ color: '#7A746C' }}>
+          {totalPractices} {lang === 'ro' ? 'practici' : 'practices'}
+        </div>
+
+        <div className="mt-2 flex items-center gap-3">
+          <div
+            className="flex-1 h-[7px] rounded-full overflow-hidden"
+            style={{ backgroundColor: 'rgba(232, 222, 211, 0.95)' }}
+          >
+            <div className="h-[7px] rounded-full" style={{ width: `${pct}%`, backgroundColor: accent, opacity: 0.65 }} />
+          </div>
+          <div className="text-[12px] font-semibold" style={{ color: '#7A746C' }}>
+            {pct}%
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -82,37 +121,64 @@ export default function FlowCategory() {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar style={{ position: 'relative' }}>
+          {/* Dead-center logo (independent of left/right icons) */}
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
+
           <IonButtons slot="start">
             <IonBackButton
               defaultHref="/flows"
               icon={chevronBackOutline}
               text=""
-              style={{ '--color': '#fff' } as any}
+              style={{ '--color': '#4E5B4F' } as any}
             />
           </IonButtons>
-          <IonTitle className="text-white text-base font-bold truncate">
-            {category ? t(category.title, lang) : 'Category'}
-          </IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
-              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+              <IonIcon icon={settingsOutline} className="text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
 
       <IonContent fullscreen={true}>
-        <div className="flex flex-col gap-4 p-4 w-full max-w-2xl mx-auto">
-          {categoryFlows.map(flow => (
-            <FlowRow
-              key={flow.id}
-              flow={flow}
-              lang={lang}
-              onOpen={openFlow}
-              disabled={!!flow.comingSoon}
-            />
-          ))}
+        <div
+          className="py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto"
+          style={{
+            paddingLeft: 'max(28px, calc(var(--fb-side-pad) + 10px))',
+            paddingRight: 'max(28px, calc(var(--fb-side-pad) + 10px))',
+          }}
+        >
+          <div
+            className="text-[26px] md:text-[30px] leading-tight text-center"
+            style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+          >
+            {category ? t(category.title, lang) : ''}
+          </div>
+
+          <div className="mt-4" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+
+          <div className="mt-4 grid gap-3">
+            {categoryFlows.map(flow => (
+              <FlowRow
+                key={flow.id}
+                flow={flow}
+                lang={lang}
+                onOpen={openFlow}
+                disabled={!!flow.comingSoon}
+              />
+            ))}
+          </div>
         </div>
       </IonContent>
     </IonPage>

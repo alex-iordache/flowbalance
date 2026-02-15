@@ -72,6 +72,36 @@ ion-content::part(scroll)::-webkit-scrollbar {
   display: none;
 }
 
+/* Hide scrollbars on custom scroll containers (keep scrolling enabled). */
+.fb-no-scrollbar {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+}
+.fb-no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Styled scrollbar for redesign (only where applied). */
+.fb-scrollbar {
+  scrollbar-gutter: stable;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(59, 49, 38, 0.55) rgba(232, 222, 211, 0.65); /* thumb track */
+}
+.fb-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.fb-scrollbar::-webkit-scrollbar-track {
+  background: rgba(232, 222, 211, 0.65);
+  border-radius: 999px;
+}
+.fb-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(59, 49, 38, 0.55);
+  border-radius: 999px;
+}
+.fb-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 49, 38, 0.7);
+}
+
 /* Keep the Capacitor/Ionic app shell constrained to the viewport.
  *
  * iOS WKWebView can report an unstable `100vh` during/after keyboard + navigation
@@ -82,6 +112,20 @@ body {
   height: 100%;
 }
 
+/* Make widths/padding predictable across WebViews.
+ * Without this, `width: 100%` + padding can overflow horizontally.
+ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  overflow-x: hidden;
+}
+
 ion-app {
   /* Fallback */
   height: 100vh;
@@ -90,7 +134,9 @@ ion-app {
   /* iOS Safari/WKWebView fallback */
   height: -webkit-fill-available;
 
-  width: 100vw;
+  /* Avoid `100vw` overflow on some Android WebViews */
+  width: 100%;
+  max-width: 100%;
   overflow: hidden;
 }
 

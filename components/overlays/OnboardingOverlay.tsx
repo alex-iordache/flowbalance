@@ -33,27 +33,34 @@ function OptionButton({
       className={[
         // Layout
         'w-full text-left rounded-2xl px-4 py-3',
-        // Simple, visible button styling (no shadows)
+        // Simple, visible button styling (no heavy shadows)
         'border transition-colors',
-        selected ? 'bg-white/20 border-white/45 ring-2 ring-white/25' : 'bg-white/10 border-white/20',
-        'active:bg-white/25',
+        'active:opacity-90',
       ].join(' ')}
       style={{
-        // Fallback in case some global CSS forces buttons transparent in certain WebViews
-        backgroundColor: selected ? 'rgba(255,255,255,0.20)' : 'rgba(255,255,255,0.10)',
+        // Warm redesign-friendly styling (readable on cream background).
+        backgroundColor: selected ? 'rgba(251,247,242,0.96)' : 'rgba(251,247,242,0.72)',
+        borderColor: selected ? 'rgba(197,122,74,0.55)' : 'rgba(232, 222, 211, 0.95)',
+        boxShadow: selected ? '0 0 0 2px rgba(197,122,74,0.18)' : 'none',
       }}
     >
       <div className="flex items-start gap-3">
         <div
           className={[
             'mt-[2px] w-5 h-5 rounded-full flex items-center justify-center shrink-0',
-            selected ? 'bg-white text-[#3b1b6a]' : 'bg-white/15 text-transparent',
+            selected ? 'text-white' : 'text-transparent',
           ].join(' ')}
           aria-hidden="true"
+          style={{
+            backgroundColor: selected ? '#4E5B4F' : 'rgba(78, 91, 79, 0.12)',
+            border: selected ? 'none' : '1px solid rgba(78, 91, 79, 0.18)',
+          }}
         >
           ✓
         </div>
-        <div className="text-white text-[14px] md:text-[16px] leading-snug">{label}</div>
+        <div className="text-[14px] md:text-[16px] leading-snug" style={{ color: '#4E5B4F' }}>
+          {label}
+        </div>
       </div>
     </button>
   );
@@ -221,13 +228,13 @@ export default function OnboardingOverlay() {
     if (step === 'lang') {
       return (
         <>
-          <div className="text-white/80 text-[12px] md:text-[13px] tracking-wide uppercase">
+          <div className="text-[12px] md:text-[13px] tracking-wide uppercase" style={{ color: '#7A746C' }}>
             {isRo ? 'SETUP' : 'SETUP'}
           </div>
-          <div className="mt-3 text-white text-[20px] md:text-[26px] font-semibold leading-tight">
+          <div className="mt-3 text-[20px] md:text-[26px] font-semibold leading-tight" style={{ color: '#4E5B4F' }}>
             {isRo ? 'Alege limba' : 'Choose your language'}
           </div>
-          <div className="mt-2 text-white/75 text-[13px] md:text-[15px] leading-snug">
+          <div className="mt-2 text-[13px] md:text-[15px] leading-snug" style={{ color: '#7A746C' }}>
             {isRo
               ? 'Interfața și sesiunile audio sunt bazate pe limba aleasă. Poți schimba limba și mai târziu din Setări.'
               : 'The interface and all audio sessions follow this language. You can change it later in Settings.'}
@@ -251,13 +258,13 @@ export default function OnboardingOverlay() {
 
     return (
       <>
-        <div className="text-white/80 text-[12px] md:text-[13px] tracking-wide uppercase">
+        <div className="text-[12px] md:text-[13px] tracking-wide uppercase" style={{ color: '#7A746C' }}>
           {isRo ? 'SETUP' : 'SETUP'}
         </div>
-        <div className="mt-3 text-white text-[20px] md:text-[26px] font-semibold leading-tight">
+        <div className="mt-3 text-[20px] md:text-[26px] font-semibold leading-tight" style={{ color: '#4E5B4F' }}>
           {t(config.copy.page2Title as any, lang)}
         </div>
-        <div className="mt-2 text-white/75 text-[13px] md:text-[15px] leading-snug">
+        <div className="mt-2 text-[13px] md:text-[15px] leading-snug" style={{ color: '#7A746C' }}>
           {t(config.copy.page2Subtitle as any, lang)}
         </div>
 
@@ -295,8 +302,12 @@ export default function OnboardingOverlay() {
         ].join(' ')}
       >
         <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl text-center">
-          <div className="text-white text-[28px] md:text-[36px] font-semibold">{headline}</div>
-          <div className="mt-3 text-white/80 text-[15px] md:text-[18px] leading-snug">{copy}</div>
+          <div className="text-[28px] md:text-[36px] font-semibold" style={{ color: '#4E5B4F' }}>
+            {headline}
+          </div>
+          <div className="mt-3 text-[15px] md:text-[18px] leading-snug" style={{ color: '#7A746C' }}>
+            {copy}
+          </div>
         </div>
       </div>
     );
@@ -311,11 +322,11 @@ export default function OnboardingOverlay() {
     <div className="h-full w-full overflow-auto">
       <div className="min-h-full px-5 py-6 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
         <div className="flex items-center justify-between">
-          <div className="text-white/70 text-[12px] md:text-[13px]">
+          <div className="text-[12px] md:text-[13px]" style={{ color: '#7A746C' }}>
             {step === 'lang' ? '1/2' : step === 'needs' ? '2/2' : '✓'}
           </div>
           {step === 'needs' ? (
-            <button type="button" onClick={goBack} className="text-white/80 text-[13px] md:text-[15px]">
+            <button type="button" onClick={goBack} className="text-[13px] md:text-[15px]" style={{ color: '#4E5B4F' }}>
               {isRo ? 'Înapoi' : 'Back'}
             </button>
           ) : (
@@ -331,8 +342,11 @@ export default function OnboardingOverlay() {
           onClick={goNext}
           className={[
             'mt-8 w-full rounded-2xl py-3 font-semibold',
-            canNext ? 'bg-white text-[#3b1b6a]' : 'bg-white/20 text-white/60',
+            canNext ? 'bg-white' : 'bg-white/60',
           ].join(' ')}
+          style={{
+            color: canNext ? '#3b1b6a' : '#7A746C',
+          }}
         >
           {step === 'lang'
             ? (isRo ? 'Continuă' : 'Continue')

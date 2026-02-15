@@ -9,12 +9,19 @@ import {
   IonIcon,
   IonContent,
 } from '@ionic/react';
-import Notifications from './Notifications';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { bookOutline, play, settingsOutline } from 'ionicons/icons';
+import {
+  bookOutline,
+  play,
+  settingsOutline,
+  moonOutline,
+  leafOutline,
+  sparklesOutline,
+  heartOutline,
+  chevronForwardOutline,
+} from 'ionicons/icons';
 import Logo from '../ui/Logo';
-import { useUser } from '@clerk/nextjs';
 import { Preferences } from '@capacitor/preferences';
 import Store from '../../store';
 import { t, type Flow, type Practice, type Language } from '../../data/flows';
@@ -382,79 +389,32 @@ function EmptyStateCard({ lang, onBrowse }: { lang: Language; onBrowse: () => vo
   );
 }
 const Home = () => {
-  const [showNotifications, setShowNotifications] = useState(false);
   const history = useHistory();
-  const { user, isLoaded } = useUser();
-  const lang = Store.useState(s => s.settings.language);
+  const lang = Store.useState(s => s.settings.language) as Language;
   const flows = Store.useState(s => s.flows);
-  const onboardingStart = Store.useState(s => s.onboardingStart);
-  const onboardingRecommendedCategories = Store.useState(s => s.onboardingRecommendedCategories);
   const onboardingRecommendedFlowIds = Store.useState(s => s.onboardingRecommendedFlowIds);
+  const onboardingRecommendedCategories = Store.useState(s => s.onboardingRecommendedCategories);
+
   const [recommendedFlowIds, setRecommendedFlowIds] = useState<string[]>([]);
-
-  const displayFirstNameFromClerk = useMemo(() => {
-    if (!isLoaded || !user) return '';
-    const first = (user.firstName ?? '').trim();
-    if (first) return first;
-    const full = (user.fullName ?? '').trim();
-    if (full) return full.split(/\s+/)[0] ?? '';
-    const primaryEmail = user.primaryEmailAddress?.emailAddress ?? '';
-    if (primaryEmail.includes('@')) return primaryEmail.split('@')[0] ?? '';
-    return '';
-  }, [isLoaded, user]);
-
-  const [firstName, setFirstName] = useState<string>('');
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const { value } = await Preferences.get({ key: 'flow_user_first_name' });
-        if (!cancelled && value) setFirstName(value);
-      } catch {
-        // ignore
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!displayFirstNameFromClerk) return;
-    setFirstName(displayFirstNameFromClerk);
-    (async () => {
-      try {
-        await Preferences.set({ key: 'flow_user_first_name', value: displayFirstNameFromClerk });
-      } catch {
-        // ignore
-      }
-    })();
-  }, [displayFirstNameFromClerk]);
 
   useEffect(() => {
     let cancelled = false;
     const key = 'flow_recommended_flow_ids_v1';
 
     (async () => {
-      // Preferred: new onboarding produces flow IDs directly.
       if (Array.isArray(onboardingRecommendedFlowIds) && onboardingRecommendedFlowIds.length) {
         const byId = new Map(flows.map(f => [f.id, f] as const));
         const ids = onboardingRecommendedFlowIds.filter(id => typeof id === 'string' && byId.has(id)).slice(0, 4);
         if (!cancelled) setRecommendedFlowIds(ids);
         try {
           await Preferences.set({ key, value: JSON.stringify(ids) });
-        } catch {
-          // ignore
-        }
+        } catch {}
         return;
       }
 
-      // If onboarding produced recommendations, prefer them and persist them.
       if (Array.isArray(onboardingRecommendedCategories) && onboardingRecommendedCategories.length) {
         const byId = new Map(flows.map(f => [f.id, f] as const));
         const picked: string[] = [];
-
         for (const catId of onboardingRecommendedCategories.slice(0, 3)) {
           const cat = FLOW_CATEGORIES.find(c => c.id === catId) ?? null;
           if (!cat) continue;
@@ -466,17 +426,13 @@ const Home = () => {
             }
           }
         }
-
         const pool = flows.map(f => f.id).filter(id => !picked.includes(id));
         const fourth = pickRandomDistinct(pool, 1)[0] ?? null;
         const ids = [...picked, ...(fourth ? [fourth] : [])].slice(0, 4);
-
         if (!cancelled) setRecommendedFlowIds(ids);
         try {
           await Preferences.set({ key, value: JSON.stringify(ids) });
-        } catch {
-          // ignore
-        }
+        } catch {}
         return;
       }
 
@@ -490,19 +446,14 @@ const Home = () => {
             return;
           }
         }
-      } catch {
-        // ignore
-      }
+      } catch {}
 
-      // Generate once per device (temporary until onboarding form exists).
       const ids = pickRandomDistinct(flows.map(f => f.id), 4);
       if (cancelled) return;
       setRecommendedFlowIds(ids);
       try {
         await Preferences.set({ key, value: JSON.stringify(ids) });
-      } catch {
-        // ignore
-      }
+      } catch {}
     })();
 
     return () => {
@@ -515,155 +466,341 @@ const Home = () => {
     return recommendedFlowIds.map(id => byId.get(id)).filter(Boolean) as Flow[];
   }, [flows, recommendedFlowIds]);
 
-  const practicesCtaCopy =
-    lang === 'ro'
-      ? 'Preferi exerciții scurte? Vezi o listă potrivită pentru tine.'
-      : 'Prefer short exercises? Browse a list picked for you.';
+  const heroFlow = useMemo(() => {
+    const active = pickActiveFlow(flows);
+    if (active) return active;
+    if (recommendedFlows[0]) return recommendedFlows[0];
+    return flows.find(f => f.id === 'Stress-Soothing') ?? flows[0] ?? null;
+  }, [flows, recommendedFlows]);
+
+  const heroHref = useMemo(() => {
+    if (!heroFlow) return '/flows';
+    const inProgress = pickInProgressPractice(heroFlow);
+    const pid = inProgress?.id ?? pickNextUnfinishedPractice(heroFlow)?.id ?? null;
+    return pid ? `/flows/${heroFlow.id}/${pid}` : `/flows/${heroFlow.id}`;
+  }, [heroFlow]);
+
+  const isRo = lang === 'ro';
+
+  const forYouTitle = isRo ? 'Pentru tine azi' : 'For you today';
+  const forYouSubtitle = isRo ? 'Alege o sesiune care să îți regleze mintea.' : 'Choose a session to help regulate your mind.';
+  const categoriesTitle = isRo ? 'Descoperă categoriile terapeutice' : 'Discover therapeutic categories';
+
+  const recommendedCarouselFlows = useMemo(() => {
+    const out: Flow[] = [];
+    const add = (f: Flow | null | undefined) => {
+      if (!f) return;
+      if (out.find(x => x.id === f.id)) return;
+      out.push(f);
+    };
+
+    // Primary source: onboarding-driven recommendations (already ordered).
+    for (const f of recommendedFlows) add(f);
+
+    // Safety fill (should rarely be needed): keep it deterministic.
+    if (out.length < 4) {
+      add(flows.find(f => f.id === 'Improve-Sleep'));
+      add(flows.find(f => f.id === 'Calming-Anxiety'));
+      add(flows.find(f => f.id === 'Stress-Soothing'));
+      add(flows.find(f => f.id === 'Daily-Heart-Lift'));
+      add(flows[0]);
+    }
+
+    return out.slice(0, 4);
+  }, [flows, recommendedFlows]);
+
+  const recommendedCarouselRef = useRef<HTMLDivElement | null>(null);
+  const recommendedCarouselKey = useMemo(
+    () => recommendedCarouselFlows.map(f => f.id).join('|'),
+    [recommendedCarouselFlows],
+  );
+
+  // Ensure the carousel starts from the left after sign-in/out re-hydration.
+  useEffect(() => {
+    const el = recommendedCarouselRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      if (!recommendedCarouselRef.current) return;
+      recommendedCarouselRef.current.scrollLeft = 0;
+    });
+  }, [recommendedCarouselKey]);
+
+  const minutesLabelForFlow = (flow: Flow) => {
+    const minutes = estimateTotalMinutes(flow);
+    return isRo ? `${minutes} minute` : `${minutes} minutes`;
+  };
+
+  const warmShadow = '0 10px 24px rgba(120, 95, 70, 0.08)';
 
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <Logo />
+        <IonToolbar style={{ position: 'relative' }}>
+          {/* Dead-center logo (independent of left/right icons) */}
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
+
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
-              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+              <IonIcon icon={settingsOutline} style={{ color: '#4E5B4F' }} className="text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding" fullscreen>
-        <Notifications
-          open={showNotifications}
-          onDidDismiss={() => setShowNotifications(false)}
-        />
-        <HelloUser firstName={firstName} lang={lang} />
-        {(() => {
-          const activeFlow = pickActiveFlow(flows);
-          if (!activeFlow) {
-            const startFlow = onboardingStart
-              ? flows.find(f => f.id === onboardingStart.flowId) ?? null
-              : null;
-            const startHref =
-              onboardingStart && onboardingStart.flowId
-                ? onboardingStart.practiceId
-                  ? `/flows/${onboardingStart.flowId}/${onboardingStart.practiceId}`
-                  : `/flows/${onboardingStart.flowId}`
-                : null;
-            const startPracticeForMinutes =
-              onboardingStart?.practiceId ??
-              (startFlow ? pickNextUnfinishedPractice(startFlow)?.id ?? null : null);
-
-            return (
-              <div className="flex flex-col gap-4">
-                {startFlow && startHref ? (
-                  <StartHereCard
-                    flow={startFlow}
-                    lang={lang}
-                    flowId={startFlow.id}
-                    practiceIdForMinutes={startPracticeForMinutes}
-                    onStart={() => history.push(startHref)}
-                  />
-                ) : (
-                  <EmptyStateCard lang={lang} onBrowse={() => history.push('/flows')} />
-                )}
-                {recommendedFlows.length ? (
-                  <RecommendedFlowsCard
-                    flows={recommendedFlows}
-                    lang={lang}
-                    onOpenFlow={(flow) => {
-                      const inProgress = pickInProgressPractice(flow);
-                      history.push(inProgress ? `/flows/${flow.id}/${inProgress.id}` : `/flows/${flow.id}`);
-                    }}
-                  />
-                ) : null}
-                <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
-                  <button
-                    type="button"
-                    onClick={() => history.push('/practices')}
-                    className="w-full text-left rounded-2xl p-4 transition-transform hover:-translate-y-[1px] active:translate-y-0"
-                    style={{
-                      background:
-                        'linear-gradient(180deg, rgba(251, 191, 36, 0.96) 0%, rgba(245, 158, 11, 0.92) 100%)',
-                      border: '1px solid rgba(251, 191, 36, 0.95)',
-                      boxShadow: '0 10px 28px rgba(245, 158, 11, 0.28)',
-                    }}
-                  >
-                    <div className="text-[#2a1150] text-[14px] md:text-[16px] font-extrabold">{practicesCtaCopy}</div>
-                    <div className="text-[#2a1150]/80 text-[12px] md:text-[14px] mt-1">
-                      {lang === 'ro' ? 'Toate înregistrările, într-un singur loc.' : 'All recordings, in one place.'}
-                    </div>
-                  </button>
-                </div>
-                <div className="mt-1 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
-                  <QuickActionCard
-                    meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
-                    title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}
-                    metaIcon={bookOutline}
-                    onClick={() => history.push(`/practices/${encodeURIComponent('relaxare-prin-respiratie.mp3')}`)}
-                  />
-                </div>
-              </div>
-            );
-          }
-
-          const inProgress = pickInProgressPractice(activeFlow);
-          const nextUnfinished = pickNextUnfinishedPractice(activeFlow);
-          const practiceForMinutes = (inProgress ?? nextUnfinished)?.id ?? null;
-
-          const href = inProgress ? `/flows/${activeFlow.id}/${inProgress.id}` : `/flows/${activeFlow.id}`;
-
-          return (
-            <div className="flex flex-col gap-4">
-              <ContinueCard
-                flow={activeFlow}
-                lang={lang}
-                flowId={activeFlow.id}
-                practiceIdForMinutes={practiceForMinutes}
-                onContinue={() => history.push(href)}
-              />
-              {recommendedFlows.length ? (
-                <RecommendedFlowsCard
-                  flows={recommendedFlows}
-                  lang={lang}
-                  onOpenFlow={(flow) => {
-                    const inP = pickInProgressPractice(flow);
-                    history.push(inP ? `/flows/${flow.id}/${inP.id}` : `/flows/${flow.id}`);
-                  }}
+      <IonContent fullscreen className="text-[#4E5B4F]">
+        <div className="px-4 py-3 pb-6 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
+          {/* Hero */}
+          <button
+            type="button"
+            onClick={() => history.push(heroHref)}
+            className="w-full overflow-hidden rounded-[26px] text-left"
+            style={{ backgroundColor: '#C57A4A', boxShadow: warmShadow }}
+          >
+            <div className="relative h-[150px] md:h-[180px]">
+              {/* Flow image (dynamic) */}
+              {heroFlow?.image ? (
+                <img
+                  src={t(heroFlow.image, lang)}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               ) : null}
-              <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
-                <button
-                  type="button"
-                  onClick={() => history.push('/practices')}
-                  className="w-full text-left rounded-2xl p-4 transition-transform hover:-translate-y-[1px] active:translate-y-0"
-                  style={{
-                    background:
-                      'linear-gradient(180deg, rgba(251, 191, 36, 0.96) 0%, rgba(245, 158, 11, 0.92) 100%)',
-                    border: '1px solid rgba(251, 191, 36, 0.95)',
-                    boxShadow: '0 10px 28px rgba(245, 158, 11, 0.28)',
-                  }}
-                >
-                  <div className="text-[#2a1150] text-[14px] md:text-[16px] font-extrabold">{practicesCtaCopy}</div>
-                  <div className="text-[#2a1150]/80 text-[12px] md:text-[14px] mt-1">
-                    {lang === 'ro' ? 'Toate înregistrările, într-un singur loc.' : 'All recordings, in one place.'}
+
+              {/* Warm fallback tint (keeps look consistent if image is missing/slow) */}
+              <div className="absolute inset-0" style={{ background: 'rgba(197, 122, 74, 0.22)' }} />
+              {/* Soft overlay to match the screenshot */}
+              <div
+                className="absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(90deg, rgba(244,239,232,0.92) 0%, rgba(244,239,232,0.55) 44%, rgba(244,239,232,0.08) 100%)',
+                }}
+              />
+
+              <div className="absolute inset-0 p-4 md:p-5 flex flex-col justify-between">
+                <div>
+                  <div
+                    className="text-[24px] md:text-[28px] leading-[1.15]"
+                    style={{ fontFamily: 'var(--font-title), var(--font-inter), ui-sans-serif, system-ui, -apple-system', fontWeight: 500 }}
+                  >
+                    {heroFlow ? t(heroFlow.title, lang) : (isRo ? 'Diminuează stresul' : 'Reduce stress')}
                   </div>
-                </button>
-              </div>
-              <div className="mt-1 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
-                <QuickActionCard
-                  meta={lang === 'ro' ? '5 min citire' : '5 min reading'}
-                  title={lang === 'ro' ? 'Respirație de reset' : 'Refresh breath'}
-                  metaIcon={bookOutline}
-                  onClick={() => history.push(`/practices/${encodeURIComponent('relaxare-prin-respiratie.mp3')}`)}
-                />
+                  <div className="mt-1 text-[14px] md:text-[15px]" style={{ color: '#7A746C' }}>
+                    {heroFlow ? t(heroFlow.intro, lang) : (isRo ? 'Un ritual zilnic de reglare.' : 'A daily regulation ritual.')}
+                  </div>
+                </div>
+
+                <div
+                  className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 w-fit"
+                  style={{ backgroundColor: 'rgba(251, 247, 242, 0.92)', border: '1px solid rgba(232, 222, 211, 0.55)' }}
+                >
+                  <IonIcon icon={play} style={{ color: '#4E5B4F' }} />
+                  <div className="text-[13px] font-semibold" style={{ color: '#7A746C' }}>
+                    {isRo ? '10 minute' : '10 minutes'}
+                  </div>
+                </div>
               </div>
             </div>
-          );
-        })()}
+          </button>
+
+          {/* For you today */}
+          <div className="mt-6">
+            <div
+              className="text-[18px] md:text-[20px]"
+              style={{ fontFamily: 'var(--font-title), var(--font-inter), ui-sans-serif, system-ui, -apple-system', fontWeight: 500 }}
+            >
+              {forYouTitle}
+            </div>
+            <div className="mt-1 text-[14px]" style={{ color: '#7A746C' }}>
+              {forYouSubtitle}
+            </div>
+
+            {/* 4 total cards, swipe/drag horizontally; 2 visible at a time */}
+            <div className="-mx-4 pl-4 pr-0">
+              <div
+                ref={recommendedCarouselRef}
+                className="fb-no-scrollbar mt-3 flex gap-3 overflow-x-auto snap-x snap-mandatory pb-2"
+              >
+                {recommendedCarouselFlows.map(flow => (
+                  <div
+                    key={flow.id}
+                    className="shrink-0 snap-start"
+                    style={{ width: '44%', minWidth: '150px', maxWidth: '190px' }}
+                  >
+                    <SmallSessionCard
+                      imageSrc={t(flow.image, lang)}
+                      title={t(flow.title, lang)}
+                      subtitle={t(flow.intro, lang)}
+                      minutesLabel={minutesLabelForFlow(flow)}
+                      onClick={() => history.push(`/flows/${flow.id}`)}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Categories */}
+          <div className="mt-7">
+            <div
+              className="text-[18px] md:text-[20px]"
+              style={{ fontFamily: 'var(--font-title), var(--font-inter), ui-sans-serif, system-ui, -apple-system', fontWeight: 500 }}
+            >
+              {categoriesTitle}
+            </div>
+
+            <div className="mt-3 grid grid-cols-1 gap-3">
+              {(() => {
+                const byId = new Map(FLOW_CATEGORIES.map(c => [c.id, c] as const));
+
+                const items: Array<{
+                  categoryId: string;
+                  icon: any;
+                  iconColor: string;
+                  subtitle: { ro: string; en: string };
+                }> = [
+                  {
+                    categoryId: 'performance-boost',
+                    icon: moonOutline,
+                    iconColor: '#CDAF87',
+                    subtitle: { ro: 'Somn, energie și focus', en: 'Sleep, energy, and focus' },
+                  },
+                  {
+                    categoryId: 'heart-balance',
+                    icon: leafOutline,
+                    iconColor: '#6F8A73',
+                    subtitle: { ro: 'Practici de echilibru și reconectare', en: 'Practices for balance and reconnection' },
+                  },
+                  {
+                    categoryId: 'mindset',
+                    icon: sparklesOutline,
+                    iconColor: '#C9A24D',
+                    subtitle: { ro: 'Încredere, bani și obiective', en: 'Confidence, money, and goals' },
+                  },
+                  {
+                    categoryId: 'emotional-regulation',
+                    icon: heartOutline,
+                    iconColor: '#D89A6A',
+                    subtitle: { ro: 'Calmare & reducerea anxietății', en: 'Calming & anxiety relief' },
+                  },
+                ];
+
+                return items.map(it => {
+                  const cat = byId.get(it.categoryId);
+                  if (!cat) return null;
+                  return (
+                    <CategoryPill
+                      key={it.categoryId}
+                      icon={it.icon}
+                      iconColor={it.iconColor}
+                      title={t(cat.title, lang)}
+                      subtitle={isRo ? it.subtitle.ro : it.subtitle.en}
+                      onClick={() => history.push(`/flows/category/${it.categoryId}`)}
+                    />
+                  );
+                });
+              })()}
+            </div>
+          </div>
+        </div>
       </IonContent>
     </IonPage>
   );
 };
+
+function SmallSessionCard(props: {
+  imageSrc?: string;
+  title: string;
+  subtitle: string;
+  minutesLabel: string;
+  onClick: () => void;
+}) {
+  const { imageSrc, title, subtitle, minutesLabel, onClick } = props;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full overflow-hidden rounded-2xl text-left"
+      style={{
+        backgroundColor: '#FBF7F2',
+        border: '1px solid rgba(232, 222, 211, 0.55)',
+        boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
+      }}
+    >
+      <div className="aspect-[16/10]" style={{ backgroundColor: 'rgba(197, 122, 74, 0.18)' }}>
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt=""
+            className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : null}
+      </div>
+      <div className="p-2.5">
+        <div className="text-[14px] font-semibold leading-snug line-clamp-2" style={{ color: '#4E5B4F' }}>
+          {title}
+        </div>
+        <div className="mt-1 text-[12px] leading-snug line-clamp-2" style={{ color: '#7A746C' }}>
+          {subtitle}
+        </div>
+        <div className="mt-3 flex items-center justify-between">
+          <div className="text-[12px] font-semibold" style={{ color: '#7A746C' }}>
+            {minutesLabel}
+          </div>
+          <IonIcon icon={chevronForwardOutline} style={{ color: '#7A746C' }} />
+        </div>
+      </div>
+    </button>
+  );
+}
+
+function CategoryPill(props: {
+  icon: string;
+  iconColor: string;
+  title: string;
+  subtitle: string;
+  onClick: () => void;
+}) {
+  const { icon, iconColor, title, subtitle, onClick } = props;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full rounded-2xl px-3 py-2.5 text-left flex items-center justify-between gap-3"
+      style={{
+        // Slightly darker than the warm cream background (#F4EFE8)
+        backgroundColor: '#EEE6DC',
+        border: '1px solid rgba(232, 222, 211, 0.65)',
+        boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
+      }}
+    >
+      <div className="flex items-center gap-3 min-w-0">
+        <IonIcon icon={icon} style={{ color: iconColor, fontSize: '22px' }} className="shrink-0" />
+        <div className="min-w-0">
+          <div className="text-[13px] font-semibold leading-snug line-clamp-2" style={{ color: '#4E5B4F' }}>
+            {title}
+          </div>
+          <div className="text-[11px] leading-snug line-clamp-2" style={{ color: '#7A746C' }}>
+            {subtitle}
+          </div>
+        </div>
+      </div>
+      <IonIcon icon={chevronForwardOutline} style={{ color: '#7A746C', fontSize: '18px' }} />
+    </button>
+  );
+}
 
 export default Home;

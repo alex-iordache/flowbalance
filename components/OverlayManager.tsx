@@ -17,7 +17,7 @@ export default function OverlayManager() {
         {overlayType === 'onboarding' ? <OnboardingOverlay /> : null}
         {overlayType === 'offline' ? <OfflineOverlay /> : null}
         {overlayType !== 'onboarding' && overlayType !== 'offline' ? (
-          <div className="h-full w-full flex items-center justify-center px-6 text-white">
+          <div className="h-full w-full flex items-center justify-center px-6" style={{ color: 'var(--fb-chrome-fg)' }}>
             Unknown overlay: {String(overlayType)}
           </div>
         ) : null}

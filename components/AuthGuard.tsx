@@ -26,10 +26,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         <IonApp>
           <IonPage>
             <IonContent>
-              <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--fb-bg)' }}>
-                <div className="text-center text-white">
+              <div className="flex items-center justify-center min-h-screen" style={{ background: '#F4EFE8' }}>
+                <div className="text-center" style={{ color: '#4E5B4F' }}>
                   <IonSpinner name="crescent" className="w-16 h-16 mb-4" />
-                  <h2 className="text-2xl font-bold">Loading Flow...</h2>
+                  <h2 className="text-[18px] font-semibold">Loading Flow…</h2>
                 </div>
               </div>
             </IonContent>
@@ -47,7 +47,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                   style={{
                     paddingTop: 'env(safe-area-inset-top)',
                     paddingBottom: 'env(safe-area-inset-bottom)',
-                    background: 'var(--fb-bg)',
+                    background: '#F4EFE8',
                   }}
                 >
                   <div className="w-full max-w-md md:max-w-xl lg:max-w-2xl space-y-4">
@@ -78,7 +78,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
                       forceRedirectUrl="/home"
                     />
                     {isSignedIn === false && !userId ? null : (
-                      <div className="text-center text-white/80 text-[12px] md:text-[14px]">
+                      <div className="text-center text-[12px] md:text-[14px]" style={{ color: '#7A746C' }}>
                         <IonSpinner name="crescent" className="w-5 h-5 align-[-4px] mr-2" />
                         Loading…
                       </div>

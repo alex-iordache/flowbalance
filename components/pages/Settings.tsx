@@ -2,13 +2,15 @@ import {
   IonPage,
   IonHeader,
   IonToolbar,
-  IonTitle,
   IonContent,
   IonToggle,
   IonButton,
   IonLabel,
   IonSelect,
   IonSelectOption,
+  IonIcon,
+  IonSpinner,
+  IonButtons,
 } from '@ionic/react';
 import { SignedIn, SignedOut, useAuth, useClerk } from '@clerk/nextjs';
 import { useMemo, useState, useEffect } from 'react';
@@ -20,6 +22,69 @@ import { setSettings } from '../../store/actions';
 import { openExternalUrl } from '../../helpers/openExternal';
 import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import { isDesktopWeb } from '../admin/adminEnv';
+import Logo from '../ui/Logo';
+import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, trashOutline } from 'ionicons/icons';
+
+function ActionRow({
+  label,
+  onClick,
+  disabled,
+  leftIcon,
+  right,
+  variant = 'default',
+}: {
+  label: string;
+  onClick: () => void;
+  disabled?: boolean;
+  leftIcon: string;
+  right?: React.ReactNode;
+  variant?: 'default' | 'danger';
+}) {
+  const accent = variant === 'danger' ? 'rgba(255, 59, 48, 0.6)' : '#CDAF87';
+  return (
+    <button
+      type="button"
+      onClick={disabled ? undefined : onClick}
+      className={`relative w-full text-left rounded-[14px] pl-3.5 pr-4 py-3 flex items-center gap-3.5 ${
+        disabled ? 'opacity-70 cursor-default pointer-events-none' : 'active:opacity-95'
+      }`}
+      style={{
+        backgroundColor: '#FBF7F2',
+        border: '1px solid rgba(232, 222, 211, 0.85)',
+        boxShadow: '0 10px 24px rgba(120, 95, 70, 0.06)',
+      }}
+    >
+      {/* Accent bar */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 10,
+          bottom: 10,
+          width: 3,
+          backgroundColor: accent,
+          opacity: 0.75,
+          borderRadius: 999,
+        }}
+      />
+
+      <IonIcon icon={leftIcon} style={{ color: '#7A746C', fontSize: '20px' }} />
+
+      <div
+        className="text-[16px] leading-tight truncate flex-1 min-w-0"
+        style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+      >
+        {label}
+      </div>
+
+      <div className="shrink-0 flex items-center gap-2">
+        {right}
+        <IonIcon icon={chevronForwardOutline} style={{ color: '#7A746C', fontSize: '18px' }} />
+      </div>
+    </button>
+  );
+}
 
 const Settings = () => {
   const history = useHistory();
@@ -33,9 +98,9 @@ const Settings = () => {
   const [ticketLoading, setTicketLoading] = useState(false);
 
   const cardStyle: React.CSSProperties = {
-    backgroundColor: 'var(--fb-bg)',
-    backgroundImage:
-      'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.05) 55%, rgba(255,255,255,0.05) 100%)',
+    backgroundColor: '#FBF7F2',
+    border: '1px solid rgba(232, 222, 211, 0.85)',
+    boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
   };
 
   const showManageSubscription = useMemo(() => {
@@ -105,15 +170,26 @@ const Settings = () => {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <IonTitle className="text-white">{isRo ? 'Setări' : 'Settings'}</IonTitle>
+        <IonToolbar style={{ position: 'relative' }}>
+          {/* Dead-center logo (independent of left/right icons) */}
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent fullscreen={true}>
         <style>{`
-          /* Settings language select: bigger, white dropdown chevron */
+          /* Settings language select: bigger, dark dropdown chevron */
           .fb-lang-select::part(icon) {
-            color: #ffffff;
+            color: #4E5B4F;
             font-size: 18px;
             margin-inline-end: 0;
             padding: 0;
@@ -128,19 +204,28 @@ const Settings = () => {
             margin-right: 0 !important;
           }
         `}</style>
-        <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-4">
+        <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-4">
+          <div
+            className="text-[26px] md:text-[30px] leading-tight text-center"
+            style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+          >
+            {isRo ? 'Setări' : 'Settings'}
+          </div>
+          <div className="mt-1" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+
           {/* Preferences */}
-          <div className="rounded-[20px] p-4 md:p-5 text-white shadow-xl" style={cardStyle}>
+          <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>
             <div className="flex items-center justify-between gap-3">
-              <div className="text-[14px] md:text-[16px] font-semibold text-white">{isRo ? 'Notificări' : 'Notifications'}</div>
+              <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+                {isRo ? 'Notificări' : 'Notifications'}
+              </div>
               <IonToggle
                 checked={settings.enableNotifications}
                 style={{
-                  // White/soft-white toggle styling
                   '--handle-background': '#ffffff',
                   '--handle-background-checked': '#ffffff',
-                  '--track-background': 'rgba(255,255,255,0.35)',
-                  '--track-background-checked': 'rgba(255,255,255,0.55)',
+                  '--track-background': 'rgba(78, 91, 79, 0.18)',
+                  '--track-background-checked': 'rgba(197, 122, 74, 0.35)',
                 } as any}
                 onIonChange={e => {
                   setSettings({
@@ -152,16 +237,18 @@ const Settings = () => {
             </div>
 
             <div className="mt-4 flex items-center gap-3">
-              <IonLabel className="text-white text-[14px] md:text-[16px] font-semibold">{isRo ? 'Limbă' : 'Language'}</IonLabel>
+              <IonLabel className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+                {isRo ? 'Limbă' : 'Language'}
+              </IonLabel>
               <div style={{ marginLeft: 'auto' }}>
                 <IonSelect
                   className="fb-lang-select"
                   value={settings.language}
                   interface="popover"
                   style={{
-                    '--placeholder-color': 'rgba(255,255,255,0.85)',
-                    '--color': '#fff',
-                    '--icon-color': '#fff',
+                    '--placeholder-color': '#7A746C',
+                    '--color': '#4E5B4F',
+                    '--icon-color': '#4E5B4F',
                     '--icon-opacity': '1',
                     fontSize: '13px',
                   } as any}
@@ -178,73 +265,61 @@ const Settings = () => {
           </div>
 
           {/* Account */}
-          <div className="rounded-[20px] p-4 md:p-5 text-white shadow-xl" style={cardStyle}>
-            <div className="text-[14px] md:text-[16px] font-semibold">{isRo ? 'Cont' : 'Account'}</div>
+          <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>
+            <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+              {isRo ? 'Cont' : 'Account'}
+            </div>
 
             <SignedIn>
               <div className="mt-3 flex flex-col gap-2">
                 {showManageSubscription ? (
-                  <IonButton
-                    expand="block"
-                    fill="solid"
-                    style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                  <ActionRow
+                    label={ticketLoading ? (isRo ? 'Se pregătește…' : 'Preparing…') : (isRo ? 'Abonament' : 'Manage subscription')}
                     onClick={() => void handleManageSubscription()}
                     disabled={ticketLoading}
-                  >
-                    {ticketLoading ? (isRo ? 'Se pregătește...' : 'Preparing...') : (isRo ? 'Abonament' : 'Manage Subscription')}
-                  </IonButton>
+                    leftIcon={cardOutline}
+                    right={ticketLoading ? <IonSpinner name="crescent" style={{ width: 18, height: 18, color: '#7A746C' }} /> : null}
+                  />
                 ) : null}
-                <IonButton
-                  expand="block"
-                  fill="solid"
-                  style={
-                    {
-                      '--background': 'rgba(255, 59, 48, 0.22)',
-                      '--background-activated': 'rgba(255, 59, 48, 0.30)',
-                      '--color': '#fff',
-                    } as any
-                  }
+                <ActionRow
+                  label={isRo ? 'Șterge contul' : 'Delete my account'}
                   onClick={() => history.push('/settings/delete-account')}
-                >
-                  {isRo ? 'Șterge contul' : 'Delete my account'}
-                </IonButton>
-                <IonButton
-                  expand="block"
-                  fill="solid"
-                  style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                  leftIcon={trashOutline}
+                  variant="danger"
+                />
+                <ActionRow
+                  label={isRo ? 'Deconectare' : 'Sign out'}
                   onClick={handleSignOut}
-                >
-                  {isRo ? 'Deconectare' : 'Sign Out'}
-                </IonButton>
+                  leftIcon={logOutOutline}
+                />
               </div>
             </SignedIn>
 
             <SignedOut>
               <div className="mt-3">
-                <IonButton
-                  expand="block"
-                  fill="solid"
-                  style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                <ActionRow
+                  label={isRo ? 'Autentificare' : 'Sign in'}
                   onClick={() => (window.location.href = '/sign-in')}
-                >
-                  {isRo ? 'Autentificare' : 'Sign In'}
-                </IonButton>
+                  leftIcon={logInOutline}
+                />
               </div>
             </SignedOut>
           </div>
 
           {/* Admin Settings */}
           {showAdminSettings ? (
-            <div className="rounded-[20px] p-4 md:p-5 text-white shadow-xl" style={cardStyle}>
-              <div className="text-[14px] md:text-[16px] font-semibold">{isRo ? 'Setări admin' : 'Admin Settings'}</div>
+            <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>
+              <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+                {isRo ? 'Setări admin' : 'Admin Settings'}
+              </div>
 
               <div className="mt-3 flex flex-col gap-3">
                 {canToggleContentTools ? (
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-[14px] md:text-[16px] font-semibold text-white">
+                    <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
                       {isRo ? 'Instrumente editare conținut' : 'Content editing tools'}
                       {!isDesktopWeb() ? (
-                        <div className="text-[12px] md:text-[14px] text-white/70 font-normal">
+                        <div className="text-[12px] md:text-[14px] font-normal" style={{ color: '#7A746C' }}>
                           {isRo ? 'Disponibil doar pe desktop web.' : 'Desktop web only.'}
                         </div>
                       ) : null}
@@ -254,8 +329,8 @@ const Settings = () => {
                       style={{
                         '--handle-background': '#ffffff',
                         '--handle-background-checked': '#ffffff',
-                        '--track-background': 'rgba(255,255,255,0.35)',
-                        '--track-background-checked': 'rgba(255,255,255,0.55)',
+                        '--track-background': 'rgba(78, 91, 79, 0.18)',
+                        '--track-background-checked': 'rgba(197, 122, 74, 0.35)',
                       } as any}
                       onIonChange={e => {
                         setSettings({
@@ -269,7 +344,7 @@ const Settings = () => {
 
                 {canToggleComingSoonAccess ? (
                   <div className="flex items-center justify-between gap-3">
-                    <div className="text-[14px] md:text-[16px] font-semibold text-white">
+                    <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
                       {isRo ? 'Acces “în curând”' : 'Access “coming soon”'}
                     </div>
                     <IonToggle
@@ -277,8 +352,8 @@ const Settings = () => {
                       style={{
                         '--handle-background': '#ffffff',
                         '--handle-background-checked': '#ffffff',
-                        '--track-background': 'rgba(255,255,255,0.35)',
-                        '--track-background-checked': 'rgba(255,255,255,0.55)',
+                        '--track-background': 'rgba(78, 91, 79, 0.18)',
+                        '--track-background-checked': 'rgba(197, 122, 74, 0.35)',
                       } as any}
                       onIonChange={e => {
                         setSettings({

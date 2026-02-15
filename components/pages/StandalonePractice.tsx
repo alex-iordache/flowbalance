@@ -33,8 +33,13 @@ function getSubscribePending(): boolean {
 function MessageBox({ children }: { children: React.ReactNode }) {
   return (
     <div
-      className="rounded-2xl p-4 text-white leading-relaxed [&>p]:mb-3 [&>p:last-child]:mb-0"
-      style={{ backgroundColor: 'rgba(0,0,0,0.18)', border: '1px solid rgba(255,255,255,0.10)' }}
+      className="rounded-2xl p-4 leading-relaxed [&>p]:mb-3 [&>p:last-child]:mb-0"
+      style={{
+        backgroundColor: '#FBF7F2',
+        border: '1px solid rgba(232, 222, 211, 0.85)',
+        boxShadow: '0 10px 24px rgba(120, 95, 70, 0.06)',
+        color: '#4E5B4F',
+      }}
     >
       {children}
     </div>
@@ -233,11 +238,11 @@ export default function StandalonePractice() {
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
-              <IonBackButton defaultHref="/practices" icon={chevronBackOutline} text="" style={{ '--color': '#fff' } as any} />
+              <IonBackButton defaultHref="/practices" icon={chevronBackOutline} text="" style={{ '--color': '#4E5B4F' } as any} />
             </IonButtons>
-            <IonTitle className="text-white">{isRo ? 'Exercițiu' : 'Exercise'}</IonTitle>
+            <IonTitle>{isRo ? 'Exercițiu' : 'Exercise'}</IonTitle>
             <IonButtons slot="end">
-              <IonIcon icon={lockClosedOutline} className="text-white text-2xl" />
+              <IonIcon icon={lockClosedOutline} className="text-2xl" />
             </IonButtons>
           </IonToolbar>
         </IonHeader>
@@ -262,17 +267,17 @@ export default function StandalonePractice() {
       <IonHeader>
         <IonToolbar>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/practices" icon={chevronBackOutline} text="" style={{ '--color': '#fff' } as any} />
+            <IonBackButton defaultHref="/practices" icon={chevronBackOutline} text="" style={{ '--color': '#4E5B4F' } as any} />
           </IonButtons>
-          <IonTitle className="text-white text-base md:text-lg font-bold truncate">{title}</IonTitle>
+          <IonTitle className="text-base md:text-lg font-bold truncate">{title}</IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
-              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+              <IonIcon icon={settingsOutline} className="text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="text-white" fullscreen={true} scrollY={true}>
+      <IonContent fullscreen={true} scrollY={true}>
         <div className="p-4 md:p-6 flex flex-col gap-4">
           <div className="flex items-center justify-center" style={{ minHeight: '42vh' }}>
             <AudioPlayer src={src} title={title} subtitle={flowName || undefined} variant="floatingCircle" />

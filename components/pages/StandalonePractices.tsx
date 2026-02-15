@@ -9,7 +9,6 @@ import {
   IonHeader,
   IonIcon,
   IonPage,
-  IonTitle,
   IonToolbar,
 } from '@ionic/react';
 import { chevronBackOutline, playCircleOutline, settingsOutline } from 'ionicons/icons';
@@ -21,6 +20,7 @@ import type { Flow, Language } from '../../data/flows';
 import onboardingNewForm from '../../data/onboardingNewForm.json';
 import { FLOW_CATEGORIES } from './flowsCatalog';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
+import Logo from '../ui/Logo';
 import {
   buildAudioUsageIndex,
   pickContextFlowId,
@@ -77,30 +77,46 @@ export default function StandalonePractices() {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar style={{ position: 'relative' }}>
+          {/* Dead-center logo (independent of left/right icons) */}
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
+
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/home" icon={chevronBackOutline} text="" style={{ '--color': '#fff' } as any} />
+            <IonBackButton defaultHref="/home" icon={chevronBackOutline} text="" style={{ '--color': '#4E5B4F' } as any} />
           </IonButtons>
-          <IonTitle className="text-white text-base md:text-lg font-bold truncate">
-            {isRo ? 'Exerciții scurte' : 'Short exercises'}
-          </IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
-              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+              <IonIcon icon={settingsOutline} className="text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="text-white" fullscreen={true}>
-        <div className="p-4 md:p-6 flex flex-col gap-4">
+      <IonContent fullscreen={true}>
+        <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
           <div
-            className="rounded-2xl p-4 text-white/90"
-            style={{ backgroundColor: 'rgba(0,0,0,0.18)', border: '1px solid rgba(255,255,255,0.10)' }}
+            className="text-[26px] md:text-[30px] leading-tight text-center"
+            style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
           >
-            <div className="text-sm md:text-base leading-relaxed">{intro}</div>
+            {isRo ? 'Exerciții scurte' : 'Short exercises'}
           </div>
 
-          <div className="flex flex-col gap-3">
+          <div className="mt-2 text-center text-[14px] md:text-[15px]" style={{ color: '#7A746C' }}>
+            {intro}
+          </div>
+
+          <div className="mt-4" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+
+          <div className="mt-4 grid gap-3">
             {list.map(item => {
               return (
                 <StandalonePracticeRow
@@ -156,23 +172,51 @@ function StandalonePracticeRow({
     <button
       type="button"
       onClick={onOpen}
-      className="w-full text-left rounded-2xl px-4 py-4 flex items-center gap-3"
+      className="relative w-full text-left rounded-[14px] pl-3.5 pr-4 py-3 flex items-center gap-3.5 active:opacity-95"
       style={{
-        backgroundColor: 'rgba(0,0,0,0.18)',
-        border: '1px solid rgba(255,255,255,0.10)',
+        backgroundColor: '#FBF7F2',
+        border: '1px solid rgba(232, 222, 211, 0.85)',
+        boxShadow: '0 10px 24px rgba(120, 95, 70, 0.06)',
       }}
     >
-      <IonIcon className="text-white text-2xl shrink-0" icon={playCircleOutline} />
-      <div className="min-w-0 flex-1">
+      {/* Accent bar */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: 'absolute',
+          left: 0,
+          top: 10,
+          bottom: 10,
+          width: 3,
+          backgroundColor: '#CDAF87',
+          opacity: 0.75,
+          borderRadius: 999,
+        }}
+      />
+
+      <div className="min-w-0 flex-1 pl-1">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="text-white text-[15px] md:text-[17px] font-semibold truncate flex-1 min-w-0">{title}</div>
-          {!hasAccess ? (
-            <IonBadge color="warning" className="align-middle shrink-0">
-              Premium
-            </IonBadge>
-          ) : null}
+          <div
+            className="text-[16px] leading-tight truncate flex-1 min-w-0"
+            style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+          >
+            {title}
+          </div>
         </div>
-        {subtitle ? <div className="text-white/70 text-[12px] md:text-[13px] truncate mt-0.5">{subtitle}</div> : null}
+        {subtitle ? (
+          <div className="text-[12px] md:text-[13px] truncate mt-0.5" style={{ color: '#7A746C' }}>
+            {subtitle}
+          </div>
+        ) : null}
+      </div>
+
+      <div className="shrink-0 flex items-center gap-2">
+        {!hasAccess ? (
+          <IonBadge color="warning" className="align-middle shrink-0">
+            Premium
+          </IonBadge>
+        ) : null}
+        <IonIcon icon={playCircleOutline} style={{ color: '#7A746C', fontSize: '22px' }} />
       </div>
     </button>
   );

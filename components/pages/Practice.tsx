@@ -20,6 +20,11 @@ import { t, type Language } from '../../data/flows';
 import AudioPlayer from '../ui/AudioPlayer';
 import { getAudioSrc } from '../../helpers/getAudioSrc';
 
+function isDayPrefixedTitle(value: string): boolean {
+  const v = (value ?? '').trim();
+  return /^(Ziua|Day)\s+\d+/i.test(v);
+}
+
 function getSubscribePending(): boolean {
   try {
     return sessionStorage.getItem('flow_subscribe_pending') === '1';
@@ -98,31 +103,34 @@ const Practice = () => {
       <IonPage>
         <IonHeader>
           <IonToolbar>
-            <IonTitle className="text-white">{isRo ? 'În curând' : 'Coming soon'}</IonTitle>
+            <IonTitle>{isRo ? 'În curând' : 'Coming soon'}</IonTitle>
             <IonButtons slot="end">
               <IonButton routerLink="/settings" routerDirection="none">
-                <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+                <IonIcon icon={settingsOutline} className="text-2xl" />
               </IonButton>
             </IonButtons>
           </IonToolbar>
         </IonHeader>
         <IonContent className="ion-padding">
           <div
-            className="rounded-2xl p-4 text-white"
+            className="rounded-2xl p-4"
             style={{
-              backgroundColor: 'rgba(0,0,0,0.25)',
-              border: '1px solid rgba(255,255,255,0.12)',
+              backgroundColor: '#FBF7F2',
+              border: '1px solid rgba(232, 222, 211, 0.85)',
+              boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
             }}
           >
-            <div className="font-semibold">{isRo ? 'Acest flow nu este încă disponibil.' : 'This flow isn’t available yet.'}</div>
-            <div className="text-sm text-white/80 mt-1">
+            <div className="font-semibold" style={{ color: '#4E5B4F' }}>
+              {isRo ? 'Acest flow nu este încă disponibil.' : 'This flow isn’t available yet.'}
+            </div>
+            <div className="text-sm mt-1" style={{ color: '#7A746C' }}>
               {isRo ? 'Revino curând.' : 'Please check back soon.'}
             </div>
             <div className="mt-4">
               <IonButton
                 expand="block"
                 fill="solid"
-                style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                style={{ '--background': '#ffffff', '--color': '#3b1b6a' } as any}
                 onClick={() => history.replace('/flows')}
               >
                 {isRo ? 'Înapoi la flows' : 'Back to flows'}
@@ -146,20 +154,27 @@ const Practice = () => {
     }
   };
 
-  const getDisplayName = () => {
-    if (!practice) return '';
-    const name = t(practice.name, lang);
-    if (!name) return '';
-    if (name.length <= 20) return name;
-    // Extract just the day part (e.g., "Day 1", "Day 2")
-    const dayMatch = name.match(/- (Day \d+)$/);
-    return dayMatch ? dayMatch[1] : name;
-  };
-
   const description = practice ? t(practice.description, lang) : null;
   const descriptionIsString = typeof description === 'string';
   const descriptionClassName =
-    'text-white leading-relaxed [&>p]:mb-4 [&>p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-3 [&_li]:my-1';
+    'leading-relaxed [&>p]:mb-4 [&>p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-3 [&_li]:my-1';
+
+  const flowShowDayTitles = (() => {
+    const practices = flow?.practices ?? [];
+    if (practices.length === 0) return false;
+    const dayCount = practices.reduce((acc, p) => {
+      const dayTitle = t(p.title, lang);
+      return acc + (isDayPrefixedTitle(dayTitle) ? 1 : 0);
+    }, 0);
+    return dayCount / practices.length >= 0.6;
+  })();
+
+  const displayTitle = (() => {
+    if (!practice) return '';
+    const dayTitle = t(practice.title, lang);
+    const normalName = t(practice.name, lang);
+    return flowShowDayTitles && isDayPrefixedTitle(dayTitle) ? dayTitle : normalName;
+  })();
 
   return (
     <IonPage>
@@ -170,26 +185,30 @@ const Practice = () => {
               defaultHref={flowId ? `/flows/${flowId}` : '/flows'}
               icon={chevronBackOutline}
               text=""
-              style={{ '--color': '#fff' } as any}
+              style={{ '--color': '#4E5B4F' } as any}
             />
           </IonButtons>
-          <IonTitle className="text-white text-base font-bold truncate">
-            {getDisplayName()}
+          <IonTitle className="text-base font-bold truncate">
+            {displayTitle}
             {!hasAccess && <IonIcon icon={lockClosedOutline} className="ml-2" />}
           </IonTitle>
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
-              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+              <IonIcon icon={settingsOutline} className="text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="text-white" fullscreen={true} scrollY={false}>
+      <IonContent fullscreen={true} scrollY={false}>
         <div className="h-full p-4 flex flex-col gap-3">
           {isActivating && !hasAccess ? (
             <div className="flex flex-col items-center justify-center flex-1 text-center">
-              <p className="text-white text-lg font-semibold mb-2">Activating your subscription…</p>
-              <p className="text-white/80 text-sm">This usually takes a few seconds.</p>
+              <p className="text-lg font-semibold mb-2" style={{ color: '#4E5B4F' }}>
+                Activating your subscription…
+              </p>
+              <p className="text-sm" style={{ color: '#7A746C' }}>
+                This usually takes a few seconds.
+              </p>
             </div>
           ) : null}
 
@@ -198,25 +217,22 @@ const Practice = () => {
             <div className="flex-1 min-h-0 flex flex-col gap-3">
               {/* 60%: Scrollable text box */}
               <div
-                className="fb-no-scrollbar p-1 overflow-auto"
+                className="fb-scrollbar overflow-auto p-1"
                 style={{
                   flex: 6,
                   minHeight: 0,
-                  scrollbarWidth: 'none', // Firefox
-                  msOverflowStyle: 'none', // IE/Edge legacy
+                  backgroundColor: 'transparent',
+                  border: 'none',
+                  boxShadow: 'none',
                 }}
               >
-                <style>{`
-                  /* Hide scrollbars (Chrome/Safari/WebView) but keep scrolling */
-                  .fb-no-scrollbar::-webkit-scrollbar { display: none; }
-                `}</style>
                 {description ? (
                   descriptionIsString ? (
-                    <p className={`${descriptionClassName} whitespace-pre-wrap`}>
+                    <p className={`${descriptionClassName} whitespace-pre-wrap`} style={{ color: '#4E5B4F' }}>
                       {description}
                     </p>
                   ) : (
-                    <div className={descriptionClassName}>
+                    <div className={descriptionClassName} style={{ color: '#4E5B4F' }}>
                       {description}
                     </div>
                   )
@@ -238,7 +254,7 @@ const Practice = () => {
                       flowId,
                       practiceId,
                     })}
-                    title={t(practice.name, lang)}
+                    title={displayTitle}
                     subtitle={flow ? t(flow.name, lang) : undefined}
                     variant="floatingCircle"
                     onPlay={handleAudioPlay}

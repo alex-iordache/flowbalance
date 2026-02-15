@@ -28,9 +28,9 @@ export default function DeleteAccount() {
 
   const cardStyle: React.CSSProperties = useMemo(
     () => ({
-      backgroundColor: 'var(--fb-bg)',
-      backgroundImage:
-        'linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.05) 55%, rgba(255,255,255,0.05) 100%)',
+      backgroundColor: '#FBF7F2',
+      border: '1px solid rgba(232, 222, 211, 0.85)',
+      boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
     }),
     []
   );
@@ -66,17 +66,19 @@ export default function DeleteAccount() {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle className="text-white">{isRo ? 'Ștergere cont' : 'Delete account'}</IonTitle>
+          <IonTitle>{isRo ? 'Ștergere cont' : 'Delete account'}</IonTitle>
         </IonToolbar>
       </IonHeader>
 
       <IonContent className="ion-padding">
         <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-4">
-          <div className="rounded-[20px] p-4 md:p-5 text-white shadow-xl" style={cardStyle}>
+          <div className="rounded-[20px] p-4 md:p-5" style={cardStyle}>
             <SignedIn>
-              <div className="text-[14px] md:text-[16px] font-semibold">{isRo ? 'Confirmare' : 'Confirmation'}</div>
+              <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+                {isRo ? 'Confirmare' : 'Confirmation'}
+              </div>
 
-              <div className="mt-3 text-white/85 text-[13px] md:text-[15px] leading-snug">
+              <div className="mt-3 text-[13px] md:text-[15px] leading-snug" style={{ color: '#4E5B4F' }}>
                 {isRo ? (
                   <>
                     Ești sigur(ă) că vrei să îți ștergi contul? Această acțiune este{' '}
@@ -89,7 +91,7 @@ export default function DeleteAccount() {
                 )}
               </div>
 
-              <div className="mt-2 text-white/75 text-[12px] md:text-[14px] leading-snug">
+              <div className="mt-2 text-[12px] md:text-[14px] leading-snug" style={{ color: '#7A746C' }}>
                 {isRo ? (
                   <>
                     Notă: dacă ai un abonament activ, îl poți gestiona din <em>Abonament</em> înainte de ștergere.
@@ -102,13 +104,17 @@ export default function DeleteAccount() {
                 )}
               </div>
 
-              {error ? <div className="mt-3 text-[13px] md:text-[15px] text-red-200">{error}</div> : null}
+              {error ? (
+                <div className="mt-3 text-[13px] md:text-[15px]" style={{ color: '#B91C1C' }}>
+                  {error}
+                </div>
+              ) : null}
 
               <div className="mt-4 flex flex-col gap-2">
                 <IonButton
                   expand="block"
                   fill="solid"
-                  style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                  style={{ '--background': '#ffffff', '--color': '#3b1b6a' } as any}
                   onClick={() => history.replace('/settings')}
                   disabled={loading}
                 >
@@ -134,8 +140,10 @@ export default function DeleteAccount() {
             </SignedIn>
 
             <SignedOut>
-              <div className="text-[14px] md:text-[16px] font-semibold">{isRo ? 'Cont' : 'Account'}</div>
-              <div className="mt-2 text-white/85 text-[13px] md:text-[15px] leading-snug">
+              <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+                {isRo ? 'Cont' : 'Account'}
+              </div>
+              <div className="mt-2 text-[13px] md:text-[15px] leading-snug" style={{ color: '#7A746C' }}>
                 {isRo
                   ? 'Trebuie să fii autentificat pentru a șterge contul.'
                   : 'You must be signed in to delete your account.'}
@@ -144,7 +152,7 @@ export default function DeleteAccount() {
                 <IonButton
                   expand="block"
                   fill="solid"
-                  style={{ '--background': 'rgba(255,255,255,0.12)', '--color': '#fff' } as any}
+                  style={{ '--background': '#ffffff', '--color': '#3b1b6a' } as any}
                   onClick={() => (window.location.href = '/sign-in')}
                 >
                   {isRo ? 'Autentificare' : 'Sign In'}

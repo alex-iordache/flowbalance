@@ -24,9 +24,12 @@ export default function PostSignupRedirect() {
   }, [isLoaded, userId]);
 
   return (
-    <div className="flex items-center justify-center min-h-screen" style={{ background: 'var(--fb-bg)' }}>
-      <div className="text-center text-white">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white mx-auto mb-4"></div>
+    <div className="flex items-center justify-center min-h-screen" style={{ background: '#F4EFE8' }}>
+      <div className="text-center" style={{ color: '#4E5B4F' }}>
+        <div
+          className="animate-spin rounded-full h-16 w-16 mx-auto mb-4"
+          style={{ border: '3px solid rgba(78, 91, 79, 0.18)', borderTopColor: '#4E5B4F' }}
+        />
         <h2 className="text-2xl font-bold">Welcome! Redirecting...</h2>
       </div>
     </div>

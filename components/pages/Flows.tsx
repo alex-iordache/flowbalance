@@ -1,34 +1,26 @@
 import { t, type Flow, type Language } from '../../data/flows';
 import Store from '../../store';
-import {
-  IonPage,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonContent,
-  IonButton,
-  IonButtons,
-  IonIcon,
-} from '@ionic/react';
+import { IonPage, IonContent, IonIcon, IonHeader, IonToolbar, IonButtons, IonButton } from '@ionic/react';
 import { useIonRouter } from '@ionic/react';
-import { settingsOutline } from 'ionicons/icons';
+import { chevronForwardOutline, settingsOutline } from 'ionicons/icons';
 import { FLOW_CATEGORIES } from './flowsCatalog';
+import Logo from '../ui/Logo';
 
 function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
   const ionRouter = useIonRouter();
   const flowsById = new Map(flows.map(f => [f.id, f]));
 
+  const warmShadow = '0 10px 24px rgba(120, 95, 70, 0.08)';
+
+  // Redesign uses a single accent color across cards.
+  const accent = '#CDAF87';
+
   return (
-    <div className="p-4 w-full max-w-2xl mx-auto flex flex-col gap-4">
+    <div className="px-4 pb-8 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-3">
       {FLOW_CATEGORIES.map(cat => {
         const catFlows = cat.flowIds.map(id => flowsById.get(id)).filter(Boolean) as Flow[];
         const totalFlows = catFlows.length;
-        const totalPractices = catFlows.reduce((acc, f) => acc + (f.practices?.length ?? 0), 0);
-        const completedPractices = catFlows.reduce(
-          (acc, f) => acc + (f.practices?.filter(p => p.finished).length ?? 0),
-          0,
-        );
-        const pct = totalPractices === 0 ? 0 : Math.round((completedPractices / totalPractices) * 100);
+        const categoryImgSrc = `/img/categories/${cat.id}.png`;
 
         return (
           <div
@@ -36,29 +28,55 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
             role="button"
             tabIndex={0}
             onClick={() => ionRouter.push(`/flows/category/${cat.id}`, 'forward')}
-            className={`${cat.bgClass} rounded-2xl p-5 w-full cursor-pointer`}
+            className="relative rounded-[16px] w-full cursor-pointer"
+            style={{
+              backgroundColor: '#FBF7F2',
+              border: '1px solid rgba(232, 222, 211, 0.85)',
+              boxShadow: warmShadow,
+            }}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="text-[11px] uppercase tracking-wide text-white/85">
-                  {totalFlows} flows • {totalPractices} practices
-                </div>
-                <div className="mt-1 text-lg md:text-xl font-bold text-white truncate">
+            {/* Accent bar: flush on the left border */}
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute',
+                left: 0,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                width: 3,
+                height: 66,
+                backgroundColor: accent,
+                opacity: 0.75,
+                borderRadius: 999,
+              }}
+            />
+
+            <div className="pl-3.5 pr-4 py-3 flex items-center gap-3.5">
+              {/* Left: category thumbnail */}
+              <img
+                className="w-[78px] h-[78px] rounded-2xl shrink-0 object-cover"
+                src={categoryImgSrc}
+                alt={t(cat.title, lang)}
+                loading="lazy"
+                decoding="async"
+              />
+
+              {/* Middle: text + progress */}
+              <div className="min-w-0 flex-1">
+                <div
+                  className="text-[18px] md:text-[20px] leading-tight truncate"
+                  style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+                >
                   {t(cat.title, lang)}
                 </div>
+                <div className="mt-0.5 text-[13px]" style={{ color: '#7A746C' }}>
+                  {totalFlows} {lang === 'ro' ? 'flow-uri' : 'flows'}
+                </div>
               </div>
-              <div className="text-white font-bold text-lg shrink-0">{pct}%</div>
-            </div>
 
-            <div className="mt-3">
-              <div className="flex items-center justify-between text-[11px] text-white/90">
-                <span>Complete</span>
-                <span>
-                  {completedPractices}/{totalPractices}
-                </span>
-              </div>
-              <div className="w-full h-2 bg-white/25 rounded-full mt-1 overflow-hidden">
-                <div className="h-2 bg-white/85 rounded-full" style={{ width: `${pct}%` }} />
+              {/* Right: chevron */}
+              <div className="flex items-center gap-2 shrink-0">
+                <IonIcon icon={chevronForwardOutline} style={{ color: '#7A746C', fontSize: '18px' }} />
               </div>
             </div>
           </div>
@@ -69,27 +87,48 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
 }
 
 const Flows = () => {
-  const ionRouter = useIonRouter();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
   const isRo = lang === 'ro';
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <IonTitle className="text-white">{isRo ? 'Flows' : 'Flows'}</IonTitle>
+        <IonToolbar style={{ position: 'relative' }}>
+          {/* Dead-center logo (independent of left/right icons) */}
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
+
           <IonButtons slot="end">
             <IonButton routerLink="/settings" routerDirection="none">
-              <IonIcon icon={settingsOutline} className="text-white text-2xl" />
+              <IonIcon icon={settingsOutline} className="text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>
-        <CategoryList flows={flows} lang={lang} />
-        </IonContent>
+        <div className="pt-3">
+          <div className="px-6 text-center">
+            <div className="text-[14px]" style={{ color: '#7A746C' }}>
+              {isRo ? 'Alege direcția în care vrei să evoluezi.' : 'Choose the direction you want to grow in.'}
+            </div>
+          </div>
+          <div className="mt-4" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+          <div className="mt-4">
+            <CategoryList flows={flows} lang={lang} />
+          </div>
+        </div>
+      </IonContent>
     </IonPage>
   );
-  }
-  
-  export default Flows;
+};
+
+export default Flows;

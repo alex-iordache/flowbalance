@@ -3,14 +3,22 @@ http://ionicframework.com/docs/theming/ */
 
 /** Ionic CSS Variables **/
 :root {
-  /* App base styling (FlowBalance purple) */
-  /* Flat background: use the upper-left gradient color */
-  /* Match the tab bar tint (we use this everywhere for a seamless look) */
-  /* Use the footer's actual tint as the global app background for a seamless look */
-  --fb-bg: #7d63ff;
-  --fb-surface: var(--fb-bg);
+  /* App base styling (warm redesign) */
+  --fb-bg: #F4EFE8;
+  --fb-surface: #FBF7F2;
   --fb-side-pad: 18px;
-  --fb-card-gradient: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, rgba(0,0,0,0.07) 55%, rgba(255,255,255,0.06) 100%);
+  --fb-card-gradient: none;
+  /* Chrome (header/footer/tabbar) foreground colors (override per-route as needed). */
+  --fb-chrome-fg: #4E5B4F;
+  --fb-chrome-fg-muted: #7A746C;
+  --fb-chrome-selected: #C57A4A;
+
+  /**
+   * Global app font used by Ionic components.
+   * Many Ionic elements (including shadow DOM parts) rely on `--ion-font-family`,
+   * which does NOT automatically follow the document/body font-family.
+   */
+  --ion-font-family: var(--font-title), var(--font-inter), ui-sans-serif, system-ui, -apple-system;
 
   /** primary **/
   /* Make Ionic's primary match the app palette */
@@ -86,7 +94,7 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-light-tint: #f5f6f9;
 
   /** logo **/
-  --logo-filter: brightness(0) invert(1);
+  --logo-filter: none;
 }
 
 /* Seamless Ionic chrome (no borders between header/content/footer) */
@@ -100,8 +108,8 @@ ion-toolbar {
   --background: var(--fb-bg) !important;
   --ion-toolbar-background: var(--fb-bg) !important;
   background: var(--fb-bg) !important;
-  /* Ensure title + buttons are white (Tailwind classes don't always penetrate Ionic shadow parts) */
-  --color: rgba(255, 255, 255, 0.98);
+  /* Ensure title + buttons follow the current theme */
+  --color: var(--fb-chrome-fg);
   --padding-start: var(--fb-side-pad);
   --padding-end: var(--fb-side-pad);
   --border-width: 0px;
@@ -146,8 +154,8 @@ ion-tab-bar {
 
 /* Bottom nav: white icons + white text (selected + unselected) */
 ion-tab-button {
-  --color: rgba(255, 255, 255, 0.95);
-  --color-selected: rgba(255, 255, 255, 1);
+  --color: var(--fb-chrome-fg-muted);
+  --color-selected: var(--fb-chrome-selected);
   flex: 1;
 }
 

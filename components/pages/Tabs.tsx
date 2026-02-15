@@ -7,13 +7,14 @@ import {
   IonIcon,
   IonLabel,
 } from '@ionic/react';
-import { home, pulse, trendingUp } from 'ionicons/icons';
+import { home, playCircleOutline, pulse, trendingUp } from 'ionicons/icons';
 import { Suspense, lazy } from 'react';
 
 import Home from './Home';
 import Flows from './Flows';
 import FlowCategory from './FlowCategory';
 import FlowDetail from './FlowDetail';
+import FlowPractices from './FlowPractices';
 import Practice from './Practice';
 import StandalonePractices from './StandalonePractices';
 import StandalonePractice from './StandalonePractice';
@@ -50,6 +51,11 @@ const Tabs = () => {
             exact={true}
           />
           <Route
+            path="/flows/:flowId/practices"
+            render={() => <FlowPractices />}
+            exact={true}
+          />
+          <Route
             path="/flows/:flowId/:practiceId"
             render={() => <Practice />}
             exact={true}
@@ -82,7 +88,11 @@ const Tabs = () => {
           <IonIcon icon={pulse} />
           <IonLabel>{isRo ? 'Flows' : 'Flows'}</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="tab3" href="/progress">
+        <IonTabButton tab="tab3" href="/practices">
+          <IonIcon icon={playCircleOutline} />
+          <IonLabel>{isRo ? 'Exerciții' : 'Practices'}</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="tab4" href="/progress">
           <IonIcon icon={trendingUp} />
           <IonLabel>{isRo ? 'Progresul meu' : 'My Progress'}</IonLabel>
         </IonTabButton>

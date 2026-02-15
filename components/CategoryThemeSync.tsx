@@ -2,26 +2,14 @@
 
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { getCategoryById, getCategoryForFlowId } from './pages/flowsCatalog';
-
-import { DEFAULT_APP_BG, DEFAULT_CARD_GRADIENT, FLOW_THEMES } from '../flowtheme';
+// Category definitions are still used in content lists/cards,
+// but the redesign keeps a consistent app chrome background.
 
 function resolveCategoryBgFromPath(pathname: string): string {
-  // /flows/category/:categoryId
-  const catMatch = pathname.match(/^\/flows\/category\/([^/]+)\/?$/);
-  if (catMatch) {
-    const cat = getCategoryById(catMatch[1]);
-    return (cat ? FLOW_THEMES[cat.theme].bg : DEFAULT_APP_BG) ?? DEFAULT_APP_BG;
-  }
-
-  // /flows/:flowId or /flows/:flowId/:practiceId
-  const flowMatch = pathname.match(/^\/flows\/([^/]+)(?:\/[^/]+)?\/?$/);
-  if (flowMatch) {
-    const cat = getCategoryForFlowId(flowMatch[1]);
-    return (cat ? FLOW_THEMES[cat.theme].bg : DEFAULT_APP_BG) ?? DEFAULT_APP_BG;
-  }
-
-  return DEFAULT_APP_BG;
+  // Warm redesign background across the app chrome.
+  // (We still keep category definitions for content/cards, but the app background stays consistent.)
+  void pathname;
+  return '#F4EFE8';
 }
 
 /**
@@ -34,7 +22,13 @@ export default function CategoryThemeSync() {
   useEffect(() => {
     const bg = resolveCategoryBgFromPath(location.pathname);
     document.documentElement.style.setProperty('--fb-bg', bg);
-    document.documentElement.style.setProperty('--fb-card-gradient', DEFAULT_CARD_GRADIENT);
+
+    // Warm redesign chrome colors everywhere.
+    document.documentElement.style.setProperty('--fb-chrome-fg', '#4E5B4F');
+    document.documentElement.style.setProperty('--fb-chrome-fg-muted', '#7A746C');
+    document.documentElement.style.setProperty('--fb-chrome-selected', '#C57A4A');
+    document.documentElement.style.setProperty('--logo-filter', 'none');
+    document.documentElement.style.setProperty('--fb-card-gradient', 'none');
   }, [location.pathname]);
 
   return null;

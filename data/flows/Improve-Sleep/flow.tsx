@@ -76,7 +76,7 @@ const flow: Flow = {
     en: "Create a steady ritual that supports your body’s natural sleep.",
   },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flows/improve-sleep.png", en: "/img/flows/improve-sleep.png" },
+  image: { ro: "/img/flows/somn-odihnitor.webp", en: "/img/flows/somn-odihnitor.webp" },
 
   started: false,
   finished: false,

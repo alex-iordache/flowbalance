@@ -55,7 +55,7 @@ const flow: Flow = {
     en: 'Become aware. Regulate. Regain your inner calm.',
   },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: '/img/flows/calming-anxiety.png', en: '/img/flows/calming-anxiety.png' },
+  image: { ro: '/img/flows/calming-anxiety.webp', en: '/img/flows/calming-anxiety.webp' },
 
   started: false,
   finished: false,

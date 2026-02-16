@@ -20,7 +20,8 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
       {FLOW_CATEGORIES.map(cat => {
         const catFlows = cat.flowIds.map(id => flowsById.get(id)).filter(Boolean) as Flow[];
         const totalFlows = catFlows.length;
-        const categoryImgSrc = `/img/categories/${cat.id}.png`;
+        const categoryImgWebpSrc = `/img/categories/${cat.id}.webp`;
+        const categoryImgPngSrc = `/img/categories/${cat.id}.png`;
 
         return (
           <div
@@ -55,10 +56,16 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
               {/* Left: category thumbnail */}
               <img
                 className="w-[78px] h-[78px] rounded-2xl shrink-0 object-cover"
-                src={categoryImgSrc}
+                src={categoryImgWebpSrc}
                 alt={t(cat.title, lang)}
                 loading="lazy"
                 decoding="async"
+                onError={(e) => {
+                  // Fallback to older PNGs if webp is missing on any environment.
+                  const img = e.currentTarget as HTMLImageElement;
+                  img.onerror = null;
+                  img.src = categoryImgPngSrc;
+                }}
               />
 
               {/* Middle: text + progress */}

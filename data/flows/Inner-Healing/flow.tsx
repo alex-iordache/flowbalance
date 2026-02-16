@@ -78,7 +78,7 @@ const flow: Flow = {
     en: 'Reconnect with your body as an ally, not a problem to fix.',
   },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: '/img/flows/inner-healing.png', en: '/img/flows/inner-healing.png' },
+  image: { ro: '/img/flows/inner-healing.webp', en: '/img/flows/inner-healing.webp' },
 
   started: false,
   finished: false,

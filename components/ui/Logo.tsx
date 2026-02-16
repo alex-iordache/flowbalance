@@ -1,18 +1,13 @@
 const Logo = () => {
   return (
-    <div
-      className="w-full text-center select-none"
-      style={{
-        fontFamily: 'var(--font-logo), ui-serif, Georgia, serif',
-        letterSpacing: '0.04em',
-        fontWeight: 600,
-        fontSize: '24px',
-        lineHeight: '1',
-        color: 'var(--fb-chrome-fg)',
-      }}
-    >
-      FLOW
-    </div>
+    <img
+      src="/flow_cropped.png"
+      alt="FLOW"
+      className="block h-[22px] md:h-[24px] w-auto select-none"
+      style={{ objectFit: 'contain' }}
+      loading="eager"
+      decoding="async"
+    />
   );
 };
 

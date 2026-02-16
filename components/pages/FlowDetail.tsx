@@ -16,26 +16,29 @@ import { useMemo } from 'react';
 import Store from '../../store';
 import { t, type Language } from '../../data/flows';
 import Logo from '../ui/Logo';
+import { FLOW_LANDING_DATA_BY_ID } from '../../data/flowLandingData';
 
 type HelpPill = { id: string; icon: any; label: { ro: string; en: string } };
 
-function getLandingExtras(flowId: string | undefined): { helpPills: HelpPill[]; protocol: Array<{ ro: string; en: string }> } {
-  if (flowId === 'Calming-Anxiety') {
-    return {
-      helpPills: [
-        { id: 'breath', icon: pulseOutline, label: { ro: 'Reglare respirație', en: 'Breath regulation' } },
-        { id: 'body', icon: bodyOutline, label: { ro: 'Stabilizare corporală', en: 'Body stabilization' } },
-        { id: 'cognitive', icon: bulbOutline, label: { ro: 'Reorientare cognitivă', en: 'Cognitive reframe' } },
-      ],
-      protocol: [
-        { ro: 'Respirație 4–6', en: 'Breathing 4–6' },
-        { ro: 'Ancorare corporală', en: 'Body grounding' },
-        { ro: 'Activare resurse interne', en: 'Activate inner resources' },
-      ],
-    };
-  }
+function getLandingExtras(flowId: string | undefined): { helpPills: HelpPill[]; programLines: Array<{ ro: string; en: string }> } {
+  const id = (flowId ?? '').trim();
+  const data = FLOW_LANDING_DATA_BY_ID[id];
+  if (!data) return { helpPills: [], programLines: [] };
 
-  return { helpPills: [], protocol: [] };
+  const isCalming = id === 'Calming-Anxiety';
+  const icons = isCalming ? [pulseOutline, bodyOutline, bulbOutline] : [pulseOutline, bodyOutline, bulbOutline];
+
+  const helpPills: HelpPill[] = data.pills
+    .map((label, idx) => ({
+      id: `${id}-pill-${idx + 1}`,
+      icon: icons[idx] ?? pulseOutline,
+      label,
+    }))
+    .filter(p => (p.label?.ro ?? '').trim().length > 0);
+
+  const programLines = (data.programLines ?? []).filter(l => (l?.ro ?? '').trim().length > 0);
+
+  return { helpPills, programLines };
 }
 
 export default function FlowDetail() {
@@ -49,9 +52,9 @@ export default function FlowDetail() {
   const extras = useMemo(() => getLandingExtras(flowId), [flowId]);
 
   const helpPills = extras.helpPills;
-  const protocolLines = extras.protocol;
+  const programLines = extras.programLines;
   const showHelp = helpPills.length > 0;
-  const showProtocol = protocolLines.length > 0;
+  const showProgram = programLines.length > 0;
 
   const description = flow ? t(flow.description, lang) : null;
   const descriptionIsString = typeof description === 'string';
@@ -216,13 +219,13 @@ export default function FlowDetail() {
             </div>
           ) : null}
 
-          {showProtocol ? (
+          {showProgram ? (
             <div className="mt-7">
               <div
                 className="text-[20px] md:text-[22px]"
                 style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
               >
-                {isRo ? 'Protocol scurt' : 'Short protocol'}
+                {isRo ? 'Program structurat' : 'Structured program'}
               </div>
 
               <div
@@ -233,7 +236,7 @@ export default function FlowDetail() {
                   boxShadow: '0 12px 26px rgba(120, 95, 70, 0.06)',
                 }}
               >
-                {protocolLines.slice(0, 5).map((line, idx) => (
+                {programLines.slice(0, 5).map((line, idx) => (
                   <div key={idx} className="flex items-start gap-3 py-1.5">
                     <div
                       className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[12px] font-semibold"

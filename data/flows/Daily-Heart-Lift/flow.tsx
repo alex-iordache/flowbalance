@@ -53,7 +53,7 @@ const flow: Flow = {
     en: "Shift your heart state through acceptance, wholeness, and meaning.",
   },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flows/daily-heart-lift.png", en: "/img/flows/daily-heart-lift.png" },
+  image: { ro: "/img/flows/daily-heart-lift.webp", en: "/img/flows/daily-heart-lift.webp" },
   comingSoon: false,
 
   started: false,

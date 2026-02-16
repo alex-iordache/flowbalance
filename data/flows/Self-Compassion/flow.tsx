@@ -59,7 +59,7 @@ const flow: Flow = {
   name: { ro: "Compasiune de sine", en: "Self Compassion" },
   intro: { ro: "Construiește o relație blândă și sigură cu tine însuți.", en: "Build a kind and safe relationship with yourself." },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flows/self-compassion.png", en: "/img/flows/self-compassion.png" },
+  image: { ro: "/img/flows/self-compassion.webp", en: "/img/flows/self-compassion.webp" },
   comingSoon: false,
 
   started: false,

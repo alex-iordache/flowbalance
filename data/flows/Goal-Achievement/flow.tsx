@@ -74,7 +74,7 @@ const flow: Flow = {
     en: 'Build clarity, motivation, and consistency to turn your dreams into reality.',
   },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: '/img/flows/goal-achievement.png', en: '/img/flows/goal-achievement.png' },
+  image: { ro: '/img/flows/goal-achievement.webp', en: '/img/flows/goal-achievement.webp' },
 
   started: false,
   finished: false,

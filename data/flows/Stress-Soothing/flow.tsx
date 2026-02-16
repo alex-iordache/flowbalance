@@ -79,7 +79,7 @@ const flow: Flow = {
     en: 'Build, step by step, a habit of calm and emotional regulation.',
   },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: '/img/flows/stress-soothing.png', en: '/img/flows/stress-soothing.png' },
+  image: { ro: '/img/flows/stress-soothing.webp', en: '/img/flows/stress-soothing.webp' },
 
   started: false,
   finished: false,

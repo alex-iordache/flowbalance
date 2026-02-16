@@ -47,7 +47,7 @@ const flow: Flow = {
   name: { ro: "Relație sănătoasă cu banii", en: "Healthy Money Mindset" },
   intro: { ro: "Construiește o relație eficientă, matură și stabilă cu banii și visurile tale.", en: "Build an effective, mature, and steady relationship with money and your dreams." },
   description: { ro: roDescription, en: enDescription },
-  image: { ro: "/img/flows/healthy-money-mindset.png", en: "/img/flows/healthy-money-mindset.png" },
+  image: { ro: "/img/flows/healthy-money-mindset.webp", en: "/img/flows/healthy-money-mindset.webp" },
   comingSoon: false,
 
   started: false,

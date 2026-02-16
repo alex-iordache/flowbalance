@@ -671,10 +671,10 @@ const Home = () => {
                   subtitle: { ro: string; en: string };
                 }> = [
                   {
-                    categoryId: 'performance-boost',
+                    categoryId: 'somatic-release',
                     icon: moonOutline,
                     iconColor: '#CDAF87',
-                    subtitle: { ro: 'Somn, energie și focus', en: 'Sleep, energy, and focus' },
+                    subtitle: { ro: 'Eliberare somatică & reconectare', en: 'Somatic release & reconnection' },
                   },
                   {
                     categoryId: 'heart-balance',

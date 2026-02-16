@@ -18,6 +18,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     title: { ro: 'Reglare emoțională', en: 'Emotional Regulation' },
     flowIds: [
       'Craving-Relief',
+      'Improve-Sleep',
       'Calming-Anxiety',
     ],
     theme: 1,
@@ -28,7 +29,6 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     id: 'performance-boost',
     title: { ro: 'Performanță', en: 'Performance Boost' },
     flowIds: [
-      'Improve-Sleep',
     ],
     theme: 2,
     bgClass: 'bg-gradient-to-br from-emerald-500 to-teal-600',

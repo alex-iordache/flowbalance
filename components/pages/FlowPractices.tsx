@@ -67,9 +67,9 @@ function PracticeRow({
   return (
     <button
       type="button"
-      onClick={() => (locked ? undefined : onOpen(practice.id))}
+      onClick={() => onOpen(practice.id)}
       className={`relative w-full text-left rounded-[14px] px-4 py-3 flex items-center gap-3 ${
-        locked ? 'opacity-95 cursor-default pointer-events-none' : 'cursor-pointer active:opacity-95'
+        locked ? 'opacity-95 cursor-pointer active:opacity-95' : 'cursor-pointer active:opacity-95'
       }`}
       style={{
         backgroundColor: '#FBF7F2',

@@ -29,6 +29,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     id: 'performance-boost',
     title: { ro: 'Performanță', en: 'Performance Boost' },
     flowIds: [
+      'Goal-Achievement',
     ],
     theme: 2,
     bgClass: 'bg-gradient-to-br from-emerald-500 to-teal-600',
@@ -40,7 +41,6 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     flowIds: [
       'Build-Self-Trust',
       'Healthy-Money-Mindset',
-      'Goal-Achievement',
     ],
     theme: 3,
     bgClass: 'bg-gradient-to-br from-violet-500 to-fuchsia-600',

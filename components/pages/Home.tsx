@@ -484,7 +484,7 @@ const Home = () => {
 
   const forYouTitle = isRo ? 'Pentru tine azi' : 'For you today';
   const forYouSubtitle = isRo ? 'Alege o sesiune care să îți regleze mintea.' : 'Choose a session to help regulate your mind.';
-  const categoriesTitle = isRo ? 'Descoperă categoriile terapeutice' : 'Discover therapeutic categories';
+  const categoriesTitle = isRo ? 'Explorează direcțiile' : 'Explore pathways';
 
   const recommendedCarouselFlows = useMemo(() => {
     const out: Flow[] = [];

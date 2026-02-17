@@ -6,6 +6,7 @@ import {
   IonTabButton,
   IonIcon,
   IonLabel,
+  useIonRouter,
 } from '@ionic/react';
 import { home, playCircleOutline, pulse, trendingUp } from 'ionicons/icons';
 import { Suspense, lazy } from 'react';
@@ -28,6 +29,7 @@ import { isDesktopWeb } from '../admin/adminEnv';
 const AdminRoutes = lazy(() => import('../admin/AdminRoutes'));
 
 const Tabs = () => {
+  const ionRouter = useIonRouter();
   const isSuperAdmin = Store.useState(s => s.isSuperAdmin);
   const adminContentEditingTools = Store.useState(s => Boolean((s.settings as any)?.adminContentEditingTools));
   const allowAdmin = isSuperAdmin && adminContentEditingTools && isDesktopWeb();
@@ -84,7 +86,17 @@ const Tabs = () => {
           <IonIcon icon={home} />
           <IonLabel>{isRo ? 'Acasă' : 'Home'}</IonLabel>
         </IonTabButton>
-        <IonTabButton tab="tab2" href="/flows">
+        <IonTabButton
+          tab="tab2"
+          href="/flows"
+          onClick={(e) => {
+            // Ionic tabs normally remember the last route within the tab.
+            // We want "Flows" to always open the category list.
+            e.preventDefault();
+            e.stopPropagation();
+            ionRouter.push('/flows', 'root');
+          }}
+        >
           <IonIcon icon={pulse} />
           <IonLabel>{isRo ? 'Flows' : 'Flows'}</IonLabel>
         </IonTabButton>

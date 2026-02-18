@@ -30,6 +30,13 @@ import {
   type StandaloneAudioScored,
 } from '../../helpers/standaloneAudioIndex';
 
+function normalizeTitle(value: string): string {
+  return String(value ?? '')
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, ' ');
+}
+
 function resolveCategoryToFlowIds(categoryId: string, flows: { id: string }[]): string[] {
   const cat = FLOW_CATEGORIES.find(c => c.id === categoryId) ?? null;
   if (!cat) return [];
@@ -67,7 +74,19 @@ export default function StandalonePractices() {
       onboarding,
       resolvedNeedFlows,
     });
-    return sortStandaloneAudios(scored, lang);
+    const sorted = sortStandaloneAudios(scored, lang);
+
+    // Some recordings can exist under different audio IDs but share the same displayed title.
+    // Dedupe by localized title and keep the highest-ranked item (since `sorted` is points-first).
+    const seen = new Set<string>();
+    const deduped: StandaloneAudioScored[] = [];
+    for (const item of sorted) {
+      const key = `${normalizeTitle(item.title.ro)}|${normalizeTitle(item.title.en)}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(item);
+    }
+    return deduped;
   }, [flows, lang, onboarding, resolvedNeedFlows, selectedNeedIds]);
 
   const intro = isRo
@@ -152,7 +171,6 @@ function StandalonePracticeRow({
   const title = isRo ? item.title.ro : item.title.en;
   const contextFlowId = pickContextFlowId(item.flowIds);
   const contextFlow = contextFlowId ? flows.find((f) => f.id === contextFlowId) ?? null : null;
-  const subtitle = contextFlow ? (isRo ? (contextFlow.title as any).ro : (contextFlow.title as any).en) : '';
 
   const examplePracticeId = contextFlowId ? item.examplePracticeIdByFlowId?.[contextFlowId] ?? null : null;
   const flowIndex = contextFlowId ? flows.findIndex((f) => f.id === contextFlowId) : -1;
@@ -203,11 +221,6 @@ function StandalonePracticeRow({
             {title}
           </div>
         </div>
-        {subtitle ? (
-          <div className="text-[12px] md:text-[13px] truncate mt-0.5" style={{ color: '#7A746C' }}>
-            {subtitle}
-          </div>
-        ) : null}
       </div>
 
       <div className="shrink-0 flex items-center gap-2">

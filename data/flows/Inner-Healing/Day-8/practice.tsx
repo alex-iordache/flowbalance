@@ -49,7 +49,7 @@ const practice: Practice = {
     en: 'Gratitude for healthy organs.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/redu-disconfortul-fizic.mp3', en: 'audioFiles/redu-disconfortul-fizic.mp3' },
+  audioUrl: { ro: 'audioFiles/redu-disconfortul-fizic.mp3', en: 'audioFilesEnAi/redu-disconfortul-fizic-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

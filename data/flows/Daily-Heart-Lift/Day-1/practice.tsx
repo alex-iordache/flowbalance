@@ -46,7 +46,7 @@ const practice: Practice = {
     en: "Repeat a simple phrase and let your body integrate acceptance.",
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/daily-heart-lift.mp3", en: "audioFiles/daily-heart-lift.mp3" },
+  audioUrl: { ro: "audioFiles/daily-heart-lift.mp3", en: "audioFilesEnAi/daily-heart-lift-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

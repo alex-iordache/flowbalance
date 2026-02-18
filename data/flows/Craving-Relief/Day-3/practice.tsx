@@ -55,7 +55,7 @@ const practice: Practice = {
   name: { ro: "Pofta nu e o urgență", en: "A Craving Isn’t an Emergency" },
   intro: { ro: "Aplică regula celor 10 minute și observă cum se schimbă pofta.", en: "Apply the 10-minute rule and notice how the craving changes." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/valul-trece.mp3", en: "audioFiles/valul-trece.mp3" },
+  audioUrl: { ro: "audioFiles/valul-trece.mp3", en: "audioFilesEnAi/valul-trece-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

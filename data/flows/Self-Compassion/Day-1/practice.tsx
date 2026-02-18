@@ -57,7 +57,7 @@ const practice: Practice = {
   name: { ro: "Blândețe", en: "Kindness" },
   intro: { ro: "Observă vocea interioară și oferă-ți exact ce ți-a lipsit: prezență și siguranță.", en: "Notice your inner voice and offer what was missing: presence and safety." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/self-compassion.mp3", en: "audioFiles/self-compassion.mp3" },
+  audioUrl: { ro: "audioFiles/self-compassion.mp3", en: "audioFilesEnAi/self-compassion-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

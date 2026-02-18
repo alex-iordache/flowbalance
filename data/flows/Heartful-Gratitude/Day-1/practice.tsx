@@ -57,7 +57,7 @@ const practice: Practice = {
     en: "Choose a concrete anchor and let gratitude land in the body.",
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/heartful-gratitude.mp3", en: "audioFiles/heartful-gratitude.mp3" },
+  audioUrl: { ro: "audioFiles/heartful-gratitude.mp3", en: "audioFilesEnAi/heartful-gratitude-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

@@ -55,7 +55,7 @@ const practice: Practice = {
   name: { ro: "Corpul și senzațiile", en: "The Body and Sensations" },
   intro: { ro: "Mută atenția în corp și observă senzațiile poftei timp de 30–60 de secunde.", en: "Shift attention into the body and observe craving sensations for 30–60 seconds." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/valul-trece.mp3", en: "audioFiles/valul-trece.mp3" },
+  audioUrl: { ro: "audioFiles/valul-trece.mp3", en: "audioFilesEnAi/valul-trece-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

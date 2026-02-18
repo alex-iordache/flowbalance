@@ -43,7 +43,7 @@ const practice: Practice = {
   name: { ro: "Repetiție conștientă", en: "Conscious Repetition" },
   intro: { ro: "Repetă pașii de până acum și observă cum crește siguranța.", en: "Repeat the steps so far and notice safety building." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/valul-trece.mp3", en: "audioFiles/valul-trece.mp3" },
+  audioUrl: { ro: "audioFiles/valul-trece.mp3", en: "audioFilesEnAi/valul-trece-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

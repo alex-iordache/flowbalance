@@ -46,7 +46,7 @@ const practice: Practice = {
     en: 'Five short body scans.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/conectarea-la-propriile-emotii.mp3', en: 'audioFiles/conectarea-la-propriile-emotii.mp3' },
+  audioUrl: { ro: 'audioFiles/conectarea-la-propriile-emotii.mp3', en: 'audioFilesEnAi/conectarea-la-propriile-emotii-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

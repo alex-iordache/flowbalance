@@ -53,7 +53,7 @@ const practice: Practice = {
   name: { ro: "Conștientizarea poftei", en: "Awareness of the Craving" },
   intro: { ro: "Observă pofta fără judecată și notează contextul în care apare.", en: "Observe the craving without judgment and note the context in which it appears." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/valul-trece.mp3", en: "audioFiles/valul-trece.mp3" },
+  audioUrl: { ro: "audioFiles/valul-trece.mp3", en: "audioFilesEnAi/valul-trece-en.mp3" },
   finished: false,
   lastPositionSec: 0,
 };

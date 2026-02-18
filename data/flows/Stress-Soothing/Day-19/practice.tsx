@@ -69,7 +69,7 @@ const practice: Practice = {
     en: 'Physical tension and emotions; listen to your body.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/redu-disconfortul-fizic.mp3', en: 'audioFiles/redu-disconfortul-fizic.mp3' },
+  audioUrl: { ro: 'audioFiles/redu-disconfortul-fizic.mp3', en: 'audioFilesEnAi/redu-disconfortul-fizic-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

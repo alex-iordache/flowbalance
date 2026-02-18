@@ -59,7 +59,7 @@ const practice: Practice = {
   name: { ro: "Motivație din sens", en: "Motivation from Meaning" },
   intro: { ro: "Alege un motiv real și lasă corpul să se reconecteze cu energia lui.", en: "Choose a real reason and let your body reconnect with its energy." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/boost-motivation.mp3", en: "audioFiles/boost-motivation.mp3" },
+  audioUrl: { ro: "audioFiles/boost-motivation.mp3", en: "audioFilesEnAi/boost-motivation-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

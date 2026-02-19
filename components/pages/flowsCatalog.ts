@@ -49,7 +49,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
   {
     id: 'stories',
     title: { ro: 'Povești', en: 'Stories' },
-    flowIds: ['Calm-Stories'],
+    flowIds: ['Calm-Stories', 'Reflection-Stories'],
     theme: 4,
     bgClass: 'bg-gradient-to-br from-orange-500 to-amber-600',
     gradientCss: 'linear-gradient(135deg, #f97316 0%, #d97706 100%)',

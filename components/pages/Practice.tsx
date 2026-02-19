@@ -171,6 +171,11 @@ const Practice = () => {
 
   const description = practice ? t(practice.description, lang) : null;
   const descriptionIsString = typeof description === 'string';
+  const hasDescription = (() => {
+    if (!description) return false;
+    if (typeof description === 'string') return description.trim().length > 0;
+    return true;
+  })();
   const descriptionClassName =
     'leading-relaxed [&>p]:mb-4 [&>p:last-child]:mb-0 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:my-3 [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:my-3 [&_li]:my-1';
 
@@ -239,38 +244,40 @@ const Practice = () => {
           {/* Show content only if user has access */}
           {hasAccess ? (
             <div className="flex-1 min-h-0 flex flex-col gap-3">
-              {/* Scrollable text box (smaller, so player has more room) */}
-              <div
-                className="fb-scrollbar overflow-auto p-1 text-[13px] md:text-[14px]"
-                style={{
-                  flex: 5,
-                  minHeight: 0,
-                  backgroundColor: 'transparent',
-                  border: 'none',
-                  boxShadow: 'none',
-                }}
-              >
-                {description ? (
-                  descriptionIsString ? (
-                    <p className={`${descriptionClassName} whitespace-pre-wrap`} style={{ color: '#4E5B4F' }}>
-                      {description}
-                    </p>
-                  ) : (
-                    <div className={descriptionClassName} style={{ color: '#4E5B4F' }}>
-                      {description}
-                    </div>
-                  )
-                ) : null}
-              </div>
+              {hasDescription ? (
+                <>
+                  {/* Scrollable text box (smaller, so player has more room) */}
+                  <div
+                    className="fb-scrollbar overflow-auto p-1 text-[13px] md:text-[14px]"
+                    style={{
+                      flex: 5,
+                      minHeight: 0,
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      boxShadow: 'none',
+                    }}
+                  >
+                    {descriptionIsString ? (
+                      <p className={`${descriptionClassName} whitespace-pre-wrap`} style={{ color: '#4E5B4F' }}>
+                        {description}
+                      </p>
+                    ) : (
+                      <div className={descriptionClassName} style={{ color: '#4E5B4F' }}>
+                        {description}
+                      </div>
+                    )}
+                  </div>
 
-              <div className="mt-1" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+                  <div className="mt-1" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+                </>
+              ) : null}
 
               {/* Player area */}
               {practice && t(practice.audioUrl, lang) ? (
                 <div
                   className="flex items-center justify-center"
                   style={{
-                    flex: 5,
+                    flex: hasDescription ? 5 : 10,
                     minHeight: 0,
                   }}
                 >

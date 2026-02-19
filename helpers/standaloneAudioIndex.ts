@@ -53,6 +53,11 @@ export type AudioUsageIndex = {
  */
 export function buildAudioUsageIndex(flows: Flow[]): AudioUsageIndex {
   const map = new Map<string, StandaloneAudioItem>();
+  const EXCLUDED_FLOW_IDS = new Set<string>([
+    // Story flows have English-only audio uploads and are intentionally excluded from stand-alone Exercises.
+    'Calm-Stories',
+    'Reflection-Stories',
+  ]);
 
   const upsert = (params: {
     flowId: string;
@@ -99,6 +104,7 @@ export function buildAudioUsageIndex(flows: Flow[]): AudioUsageIndex {
   };
 
   for (const flow of flows) {
+    if (EXCLUDED_FLOW_IDS.has(flow.id)) continue;
     const fid = flow.id;
     for (const p of flow.practices ?? []) {
       const ro = (p as any)?.audioUrl?.ro;

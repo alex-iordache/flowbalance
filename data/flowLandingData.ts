@@ -193,5 +193,35 @@ export const FLOW_LANDING_DATA_BY_ID: Record<string, FlowLandingData> = {
       { ro: 'Integrare obiceiuri', en: 'Integrate habits' },
     ],
   },
+
+  'Calm-Stories': {
+    pills: [
+      { ro: 'Relaxare profundă', en: 'Deep relaxation' },
+      { ro: 'Povești audio lente', en: 'Slow audio stories' },
+      { ro: 'Ritual de seară', en: 'Evening ritual' },
+    ],
+    programLines: [
+      { ro: 'Inducere naturală a somnului', en: 'Natural sleep induction' },
+      { ro: 'Reducerea gândurilor repetitive', en: 'Reduce repetitive thoughts' },
+      { ro: 'Siguranță și calm interior', en: 'Inner safety and calm' },
+      { ro: 'Respirație regulată', en: 'Steady breathing' },
+      { ro: 'Deconectare progresivă', en: 'Gradual unwinding' },
+    ],
+  },
+
+  'Reflection-Stories': {
+    pills: [
+      { ro: 'Resetare prin perspectivă', en: 'Reset through perspective' },
+      { ro: 'Povești audio ghidate', en: 'Guided audio stories' },
+      { ro: 'Claritate mentală', en: 'Mental clarity' },
+    ],
+    programLines: [
+      { ro: 'Ritual de seară', en: 'Evening ritual' },
+      { ro: 'Recadrare emoțională', en: 'Emotional reframing' },
+      { ro: 'Puterea metaforei', en: 'The power of metaphor' },
+      { ro: 'Alegere conștientă', en: 'Conscious choice' },
+      { ro: 'Integrare subtilă', en: 'Subtle integration' },
+    ],
+  },
 };
 

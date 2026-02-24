@@ -8,7 +8,7 @@ const practice: Practice = {
   intro: { ro: '', en: '' },
   description: { ro: '', en: '' },
   audioUrl: {
-    ro: 'audioFilesEnAi/turn-the-burden-into-a-gift-en.mp3',
+    ro: 'audioFiles/transforma-povara-in-dar.mp3',
     en: 'audioFilesEnAi/turn-the-burden-into-a-gift-en.mp3',
   },
   finished: false,

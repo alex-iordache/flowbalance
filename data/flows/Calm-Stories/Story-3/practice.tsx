@@ -8,7 +8,7 @@ const practice: Practice = {
   intro: { ro: '', en: '' },
   description: { ro: '', en: '' },
   audioUrl: {
-    ro: 'audioFilesEnAi/the-little-badger-s-secret-garden-en.mp3',
+    ro: 'audioFiles/gradina-secreta-a-bursucului.mp3',
     en: 'audioFilesEnAi/the-little-badger-s-secret-garden-en.mp3',
   },
   finished: false,

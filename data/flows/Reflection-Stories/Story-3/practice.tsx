@@ -8,7 +8,7 @@ const practice: Practice = {
   intro: { ro: '', en: '' },
   description: { ro: '', en: '' },
   audioUrl: {
-    ro: 'audioFilesEnAi/when-you-part-from-someone-dear-en.mp3',
+    ro: 'audioFiles/despartirea-de-cineva-drag.mp3',
     en: 'audioFilesEnAi/when-you-part-from-someone-dear-en.mp3',
   },
   finished: false,

@@ -8,7 +8,7 @@ const practice: Practice = {
   intro: { ro: '', en: '' },
   description: { ro: '', en: '' },
   audioUrl: {
-    ro: 'audioFilesEnAi/the-freedom-to-choose-your-state-en.mp3',
+    ro: 'audioFiles/libertatea-de-a-ti-alege-starea.mp3',
     en: 'audioFilesEnAi/the-freedom-to-choose-your-state-en.mp3',
   },
   finished: false,

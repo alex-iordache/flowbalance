@@ -8,7 +8,7 @@ const practice: Practice = {
   intro: { ro: '', en: '' },
   description: { ro: '', en: '' },
   audioUrl: {
-    ro: 'audioFilesEnAi/starlight-library-en.mp3',
+    ro: 'audioFiles/biblioteca-stelara.mp3',
     en: 'audioFilesEnAi/starlight-library-en.mp3',
   },
   finished: false,

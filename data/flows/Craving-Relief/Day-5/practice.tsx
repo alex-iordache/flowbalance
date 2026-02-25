@@ -41,7 +41,7 @@ const practice: Practice = {
   name: { ro: "Pofta și emoțiile", en: "Cravings and Emotions" },
   intro: { ro: "Recunoaște emoția din spatele poftei, fără să o rezolvi.", en: "Acknowledge the emotion underneath the craving—without trying to fix it." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/ce-incerc-sa-simt-dialog-cu-partea-care-cere.mp3", en: "audioFiles/ce-incerc-sa-simt-dialog-cu-partea-care-cere.mp3" },
+  audioUrl: { ro: "audioFiles/ce-incerc-sa-simt-dialog-cu-partea-care-cere.mp3", en: "audioFilesEnAi/ce-incerc-sa-simt-dialog-cu-partea-care-cere-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

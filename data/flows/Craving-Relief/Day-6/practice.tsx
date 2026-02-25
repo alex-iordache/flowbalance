@@ -45,7 +45,7 @@ const practice: Practice = {
   name: { ro: "Autocompasiune", en: "Self-Compassion" },
   intro: { ro: "Înlocuiește lupta cu blândețe și alege o acțiune mică de grijă.", en: "Replace struggle with kindness and choose one small caring action." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/autocompasiune.mp3", en: "audioFiles/autocompasiune.mp3" },
+  audioUrl: { ro: "audioFiles/autocompasiune.mp3", en: "audioFilesEnAi/autocompasiune-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

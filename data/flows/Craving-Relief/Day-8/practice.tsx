@@ -39,7 +39,7 @@ const practice: Practice = {
   name: { ro: "Alegerea conștientă", en: "Conscious Choice" },
   intro: { ro: "După pauză, alege conștient și observă efectul în corp.", en: "After the pause, choose consciously and notice the effect in your body." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/butonul-de-pauza-alegerea-constienta.mp3", en: "audioFiles/butonul-de-pauza-alegerea-constienta.mp3" },
+  audioUrl: { ro: "audioFiles/butonul-de-pauza-alegerea-constienta.mp3", en: "audioFilesEnAi/butonul-de-pauza-alegerea-constienta-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

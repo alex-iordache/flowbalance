@@ -43,7 +43,7 @@ const practice: Practice = {
   name: { ro: "Integrare", en: "Integration" },
   intro: { ro: "Integrează ce ai învățat și continuă să folosești exercițiile când ai nevoie.", en: "Integrate what you learned and keep using the exercises whenever you need them." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/integrare-valurile-trec-tu-ramai.mp3", en: "audioFiles/integrare-valurile-trec-tu-ramai.mp3" },
+  audioUrl: { ro: "audioFiles/integrare-valurile-trec-tu-ramai.mp3", en: "audioFilesEnAi/integrare-valurile-trec-tu-ramai-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

@@ -39,7 +39,7 @@ const practice: Practice = {
   name: { ro: "Identitatea calmă", en: "Calm Identity" },
   intro: { ro: "Privește progresul și reamintește-ți cine ești dincolo de poftă.", en: "Review your progress and remember who you are beyond cravings." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/identitatea-calma-eu-dincolo-de-pofta.mp3", en: "audioFiles/identitatea-calma-eu-dincolo-de-pofta.mp3" },
+  audioUrl: { ro: "audioFiles/identitatea-calma-eu-dincolo-de-pofta.mp3", en: "audioFilesEnAi/identitatea-calma-eu-dincolo-de-pofta-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

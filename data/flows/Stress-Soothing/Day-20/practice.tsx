@@ -61,7 +61,7 @@ const practice: Practice = {
   description: { ro: roDescription, en: enDescription },
   audioUrl: {
     ro: 'audioFiles/deconectarea-de-la-problemele-de-serviciu.mp3',
-    en: 'audioFiles/deconectarea-de-la-problemele-de-serviciu.mp3',
+    en: 'audioFilesEnAi/deconectarea-de-la-problemele-de-serviciu-en.mp3',
   },
   finished: false,
   lastPositionSec: 0,

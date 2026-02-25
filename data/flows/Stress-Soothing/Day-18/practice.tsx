@@ -34,7 +34,7 @@ const practice: Practice = {
     en: 'What calms you after you get upset; a new calming method.',
   },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: 'audioFiles/cum-te-calmezi.mp3', en: 'audioFiles/cum-te-calmezi.mp3' },
+  audioUrl: { ro: 'audioFiles/cum-te-calmezi.mp3', en: 'audioFilesEnAi/cum-te-calmezi-en.mp3' },
   finished: false,
   lastPositionSec: 0,
 };

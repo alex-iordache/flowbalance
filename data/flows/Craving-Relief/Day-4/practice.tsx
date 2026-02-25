@@ -47,7 +47,7 @@ const practice: Practice = {
   name: { ro: "Repetiție și siguranță", en: "Repetition and Safety" },
   intro: { ro: "Consolidează pauza și întreabă-te de ce ai cu adevărat nevoie.", en: "Strengthen the pause and ask what you truly need." },
   description: { ro: roDescription, en: enDescription },
-  audioUrl: { ro: "audioFiles/corp-sigur-calmarea-sistemului-nervos.mp3", en: "audioFiles/corp-sigur-calmarea-sistemului-nervos.mp3" },
+  audioUrl: { ro: "audioFiles/corp-sigur-calmarea-sistemului-nervos.mp3", en: "audioFilesEnAi/corp-sigur-calmarea-sistemului-nervos-en.mp3" },
 
   finished: false,
   lastPositionSec: 0,

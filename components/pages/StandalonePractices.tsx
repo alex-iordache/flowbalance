@@ -114,8 +114,8 @@ export default function StandalonePractices() {
             <IonBackButton defaultHref="/home" icon={chevronBackOutline} text="" style={{ '--color': '#4E5B4F' } as any} />
           </IonButtons>
           <IonButtons slot="end">
-            <IonButton routerLink="/settings" routerDirection="none">
-              <IonIcon icon={settingsOutline} className="text-2xl" />
+            <IonButton routerLink="/settings" routerDirection="none" style={{ '--color': '#4E5B4F' } as any}>
+              <IonIcon icon={settingsOutline} style={{ color: '#4E5B4F' }} className="text-2xl" />
             </IonButton>
           </IonButtons>
         </IonToolbar>

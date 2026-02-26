@@ -81,6 +81,12 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{
               __html: `
                 (function () {
+                  // Some third-party bundles (especially in iOS WebViews) still expect a Node-like
+                  // global identifier. Provide a safe shim early.
+                  try {
+                    if (typeof window !== 'undefined' && !window.global) window.global = window;
+                  } catch {}
+
                   function show(msg) {
                     try {
                       var id = '__fb_runtime_error_overlay__';
@@ -114,11 +120,33 @@ export default function RootLayout({
                   }
 
                   window.addEventListener('error', function (e) {
-                    var m = e && e.error ? (e.error.stack || e.error.message || e.error) : (e.message || e);
+                    var m = (function () {
+                      try {
+                        if (e && e.error) {
+                          var msg = e.error.message || String(e.error);
+                          var st = e.error.stack || '';
+                          return st && st.indexOf(msg) === -1 ? (msg + '\\n' + st) : (st || msg);
+                        }
+                        return e && e.message ? e.message : String(e);
+                      } catch {
+                        return 'Unknown error';
+                      }
+                    })();
                     show(m);
                   });
                   window.addEventListener('unhandledrejection', function (e) {
-                    var r = e && e.reason ? (e.reason.stack || e.reason.message || e.reason) : e;
+                    var r = (function () {
+                      try {
+                        if (e && e.reason) {
+                          var msg = e.reason.message || String(e.reason);
+                          var st = e.reason.stack || '';
+                          return st && st.indexOf(msg) === -1 ? (msg + '\\n' + st) : (st || msg);
+                        }
+                        return String(e);
+                      } catch {
+                        return 'Unknown rejection';
+                      }
+                    })();
                     show(r);
                   });
                 })();

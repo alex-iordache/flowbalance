@@ -87,6 +87,25 @@ export default function RootLayout({
                     if (typeof window !== 'undefined' && !window.global) window.global = window;
                   } catch {}
 
+                  // Capacitor web builds may expose window.Capacitor without the native bridge helpers.
+                  // Some plugins (e.g. Keyboard) may still call Capacitor.triggerEvent(...).
+                  // Polyfill it to dispatch DOM events instead of crashing.
+                  try {
+                    if (
+                      typeof window !== 'undefined' &&
+                      window.Capacitor &&
+                      typeof window.Capacitor.triggerEvent !== 'function'
+                    ) {
+                      window.Capacitor.triggerEvent = function (eventName, target, data) {
+                        try {
+                          var t = target === 'document' ? document : window;
+                          var ev = new CustomEvent(String(eventName), { detail: data });
+                          t.dispatchEvent(ev);
+                        } catch {}
+                      };
+                    }
+                  } catch {}
+
                   function show(msg) {
                     try {
                       var id = '__fb_runtime_error_overlay__';

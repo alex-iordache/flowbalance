@@ -41,6 +41,7 @@ export default function AudioPlayer({
   const onEndedRef = useRef<Props['onEnded']>(onEnded);
   const onPositionChangeRef = useRef<Props['onPositionChange']>(onPositionChange);
   const lastReportedSecRef = useRef<number>(-1); // floor(sec) last reported
+  const initialPositionSecRef = useRef(initialPositionSec);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -67,6 +68,8 @@ export default function AudioPlayer({
   useEffect(() => {
     onPositionChangeRef.current = onPositionChange;
   }, [onPositionChange]);
+
+  initialPositionSecRef.current = initialPositionSec;
 
   useEffect(() => {
     const a = audioRef.current;
@@ -98,11 +101,11 @@ export default function AudioPlayer({
     const onLoadedMetadata = () => {
       const dur = Number.isFinite(a.duration) ? a.duration : 0;
       setDuration(dur);
-      // Resume from saved position if valid.
-      if (initialPositionSec > 0 && initialPositionSec < dur) {
-        a.currentTime = initialPositionSec;
-        setCurrent(initialPositionSec);
-        lastReportedSecRef.current = initialPositionSec;
+      const initPos = initialPositionSecRef.current;
+      if (initPos > 0 && initPos < dur) {
+        a.currentTime = initPos;
+        setCurrent(initPos);
+        lastReportedSecRef.current = initPos;
       }
     };
     const onCanPlay = () => setStatus('ready');
@@ -172,7 +175,10 @@ export default function AudioPlayer({
       a.removeEventListener('waiting', onWaitingEvt);
       a.removeEventListener('playing', onPlayingEvt);
     };
-  }, [src, initialPositionSec]);
+    // Intentionally only [src] - do NOT add initialPositionSec. When we save position,
+    // the store updates and initialPositionSec changes. Re-running this effect would
+    // reset/reload the audio and interrupt playback.
+  }, [src]);
 
   const toggle = async () => {
     const a = audioRef.current;

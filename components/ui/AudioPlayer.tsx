@@ -6,6 +6,10 @@ type Props = {
   subtitle?: string;
   onPlay?: () => void;
   onEnded?: () => void;
+  /** Start playback from this position (seconds). Used for resuming. */
+  initialPositionSec?: number;
+  /** Called when the current playback position changes (e.g. every second). Used for persisting progress. */
+  onPositionChange?: (sec: number) => void;
   variant?: 'card' | 'floatingCircle';
 };
 
@@ -27,12 +31,16 @@ export default function AudioPlayer({
   subtitle,
   onPlay,
   onEnded,
+  initialPositionSec = 0,
+  onPositionChange,
   variant = 'card',
 }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const rafRef = useRef<number | null>(null);
   const onPlayRef = useRef<Props['onPlay']>(onPlay);
   const onEndedRef = useRef<Props['onEnded']>(onEnded);
+  const onPositionChangeRef = useRef<Props['onPositionChange']>(onPositionChange);
+  const lastReportedSecRef = useRef<number>(-1); // floor(sec) last reported
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -57,6 +65,10 @@ export default function AudioPlayer({
   }, [onEnded]);
 
   useEffect(() => {
+    onPositionChangeRef.current = onPositionChange;
+  }, [onPositionChange]);
+
+  useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
 
@@ -73,12 +85,25 @@ export default function AudioPlayer({
     };
 
     const tick = () => {
-      setCurrent(a.currentTime || 0);
+      const sec = a.currentTime || 0;
+      setCurrent(sec);
+      // Report position every second (avoid flooding onPositionChange).
+      if (onPositionChangeRef.current && Math.floor(sec) !== Math.floor(lastReportedSecRef.current)) {
+        lastReportedSecRef.current = sec;
+        onPositionChangeRef.current(sec);
+      }
       rafRef.current = requestAnimationFrame(tick);
     };
 
     const onLoadedMetadata = () => {
-      setDuration(Number.isFinite(a.duration) ? a.duration : 0);
+      const dur = Number.isFinite(a.duration) ? a.duration : 0;
+      setDuration(dur);
+      // Resume from saved position if valid.
+      if (initialPositionSec > 0 && initialPositionSec < dur) {
+        a.currentTime = initialPositionSec;
+        setCurrent(initialPositionSec);
+        lastReportedSecRef.current = initialPositionSec;
+      }
     };
     const onCanPlay = () => setStatus('ready');
     const onPlayEvt = () => {
@@ -92,6 +117,8 @@ export default function AudioPlayer({
     const onPauseEvt = () => {
       setIsPlaying(false);
       setStatus('paused');
+      const sec = a.currentTime || 0;
+      if (onPositionChangeRef.current) onPositionChangeRef.current(sec);
       stopRaf();
     };
     const onEndedEvt = () => {
@@ -132,6 +159,9 @@ export default function AudioPlayer({
     }
 
     return () => {
+      // Report final position on unmount (e.g. user navigated away).
+      const sec = a.currentTime || 0;
+      if (onPositionChangeRef.current) onPositionChangeRef.current(sec);
       stopRaf();
       a.removeEventListener('loadedmetadata', onLoadedMetadata);
       a.removeEventListener('canplay', onCanPlay);
@@ -142,7 +172,7 @@ export default function AudioPlayer({
       a.removeEventListener('waiting', onWaitingEvt);
       a.removeEventListener('playing', onPlayingEvt);
     };
-  }, [src]);
+  }, [src, initialPositionSec]);
 
   const toggle = async () => {
     const a = audioRef.current;

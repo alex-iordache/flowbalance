@@ -48,6 +48,26 @@ export const setDone = (
   saveListsState();
 };
 
+export const setPracticePositionSec = (
+  flowId: string,
+  practiceId: string,
+  sec: number,
+) => {
+  Store.update((s, o) => {
+    const flowIndex = o.flows.findIndex(f => f.id === flowId);
+    if (flowIndex === -1) return;
+
+    const practiceIndex = o.flows[flowIndex].practices.findIndex(p => p.id === practiceId);
+    if (practiceIndex === -1) return;
+
+    const draftPractice = s.flows[flowIndex].practices[practiceIndex];
+    if (!draftPractice) return;
+
+    draftPractice.lastPositionSec = Math.max(0, sec);
+  });
+  saveFlowsState();
+};
+
 export const setPracticeFinished = (
   flowId: string,
   practiceId: string,
@@ -64,6 +84,9 @@ export const setPracticeFinished = (
     if (!draftPractice) return;
 
     draftPractice.finished = finished;
+    if (finished) {
+      draftPractice.lastPositionSec = 0; // Reset so replay starts from the beginning.
+    }
 
     // Keep summary fields in sync (best-effort; defaults are still safe).
     const completed = s.flows[flowIndex].practices.reduce((acc, p) => acc + (p.finished ? 1 : 0), 0);

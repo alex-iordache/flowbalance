@@ -9,7 +9,7 @@ import {
   IonToolbar,
 } from '@ionic/react';
 import { useParams, useHistory } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import Store from '../../store';
 import * as actions from '../../store/actions';
@@ -51,6 +51,11 @@ const Practice = () => {
   // Check if user has access to this practice
   const hasAccess = usePracticeAccess(flowId, practiceId, flowIndex, practiceIndex);
   const [isActivating, setIsActivating] = useState(false);
+  const lastPositionRef = useRef(practice?.lastPositionSec ?? 0);
+
+  useEffect(() => {
+    lastPositionRef.current = practice?.lastPositionSec ?? 0;
+  }, [practice?.id, practice?.lastPositionSec]);
 
   // If the user doesn't have access, route them to the in-app subscribe screen.
   useEffect(() => {
@@ -168,6 +173,30 @@ const Practice = () => {
       actions.setPracticeFinished(flowId, practiceId, true);
     }
   };
+
+  const handlePositionChange = (sec: number) => {
+    lastPositionRef.current = sec;
+    if (flowId && practiceId) {
+      actions.setPracticePositionSec(flowId, practiceId, sec);
+    }
+  };
+
+  // Save position when user leaves page (visibility hidden) or unmounts (navigates away).
+  useEffect(() => {
+    if (!flowId || !practiceId || !hasAccess) return;
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        actions.setPracticePositionSec(flowId, practiceId, lastPositionRef.current);
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      actions.setPracticePositionSec(flowId, practiceId, lastPositionRef.current);
+    };
+  }, [flowId, practiceId, hasAccess]);
 
   const description = practice ? t(practice.description, lang) : null;
   const descriptionIsString = typeof description === 'string';
@@ -292,6 +321,8 @@ const Practice = () => {
                     variant="floatingCircle"
                     onPlay={handleAudioPlay}
                     onEnded={handleAudioEnded}
+                    initialPositionSec={practice.lastPositionSec ?? 0}
+                    onPositionChange={handlePositionChange}
                   />
                 </div>
               ) : null}

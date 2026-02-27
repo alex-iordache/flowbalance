@@ -22,7 +22,6 @@ import { setSettings } from '../../store/actions';
 import { openExternalUrl } from '../../helpers/openExternal';
 import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import { isDesktopWeb } from '../admin/adminEnv';
-import { Capacitor } from '@capacitor/core';
 import { Preferences } from '@capacitor/preferences';
 import Logo from '../ui/Logo';
 import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, refreshOutline, trashOutline } from 'ionicons/icons';
@@ -114,7 +113,6 @@ const Settings = () => {
   const [ticket, setTicket] = useState<string | null>(null);
   const [ticketLoading, setTicketLoading] = useState(false);
   const [lastAppRefreshAt, setLastAppRefreshAt] = useState<string | null>(null);
-  const isNative = Capacitor.isNativePlatform?.() ?? false;
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: '#FBF7F2',
@@ -169,11 +167,10 @@ const Settings = () => {
   }, [isLoaded, userId, showManageSubscription]);
 
   useEffect(() => {
-    if (!isNative) return;
     Preferences.get({ key: PREF_LAST_APP_REFRESH }).then(({ value }) => {
       if (value) setLastAppRefreshAt(value);
     });
-  }, [isNative]);
+  }, []);
 
   const handleRefreshApp = async () => {
     const now = new Date().toISOString();
@@ -296,8 +293,8 @@ const Settings = () => {
             </div>
           </div>
 
-          {/* Updates (native only) */}
-          {isNative ? (
+          {/* Updates */}
+          {(
             <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>
               <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
                 {isRo ? 'Actualizări' : 'Updates'}
@@ -319,7 +316,7 @@ const Settings = () => {
                 ) : null}
               </div>
             </div>
-          ) : null}
+          )}
 
           {/* Account */}
           <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>

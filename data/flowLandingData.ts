@@ -223,5 +223,65 @@ export const FLOW_LANDING_DATA_BY_ID: Record<string, FlowLandingData> = {
       { ro: 'Integrare subtilă', en: 'Subtle integration' },
     ],
   },
+
+  'Build-Inner-Confidence': {
+    pills: [
+      { ro: 'Încredere interioară', en: 'Inner confidence' },
+      { ro: 'Povești terapeutice', en: 'Therapeutic stories' },
+      { ro: 'Copii 3–10 ani', en: 'Ages 3–10' },
+    ],
+    programLines: [
+      { ro: 'Dialog interior susținător', en: 'Supportive inner dialogue' },
+      { ro: 'Imagine de sine stabilă', en: 'Stable self-image' },
+      { ro: 'Reducere teamă de greșeală', en: 'Less fear of mistakes' },
+      { ro: 'Asumare provocări', en: 'Taking on challenges' },
+      { ro: 'Competență personală', en: 'Personal competence' },
+    ],
+  },
+
+  'Emotional-Balance': {
+    pills: [
+      { ro: 'Emoții puternice', en: 'Strong emotions' },
+      { ro: 'Auto-observare', en: 'Self-observation' },
+      { ro: 'Copii 3–10 ani', en: 'Ages 3–10' },
+    ],
+    programLines: [
+      { ro: 'Identificare emoții', en: 'Identify emotions' },
+      { ro: 'Distanță emoție–reacție', en: 'Emotion–reaction distance' },
+      { ro: 'Respirație și imaginație', en: 'Breathing and imagery' },
+      { ro: 'Autoreglare', en: 'Self-regulation' },
+      { ro: 'Toleranță la frustrare', en: 'Frustration tolerance' },
+    ],
+  },
+
+  'Focus-Mental-Training': {
+    pills: [
+      { ro: 'Pregătire mentală', en: 'Mental preparation' },
+      { ro: 'Teze și examene', en: 'Tests and exams' },
+      { ro: 'Copii 3–10 ani', en: 'Ages 3–10' },
+    ],
+    programLines: [
+      { ro: 'Reducere anxietate', en: 'Reduce anxiety' },
+      { ro: 'Concentrare calmă', en: 'Calm focus' },
+      { ro: 'Vizualizare ghidată', en: 'Guided visualization' },
+      { ro: 'Încredere în resurse', en: 'Trust in resources' },
+      { ro: 'Energie pentru performanță', en: 'Energy for performance' },
+    ],
+  },
+
+  'Growth-Mindset-Stories': {
+    pills: [
+      { ro: 'Mentalitate de creștere', en: 'Growth mindset' },
+      { ro: 'Povești terapeutice', en: 'Therapeutic stories' },
+      { ro: 'Copii 3–10 ani', en: 'Ages 3–10' },
+    ],
+    programLines: [
+      { ro: 'Eșec ca oportunitate', en: 'Failure as opportunity' },
+      { ro: 'Reziliență', en: 'Resilience' },
+      { ro: 'Perseverență', en: 'Perseverance' },
+      { ro: 'Flexibilitate cognitivă', en: 'Cognitive flexibility' },
+      { ro: 'Progres pas cu pas', en: 'Step-by-step progress' },
+    ],
+  },
 };
 

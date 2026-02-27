@@ -76,6 +76,19 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
     bgClass: 'bg-gradient-to-br from-cyan-500 to-blue-600',
     gradientCss: 'linear-gradient(135deg, #06b6d4 0%, #2563eb 100%)',
   },
+  {
+    id: 'kids-emotional-growth',
+    title: { ro: 'Dezvoltare Emoțională pentru Copii', en: 'Kids Emotional Growth' },
+    flowIds: [
+      'Build-Inner-Confidence',
+      'Emotional-Balance',
+      'Focus-Mental-Training',
+      'Growth-Mindset-Stories',
+    ],
+    theme: 4,
+    bgClass: 'bg-gradient-to-br from-amber-400 to-orange-500',
+    gradientCss: 'linear-gradient(135deg, #fbbf24 0%, #f97316 100%)',
+  },
 ];
 
 export function getCategoryById(categoryId: string): FlowCategoryDef | null {

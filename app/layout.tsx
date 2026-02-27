@@ -87,24 +87,36 @@ export default function RootLayout({
                     if (typeof window !== 'undefined' && !window.global) window.global = window;
                   } catch {}
 
-                  // Capacitor web builds may expose window.Capacitor without the native bridge helpers.
-                  // Some plugins (e.g. Keyboard) may still call Capacitor.triggerEvent(...).
-                  // Polyfill it to dispatch DOM events instead of crashing.
-                  try {
-                    if (
-                      typeof window !== 'undefined' &&
-                      window.Capacitor &&
-                      typeof window.Capacitor.triggerEvent !== 'function'
-                    ) {
-                      window.Capacitor.triggerEvent = function (eventName, target, data) {
-                        try {
-                          var t = target === 'document' ? document : window;
-                          var ev = new CustomEvent(String(eventName), { detail: data });
-                          t.dispatchEvent(ev);
-                        } catch {}
-                      };
+                  // Capacitor web builds may create/overwrite window.Capacitor after our early scripts run.
+                  // Some plugins (e.g. Keyboard) call Capacitor.triggerEvent(...). If it's missing, the app crashes.
+                  // Polyfill it defensively and keep re-applying briefly to survive late init/overwrites.
+                  (function () {
+                    function ensure() {
+                      try {
+                        if (typeof window === 'undefined') return;
+                        var cap = window.Capacitor || (window.Capacitor = {});
+                        if (typeof cap.triggerEvent !== 'function') {
+                          cap.triggerEvent = function (eventName, target, data) {
+                            try {
+                              var t = target === 'document' ? document : window;
+                              var ev = new CustomEvent(String(eventName), { detail: data });
+                              t.dispatchEvent(ev);
+                            } catch {}
+                          };
+                        }
+                      } catch {}
                     }
-                  } catch {}
+
+                    ensure();
+                    try {
+                      var tries = 0;
+                      var interval = window.setInterval(function () {
+                        tries += 1;
+                        ensure();
+                        if (tries >= 50) window.clearInterval(interval); // ~5s
+                      }, 100);
+                    } catch {}
+                  })();
 
                   function show(msg) {
                     try {

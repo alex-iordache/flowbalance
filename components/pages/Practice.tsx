@@ -103,6 +103,24 @@ const Practice = () => {
     history.replace(`/subscribe?return=${encodeURIComponent(returnTo)}`);
   }, [comingSoonBlocked, hasAccess, history, flowId, practiceId]);
 
+  // Save position when user leaves page (visibility hidden) or unmounts (navigates away).
+  // Must be before any early return (hooks rules).
+  useEffect(() => {
+    if (!flowId || !practiceId || !hasAccess || comingSoonBlocked) return;
+
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        actions.setPracticePositionSec(flowId, practiceId, lastPositionRef.current);
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      actions.setPracticePositionSec(flowId, practiceId, lastPositionRef.current);
+    };
+  }, [flowId, practiceId, hasAccess, comingSoonBlocked]);
+
   if (comingSoonBlocked) {
     return (
       <IonPage>
@@ -180,23 +198,6 @@ const Practice = () => {
       actions.setPracticePositionSec(flowId, practiceId, sec);
     }
   };
-
-  // Save position when user leaves page (visibility hidden) or unmounts (navigates away).
-  useEffect(() => {
-    if (!flowId || !practiceId || !hasAccess) return;
-
-    const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        actions.setPracticePositionSec(flowId, practiceId, lastPositionRef.current);
-      }
-    };
-
-    document.addEventListener('visibilitychange', onVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', onVisibilityChange);
-      actions.setPracticePositionSec(flowId, practiceId, lastPositionRef.current);
-    };
-  }, [flowId, practiceId, hasAccess]);
 
   const description = practice ? t(practice.description, lang) : null;
   const descriptionIsString = typeof description === 'string';

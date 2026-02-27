@@ -108,7 +108,7 @@ function PracticeRow({
 
       <div className="min-w-0 flex-1">
         <div
-          className="text-[16px] leading-tight truncate"
+          className="text-[16px] leading-tight"
           style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
         >
           {primary}

@@ -22,8 +22,25 @@ import { setSettings } from '../../store/actions';
 import { openExternalUrl } from '../../helpers/openExternal';
 import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import { isDesktopWeb } from '../admin/adminEnv';
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 import Logo from '../ui/Logo';
-import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, trashOutline } from 'ionicons/icons';
+import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, refreshOutline, trashOutline } from 'ionicons/icons';
+
+const PREF_LAST_APP_REFRESH = 'last_app_refresh_at';
+
+function formatLastUpdate(iso: string, lang: 'ro' | 'en'): string {
+  try {
+    const d = new Date(iso);
+    const day = String(d.getDate()).padStart(2, '0');
+    let month = d.toLocaleString(lang === 'ro' ? 'ro-RO' : 'en-GB', { month: 'long' });
+    month = month.charAt(0).toUpperCase() + month.slice(1);
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
+  } catch {
+    return '';
+  }
+}
 
 function ActionRow({
   label,
@@ -96,6 +113,8 @@ const Settings = () => {
   const isRo = settings.language === 'ro';
   const [ticket, setTicket] = useState<string | null>(null);
   const [ticketLoading, setTicketLoading] = useState(false);
+  const [lastAppRefreshAt, setLastAppRefreshAt] = useState<string | null>(null);
+  const isNative = Capacitor.isNativePlatform?.() ?? false;
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: '#FBF7F2',
@@ -148,6 +167,19 @@ const Settings = () => {
       ctrl.abort();
     };
   }, [isLoaded, userId, showManageSubscription]);
+
+  useEffect(() => {
+    if (!isNative) return;
+    Preferences.get({ key: PREF_LAST_APP_REFRESH }).then(({ value }) => {
+      if (value) setLastAppRefreshAt(value);
+    });
+  }, [isNative]);
+
+  const handleRefreshApp = async () => {
+    const now = new Date().toISOString();
+    await Preferences.set({ key: PREF_LAST_APP_REFRESH, value: now });
+    window.location.href = window.location.origin + window.location.pathname + '?_=' + Date.now();
+  };
 
   const handleSignOut = async () => {
     // Sign out with Clerk
@@ -263,6 +295,31 @@ const Settings = () => {
               </div>
             </div>
           </div>
+
+          {/* Updates (native only) */}
+          {isNative ? (
+            <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>
+              <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+                {isRo ? 'Actualizări' : 'Updates'}
+              </div>
+              <div className="mt-3 flex flex-col gap-2">
+                <ActionRow
+                  label={isRo ? 'Descarcă ultimele actualizări' : 'Download latest updates'}
+                  onClick={() => void handleRefreshApp()}
+                  leftIcon={refreshOutline}
+                />
+                {lastAppRefreshAt ? (
+                  <div
+                    className="mt-1 text-[13px]"
+                    style={{ color: '#7A746C', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}
+                  >
+                    {isRo ? 'Ultima actualizare: ' : 'Last update: '}
+                    {formatLastUpdate(lastAppRefreshAt, settings.language)}
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          ) : null}
 
           {/* Account */}
           <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>

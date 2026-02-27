@@ -72,7 +72,7 @@ function ProgressFlowRow({
 
       <div className="flex flex-col flex-1 leading-normal min-w-0">
         <div
-          className="mt-0 mb-1 text-[18px] leading-tight truncate"
+          className="mt-0 mb-1 text-[18px] leading-tight"
           style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
         >
           {t(flow.name, lang)}

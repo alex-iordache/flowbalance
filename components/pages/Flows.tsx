@@ -71,7 +71,7 @@ function CategoryList({ flows, lang }: { flows: Flow[]; lang: Language }) {
               {/* Middle: text + progress */}
               <div className="min-w-0 flex-1">
                 <div
-                  className="text-[18px] md:text-[20px] leading-tight truncate"
+                  className="text-[18px] md:text-[20px] leading-tight"
                   style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
                 >
                   {t(cat.title, lang)}

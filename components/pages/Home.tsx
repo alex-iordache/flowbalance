@@ -179,7 +179,7 @@ function ContinueCard({
               {minutesLabel ? `${minutesLabel} • ` : ''}
               {pct}% {isRo ? 'complet' : 'complete'}
             </div>
-            <div className="mt-1 text-white text-[18px] md:text-[22px] font-semibold truncate">{title}</div>
+            <div className="mt-1 text-white text-[18px] md:text-[22px] font-semibold">{title}</div>
             <div className="mt-1 text-white/80 text-[13px] md:text-[15px] leading-snug line-clamp-2">{subtitle}</div>
           </div>
 
@@ -269,7 +269,7 @@ function StartHereCard({
               {minutesLabel ? `${minutesLabel} • ` : ''}
               {isRo ? 'Recomandat pentru tine' : 'Recommended for you'}
             </div>
-            <div className="mt-1 text-white text-[18px] md:text-[22px] font-semibold truncate">{title}</div>
+            <div className="mt-1 text-white text-[18px] md:text-[22px] font-semibold">{title}</div>
             <div className="mt-1 text-white/80 text-[13px] md:text-[15px] leading-snug line-clamp-2">{subtitle}</div>
           </div>
 

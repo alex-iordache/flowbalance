@@ -45,16 +45,15 @@ const FlowRow = ({
         boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
       }}
     >
-      {/* Accent bar: flush on the left border */}
+      {/* Accent bar: flush on the left border, stretches with card when title wraps */}
       <div
         aria-hidden="true"
         style={{
           position: 'absolute',
           left: 0,
-          top: '50%',
-          transform: 'translateY(-50%)',
+          top: 12,
+          bottom: 12,
           width: 3,
-          height: 66,
           backgroundColor: accent,
           opacity: 0.75,
           borderRadius: 999,
@@ -68,7 +67,7 @@ const FlowRow = ({
       />
       <div className="flex flex-col flex-1 leading-normal min-w-0">
         <h5
-          className="mt-0 mb-1 text-[18px] leading-tight truncate"
+          className="mt-0 mb-1 text-[18px] leading-tight"
           style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
         >
           {t(flow.name, lang)}

@@ -19,6 +19,7 @@ import {
   leafOutline,
   sparklesOutline,
   heartOutline,
+  chevronForwardOutline,
 } from 'ionicons/icons';
 import Logo from '../ui/Logo';
 import { Preferences } from '@capacitor/preferences';

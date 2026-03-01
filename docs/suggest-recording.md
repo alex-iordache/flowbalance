@@ -81,7 +81,7 @@ Set these in **Vercel** (and optionally in local `.env.local` for local testing)
 
 ### Optional
 - `SUGGEST_RECORDING_TO_EMAIL` — recipient email
-  - Current desired value: `simona.nicolaescu@dynamichr.ro`
+  - Current desired value (for testing): `alexandru.iordache@mrm.com`
 - `SUGGEST_RECORDING_FROM_EMAIL` — sender identity
   - Default used in code: `Flow Balance <onboarding@resend.dev>`
   - For production, use a sender from a verified domain (e.g. `support@flowbalance.app`)
@@ -90,7 +90,7 @@ Set these in **Vercel** (and optionally in local `.env.local` for local testing)
 
 ## How to test
 1. Set `RESEND_API_KEY` in Vercel.
-2. (Optional) Set `SUGGEST_RECORDING_TO_EMAIL=simona.nicolaescu@dynamichr.ro`.
+2. (Optional) Set `SUGGEST_RECORDING_TO_EMAIL=alexandru.iordache@mrm.com`.
 3. Open app → Home → “Suggest a recording”.
 4. Select a category + type a suggestion (10+ chars) → Send.
 5. Confirm:

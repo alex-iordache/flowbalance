@@ -63,11 +63,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Server not configured' }, { status: 500 });
     }
 
-    const to = process.env.SUGGEST_RECORDING_TO_EMAIL || 'simona.nicolaescu@dynamichr.ro';
+    const to = process.env.SUGGEST_RECORDING_TO_EMAIL || 'alexandru.iordache@mrm.com';
     const from = process.env.SUGGEST_RECORDING_FROM_EMAIL || 'Flow Balance <onboarding@resend.dev>';
 
     const resend = new Resend(apiKey);
-    await resend.emails.send({
+    const result = await resend.emails.send({
       from,
       to,
       subject: `Flow Balance • Suggest a recording (${categoryLabel || categoryId})`,
@@ -78,6 +78,17 @@ export async function POST(req: Request) {
         suggestion,
       ].join('\n'),
     });
+
+    // Resend SDK returns { data, error } and may not throw on non-2xx.
+    if ((result as any)?.error) {
+      // eslint-disable-next-line no-console
+      console.error('resend send error', (result as any).error);
+      const msg =
+        typeof (result as any).error?.message === 'string'
+          ? (result as any).error.message
+          : 'Resend rejected the request';
+      return NextResponse.json({ error: msg }, { status: 502 });
+    }
 
     return NextResponse.json({ ok: true }, { status: 200 });
   } catch (err) {

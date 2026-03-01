@@ -129,12 +129,28 @@ export default function SuggestRecording() {
             font-weight: 700;
           }
 
+          /* Accordion: remove Ionic white header/content backgrounds */
+          .fb-suggest-accordion,
+          .fb-suggest-accordion ion-accordion,
+          .fb-suggest-accordion ion-accordion::part(header),
+          .fb-suggest-accordion ion-accordion::part(content) {
+            background: transparent !important;
+          }
+          .fb-suggest-accordion ion-accordion::part(content) {
+            padding: 0 !important;
+          }
+
           /* IonSelect: prevent grey hover/focus blocks; keep rounded look */
+          .fb-suggest-select {
+            width: 100%;
+            display: block;
+          }
           .fb-suggest-select::part(container) {
             background: #ffffff;
             border: 1px solid rgba(232, 222, 211, 0.85);
             border-radius: 14px;
             padding: 10px 12px;
+            width: 100%;
             transition: background-color 120ms ease, border-color 120ms ease;
           }
           .fb-suggest-select:hover::part(container) {
@@ -152,6 +168,12 @@ export default function SuggestRecording() {
           .fb-suggest-select::part(icon) {
             color: #7A746C;
             opacity: 1;
+          }
+
+          /* IonSelect popover: make the dropdown panel wider */
+          ion-popover.fb-suggest-select-popover::part(content) {
+            width: min(520px, calc(100vw - 32px));
+            max-width: 520px;
           }
         `}</style>
         <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
@@ -186,6 +208,7 @@ export default function SuggestRecording() {
           {/* Anonymous note (accordion) */}
           <div className="mt-3">
             <IonAccordionGroup
+              className="fb-suggest-accordion"
               value={privacyAccordionValue}
               onIonChange={(e) => setPrivacyAccordionValue(typeof (e as any)?.detail?.value === 'string' ? (e as any).detail.value : undefined)}
             >
@@ -246,6 +269,7 @@ export default function SuggestRecording() {
                   className="fb-suggest-select"
                   value={categoryId}
                   interface="popover"
+                  interfaceOptions={{ cssClass: 'fb-suggest-select-popover' }}
                   placeholder={isRo ? 'Alege o categorie' : 'Select a category'}
                   onIonChange={(e) => setCategoryId(String(e.detail.value ?? ''))}
                 >

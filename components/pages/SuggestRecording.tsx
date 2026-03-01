@@ -8,8 +8,7 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonItem,
-  IonLabel,
+  IonIcon,
   IonPage,
   IonSelect,
   IonSelectOption,
@@ -17,7 +16,7 @@ import {
   IonToolbar,
   IonAlert,
 } from '@ionic/react';
-import { chevronBackOutline } from 'ionicons/icons';
+import { chevronBackOutline, chevronDownOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useMemo, useState } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
 
@@ -57,6 +56,7 @@ export default function SuggestRecording() {
   const [categoryId, setCategoryId] = useState<string>(() => prefillCategoryId);
   const [suggestion, setSuggestion] = useState<string>('');
   const [showThanks, setShowThanks] = useState(false);
+  const [privacyAccordionValue, setPrivacyAccordionValue] = useState<string | undefined>(undefined);
 
   const categories = useMemo(() => {
     return [...FLOW_CATEGORIES]
@@ -71,7 +71,7 @@ export default function SuggestRecording() {
     ? 'Spune-ne ce practică ai vrea să auzi în aplicație. Ne ajută să prioritizăm următoarele înregistrări.'
     : "Tell us what you'd like to hear in the app. This helps us prioritize upcoming recordings.";
 
-  const anonTitle = isRo ? 'Anonim' : 'Anonymous';
+  const anonTitle = isRo ? 'Confidențialitatea ta contează' : 'Your privacy is important';
   const anonBody = isRo
     ? 'Această cerere va fi trimisă anonim. Nu vom trimite către echipa Flow Balance date despre contul tău (email, nume, userId etc.).'
     : 'This request is sent anonymously. We will not send any account/user data to the Flow Balance team (email, name, userId, etc.).';
@@ -122,6 +122,38 @@ export default function SuggestRecording() {
       </IonHeader>
 
       <IonContent fullscreen={true}>
+        <style>{`
+          /* Alert OK button: avoid default Ionic blue */
+          .fb-suggest-alert .alert-button.fb-suggest-ok {
+            color: #C57A4A !important;
+            font-weight: 700;
+          }
+
+          /* IonSelect: prevent grey hover/focus blocks; keep rounded look */
+          .fb-suggest-select::part(container) {
+            background: #ffffff;
+            border: 1px solid rgba(232, 222, 211, 0.85);
+            border-radius: 14px;
+            padding: 10px 12px;
+            transition: background-color 120ms ease, border-color 120ms ease;
+          }
+          .fb-suggest-select:hover::part(container) {
+            background: #ffffff;
+          }
+          .fb-suggest-select:focus-within::part(container) {
+            background: #ffffff;
+            border-color: rgba(197, 122, 74, 0.55);
+            box-shadow: 0 0 0 3px rgba(197, 122, 74, 0.12);
+          }
+          .fb-suggest-select::part(text),
+          .fb-suggest-select::part(placeholder) {
+            color: #4E5B4F;
+          }
+          .fb-suggest-select::part(icon) {
+            color: #7A746C;
+            opacity: 1;
+          }
+        `}</style>
         <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
           <div
             className="text-[26px] md:text-[30px] leading-tight text-center"
@@ -153,15 +185,38 @@ export default function SuggestRecording() {
 
           {/* Anonymous note (accordion) */}
           <div className="mt-3">
-            <IonAccordionGroup>
-              <IonAccordion value="anon">
-                <IonItem slot="header" lines="none" style={{ '--background': '#FBF7F2', '--color': '#4E5B4F' } as any}>
-                  <IonLabel className="text-[14px] font-semibold">{anonTitle}</IonLabel>
-                </IonItem>
+            <IonAccordionGroup
+              value={privacyAccordionValue}
+              onIonChange={(e) => setPrivacyAccordionValue(typeof (e as any)?.detail?.value === 'string' ? (e as any).detail.value : undefined)}
+            >
+              <IonAccordion value="privacy">
+                <div slot="header">
+                  <div
+                    className="rounded-2xl flex items-center justify-between gap-3 px-3 py-2"
+                    style={{
+                      backgroundColor: '#FBF7F2',
+                      border: '1px solid rgba(232, 222, 211, 0.65)',
+                      boxShadow: '0 10px 24px rgba(120, 95, 70, 0.06)',
+                    }}
+                  >
+                    <div className="text-[13px] font-semibold" style={{ color: '#4E5B4F' }}>
+                      {anonTitle}
+                    </div>
+                    <IonIcon
+                      icon={privacyAccordionValue === 'privacy' ? chevronDownOutline : chevronForwardOutline}
+                      style={{ color: '#7A746C', fontSize: 18 }}
+                    />
+                  </div>
+                </div>
                 <div
                   slot="content"
-                  className="px-4 py-3 text-[13px]"
-                  style={{ backgroundColor: '#FBF7F2', color: '#7A746C', borderBottomLeftRadius: 16, borderBottomRightRadius: 16 }}
+                  className="mt-2 px-3 py-2.5 text-[12px] leading-snug"
+                  style={{
+                    backgroundColor: '#FBF7F2',
+                    color: '#7A746C',
+                    borderRadius: 16,
+                    border: '1px solid rgba(232, 222, 211, 0.65)',
+                  }}
                 >
                   {anonBody}
                 </div>
@@ -183,23 +238,16 @@ export default function SuggestRecording() {
             </div>
 
             <div className="mt-3">
-              <IonItem lines="none" style={{ '--background': 'transparent', '--padding-start': '0px' } as any}>
-                <IonLabel position="stacked" style={{ color: '#7A746C', fontWeight: 600 }}>
-                  {isRo ? 'Categorie' : 'Category'}
-                </IonLabel>
+              <div className="text-[13px] font-semibold" style={{ color: '#7A746C' }}>
+                {isRo ? 'Categorie' : 'Category'}
+              </div>
+              <div className="mt-2">
                 <IonSelect
+                  className="fb-suggest-select"
                   value={categoryId}
                   interface="popover"
                   placeholder={isRo ? 'Alege o categorie' : 'Select a category'}
                   onIonChange={(e) => setCategoryId(String(e.detail.value ?? ''))}
-                  style={{
-                    '--placeholder-color': '#7A746C',
-                    '--color': '#4E5B4F',
-                    '--background': '#ffffff',
-                    borderRadius: '14px',
-                    padding: '10px 12px',
-                    border: '1px solid rgba(232, 222, 211, 0.85)',
-                  } as any}
                 >
                   {categories.map(c => (
                     <IonSelectOption key={c.id} value={c.id}>
@@ -207,14 +255,14 @@ export default function SuggestRecording() {
                     </IonSelectOption>
                   ))}
                 </IonSelect>
-              </IonItem>
+              </div>
             </div>
 
             <div className="mt-3">
-              <IonItem lines="none" style={{ '--background': 'transparent', '--padding-start': '0px' } as any}>
-                <IonLabel position="stacked" style={{ color: '#7A746C', fontWeight: 600 }}>
-                  {isRo ? 'Sugestie' : 'Suggestion'}
-                </IonLabel>
+              <div className="text-[13px] font-semibold" style={{ color: '#7A746C' }}>
+                {isRo ? 'Sugestie' : 'Suggestion'}
+              </div>
+              <div className="mt-2">
                 <IonTextarea
                   value={suggestion}
                   autoGrow={true}
@@ -235,7 +283,7 @@ export default function SuggestRecording() {
                     minHeight: '110px',
                   } as any}
                 />
-              </IonItem>
+              </div>
               <div className="mt-2 text-[12px]" style={{ color: '#7A746C' }}>
                 {isRo ? 'Minim 10 caractere.' : 'Minimum 10 characters.'}
               </div>
@@ -266,9 +314,15 @@ export default function SuggestRecording() {
             // Behave like an overlay: return to the previous page and remove this form from history.
             history.replace(returnTo);
           }}
+          cssClass="fb-suggest-alert"
           header={thanksHeader}
           message={thanksMessage}
-          buttons={[isRo ? 'OK' : 'OK']}
+          buttons={[
+            {
+              text: 'OK',
+              cssClass: 'fb-suggest-ok',
+            },
+          ]}
         />
       </IonContent>
     </IonPage>

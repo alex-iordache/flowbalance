@@ -11,12 +11,14 @@ import {
 } from '@ionic/react';
 import { useIonRouter } from '@ionic/react';
 import { useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { chevronBackOutline, settingsOutline } from 'ionicons/icons';
 
 import Store from '../../store';
 import { t, type Flow, type Language } from '../../data/flows';
 import { FLOW_CATEGORIES } from './flowsCatalog';
 import Logo from '../ui/Logo';
+import SuggestRecordingCta from '../ui/SuggestRecordingCta';
 
 const FlowRow = ({
   flow,
@@ -103,6 +105,7 @@ const FlowRow = ({
 
 export default function FlowCategory() {
   const ionRouter = useIonRouter();
+  const history = useHistory();
   const { categoryId } = useParams<{ categoryId: string }>();
   const flows = Store.useState(s => s.flows);
   const lang = Store.useState(s => s.settings.language) as Language;
@@ -166,6 +169,18 @@ export default function FlowCategory() {
           </div>
 
           <div className="mt-4" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
+
+          <div className="mt-4">
+            <SuggestRecordingCta
+              lang={lang}
+              onClick={() =>
+                history.push('/suggest-recording', {
+                  from: history.location.pathname + history.location.search,
+                  categoryId,
+                })
+              }
+            />
+          </div>
 
           <div className="mt-4 grid gap-3">
             {categoryFlows.map(flow => (

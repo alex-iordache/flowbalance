@@ -17,6 +17,7 @@ Add a lightweight way for users to suggest new audio recordings, from the Home s
 
 **File**
 - `components/pages/Home.tsx`
+  - Uses shared component: `components/ui/SuggestRecordingCta.tsx`
 
 **Asset**
 - `public/img/ui/suggest-recording.png`
@@ -26,7 +27,6 @@ Add a lightweight way for users to suggest new audio recordings, from the Home s
 ### 2) Suggest form page (route behaving like an overlay)
 Created a new in-app page that looks/behaves like an overlay:
 - Localized header + intro text
-- Temporary disclaimer at top: “Testing (not functional yet)”
 - “Your privacy is important” accordion (compact, with right/down chevron)
 - Category dropdown (uses existing `FLOW_CATEGORIES`, excludes `stories`)
 - Suggestion textarea + Send button
@@ -42,6 +42,20 @@ Created a new in-app page that looks/behaves like an overlay:
 - `components/pages/SuggestRecording.tsx`
 - `components/pages/Tabs.tsx` (route added)
 - `components/AppShell.tsx` (route allowed at app shell level)
+
+---
+
+### 2.1 Category pages CTA (same box above flows list)
+- The same CTA box is shown on every category page, above the flows list.
+- Clicking it opens the form with:
+  - `from` set to the current category page URL
+  - `categoryId` set, so the dropdown is pre-selected automatically
+
+**File**
+- `components/pages/FlowCategory.tsx`
+
+**Shared component**
+- `components/ui/SuggestRecordingCta.tsx`
 
 ---
 
@@ -67,7 +81,7 @@ Set these in **Vercel** (and optionally in local `.env.local` for local testing)
 
 ### Optional
 - `SUGGEST_RECORDING_TO_EMAIL` — recipient email
-  - Current desired value: `lex131@gmail.com`
+  - Current desired value: `simona.nicolaescu@dynamichr.ro`
 - `SUGGEST_RECORDING_FROM_EMAIL` — sender identity
   - Default used in code: `Flow Balance <onboarding@resend.dev>`
   - For production, use a sender from a verified domain (e.g. `support@flowbalance.app`)
@@ -76,7 +90,7 @@ Set these in **Vercel** (and optionally in local `.env.local` for local testing)
 
 ## How to test
 1. Set `RESEND_API_KEY` in Vercel.
-2. (Optional) Set `SUGGEST_RECORDING_TO_EMAIL=lex131@gmail.com`.
+2. (Optional) Set `SUGGEST_RECORDING_TO_EMAIL=simona.nicolaescu@dynamichr.ro`.
 3. Open app → Home → “Suggest a recording”.
 4. Select a category + type a suggestion (10+ chars) → Send.
 5. Confirm:
@@ -87,8 +101,7 @@ Set these in **Vercel** (and optionally in local `.env.local` for local testing)
 ---
 
 ## Notes / follow-ups (later)
-- Add a small lamp icon on category pages that opens:
+- Add a smaller lamp icon on category pages (if desired) that opens:
   - `history.push('/suggest-recording', { from: currentPath, categoryId })`
-- Remove the “Testing (not functional yet)” disclaimer once delivery is verified.
 - If spam becomes a problem: add Turnstile/hCaptcha or stronger rate limiting.
 

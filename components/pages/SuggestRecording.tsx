@@ -78,11 +78,6 @@ export default function SuggestRecording() {
     ? 'Această cerere va fi trimisă anonim. Nu vom trimite către echipa Flow Balance date despre contul tău (email, nume, userId etc.).'
     : 'This request is sent anonymously. We will not send any account/user data to the Flow Balance team (email, name, userId, etc.).';
 
-  const testingTitle = isRo ? 'În testare (încă nu este funcțional)' : 'Testing (not functional yet)';
-  const testingBody = isRo
-    ? 'Acest ecran este încă în testare. În curând vom activa trimiterea reală a mesajelor.'
-    : 'This screen is still in testing. We will enable real message sending soon.';
-
   const thanksHeader = isRo ? 'Mulțumim!' : 'Thank you!';
   const thanksMessage = isRo
     ? 'Îți citim propunerea și o luăm în considerare. Revino peste câteva zile — facem tot posibilul să o înregistrăm cât mai curând.'
@@ -230,23 +225,6 @@ export default function SuggestRecording() {
 
           <div className="mt-2 text-center text-[14px] md:text-[15px]" style={{ color: '#7A746C' }}>
             {intro}
-          </div>
-
-          {/* Testing disclaimer (temporary) */}
-          <div
-            className="mt-4 rounded-2xl px-4 py-3"
-            style={{
-              backgroundColor: 'rgba(245, 158, 11, 0.10)',
-              border: '1px solid rgba(245, 158, 11, 0.22)',
-              boxShadow: '0 10px 24px rgba(120, 95, 70, 0.06)',
-            }}
-          >
-            <div className="text-[13px] font-semibold" style={{ color: '#7A746C' }}>
-              {testingTitle}
-            </div>
-            <div className="mt-1 text-[13px]" style={{ color: '#7A746C' }}>
-              {testingBody}
-            </div>
           </div>
 
           {/* Anonymous note (accordion) */}

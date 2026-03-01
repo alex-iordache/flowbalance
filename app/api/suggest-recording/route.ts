@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Server not configured' }, { status: 500 });
     }
 
-    const to = process.env.SUGGEST_RECORDING_TO_EMAIL || 'lex131@gmail.com';
+    const to = process.env.SUGGEST_RECORDING_TO_EMAIL || 'simona.nicolaescu@dynamichr.ro';
     const from = process.env.SUGGEST_RECORDING_FROM_EMAIL || 'Flow Balance <onboarding@resend.dev>';
 
     const resend = new Resend(apiKey);

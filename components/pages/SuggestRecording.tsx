@@ -56,6 +56,8 @@ export default function SuggestRecording() {
   const [categoryId, setCategoryId] = useState<string>(() => prefillCategoryId);
   const [suggestion, setSuggestion] = useState<string>('');
   const [showThanks, setShowThanks] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string>('');
   const [privacyAccordionValue, setPrivacyAccordionValue] = useState<string | undefined>(undefined);
 
   const categories = useMemo(() => {
@@ -86,12 +88,36 @@ export default function SuggestRecording() {
     ? 'Îți citim propunerea și o luăm în considerare. Revino peste câteva zile — facem tot posibilul să o înregistrăm cât mai curând.'
     : "We read every suggestion and will take it into consideration. Check back in a few days—we're doing our best to record it as soon as possible.";
 
-  const handleSubmit = () => {
-    if (!canSubmit) return;
-    // NOTE: Intentionally UI-only for now (testing). We'll wire server delivery after validation.
-    setShowThanks(true);
-    setCategoryId('');
-    setSuggestion('');
+  const handleSubmit = async () => {
+    if (!canSubmit || sending) return;
+    setErrorMsg('');
+    setSending(true);
+    try {
+      const catLabel = categories.find(c => c.id === categoryId) ? t(categories.find(c => c.id === categoryId)!.title, lang) : categoryId;
+      const res = await fetch('/api/suggest-recording', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          categoryId,
+          categoryLabel: catLabel,
+          suggestion: suggestion.trim(),
+          company: '',
+        }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        const msg = typeof data?.error === 'string' ? data.error : 'Failed to send';
+        setErrorMsg(msg);
+        return;
+      }
+      setShowThanks(true);
+      setCategoryId(prefillCategoryId);
+      setSuggestion('');
+    } catch {
+      setErrorMsg(isRo ? 'Nu am putut trimite. Încearcă din nou.' : "Couldn't send. Please try again.");
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -331,7 +357,7 @@ export default function SuggestRecording() {
             <div className="mt-4">
               <IonButton
                 expand="block"
-                disabled={!canSubmit}
+                disabled={!canSubmit || sending}
                 onClick={handleSubmit}
                 style={{
                   '--background': '#C57A4A',
@@ -340,9 +366,15 @@ export default function SuggestRecording() {
                   '--box-shadow': '0 10px 24px rgba(120, 95, 70, 0.14)',
                 } as any}
               >
-                {isRo ? 'Trimite' : 'Send'}
+                {sending ? (isRo ? 'Se trimite…' : 'Sending…') : (isRo ? 'Trimite' : 'Send')}
               </IonButton>
             </div>
+
+            {errorMsg ? (
+              <div className="mt-3 text-[12px]" style={{ color: '#B91C1C' }}>
+                {errorMsg}
+              </div>
+            ) : null}
           </div>
         </div>
 

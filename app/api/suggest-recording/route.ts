@@ -64,7 +64,8 @@ export async function POST(req: Request) {
     }
 
     const to = process.env.SUGGEST_RECORDING_TO_EMAIL || 'alexandru.iordache@mrm.com';
-    const from = process.env.SUGGEST_RECORDING_FROM_EMAIL || 'Flow Balance <onboarding@resend.dev>';
+    // IMPORTANT: For non-test recipients, Resend requires `from` to be on a verified domain.
+    const from = process.env.SUGGEST_RECORDING_FROM_EMAIL || 'Flow Balance <suggestions@flowbalance.app>';
 
     const resend = new Resend(apiKey);
     const result = await resend.emails.send({

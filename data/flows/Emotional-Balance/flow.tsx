@@ -1,5 +1,9 @@
 import type { Flow } from '../types';
 import practice_1 from './Story-1/practice';
+import practice_2 from './Story-2/practice';
+import practice_3 from './Story-3/practice';
+import practice_4 from './Story-4/practice';
+import practice_5 from './Story-5/practice';
 
 const roDescription = (
   <>
@@ -104,8 +108,8 @@ const flow: Flow = {
   lastPracticeFinishedId: null,
   lastPracticePositionSec: 0,
 
-  totalPractices: 1,
-  practices: [practice_1],
+  totalPractices: 5,
+  practices: [practice_1, practice_2, practice_3, practice_4, practice_5],
 };
 
 export default flow;

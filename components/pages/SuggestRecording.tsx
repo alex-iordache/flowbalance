@@ -142,7 +142,8 @@ export default function SuggestRecording() {
 
           /* IonSelect: prevent grey hover/focus blocks; keep rounded look */
           .fb-suggest-select {
-            width: 100%;
+            width: 100% !important;
+            max-width: 100% !important;
             display: block;
           }
           .fb-suggest-select::part(container) {
@@ -150,7 +151,7 @@ export default function SuggestRecording() {
             border: 1px solid rgba(232, 222, 211, 0.85);
             border-radius: 14px;
             padding: 10px 12px;
-            width: 100%;
+            width: 100% !important;
             transition: background-color 120ms ease, border-color 120ms ease;
           }
           .fb-suggest-select:hover::part(container) {
@@ -174,6 +175,15 @@ export default function SuggestRecording() {
           ion-popover.fb-suggest-select-popover::part(content) {
             width: min(520px, calc(100vw - 32px));
             max-width: 520px;
+          }
+
+          /* IonTextarea: remove white/grey fill behind text */
+          .fb-suggest-textarea {
+            width: 100%;
+            display: block;
+          }
+          .fb-suggest-textarea::part(native) {
+            background: transparent !important;
           }
         `}</style>
         <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
@@ -256,10 +266,6 @@ export default function SuggestRecording() {
               boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
             }}
           >
-            <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
-              {isRo ? 'Detalii' : 'Details'}
-            </div>
-
             <div className="mt-3">
               <div className="text-[13px] font-semibold" style={{ color: '#7A746C' }}>
                 {isRo ? 'Categorie' : 'Category'}
@@ -288,6 +294,7 @@ export default function SuggestRecording() {
               </div>
               <div className="mt-2">
                 <IonTextarea
+                  className="fb-suggest-textarea"
                   value={suggestion}
                   autoGrow={true}
                   rows={4}
@@ -300,7 +307,7 @@ export default function SuggestRecording() {
                   style={{
                     '--placeholder-color': '#7A746C',
                     '--color': '#4E5B4F',
-                    '--background': '#ffffff',
+                    '--background': 'transparent',
                     borderRadius: '14px',
                     padding: '10px 12px',
                     border: '1px solid rgba(232, 222, 211, 0.85)',

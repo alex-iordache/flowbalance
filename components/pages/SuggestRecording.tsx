@@ -145,6 +145,11 @@ export default function SuggestRecording() {
             width: 100% !important;
             max-width: 100% !important;
             display: block;
+            /* Kill the default Ionic “active/focus” underline */
+            --highlight-height: 0px;
+            --highlight-color-focused: transparent;
+            --highlight-color: transparent;
+            --ripple-color: transparent;
           }
           .fb-suggest-select::part(container) {
             background: #ffffff;
@@ -152,6 +157,9 @@ export default function SuggestRecording() {
             border-radius: 14px;
             padding: 10px 12px;
             width: 100% !important;
+            display: flex;
+            align-items: center;
+            box-sizing: border-box;
             transition: background-color 120ms ease, border-color 120ms ease;
           }
           .fb-suggest-select:hover::part(container) {
@@ -172,9 +180,9 @@ export default function SuggestRecording() {
           }
 
           /* IonSelect popover: make the dropdown panel wider */
-          ion-popover.fb-suggest-select-popover::part(content) {
-            width: min(520px, calc(100vw - 32px));
-            max-width: 520px;
+          ion-popover.fb-suggest-select-popover {
+            --width: min(360px, calc(100vw - 32px));
+            --max-width: min(360px, calc(100vw - 32px));
           }
 
           /* IonTextarea: remove white/grey fill behind text */
@@ -272,7 +280,7 @@ export default function SuggestRecording() {
               </div>
               <div className="mt-2">
                 <IonSelect
-                  className="fb-suggest-select"
+                  className="fb-suggest-select w-full"
                   value={categoryId}
                   interface="popover"
                   interfaceOptions={{ cssClass: 'fb-suggest-select-popover' }}

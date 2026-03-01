@@ -23,6 +23,7 @@ import Settings from './Settings';
 import MyProgress from './MyProgress';
 import Subscribe from './Subscribe';
 import DeleteAccount from './DeleteAccount';
+import SuggestRecording from './SuggestRecording';
 import Store from '../../store';
 import { isDesktopWeb } from '../admin/adminEnv';
 
@@ -64,6 +65,7 @@ const Tabs = () => {
           />
           <Route path="/practices" render={() => <StandalonePractices />} exact={true} />
           <Route path="/practices/:audioId" render={() => <StandalonePractice />} exact={true} />
+          <Route path="/suggest-recording" render={() => <SuggestRecording />} exact={true} />
           <Route path="/settings/delete-account" render={() => <DeleteAccount />} exact={true} />
           <Route path="/settings" render={() => <Settings />} exact={true} />
           <Route path="/subscribe" render={() => <Subscribe />} exact={true} />

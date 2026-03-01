@@ -1,0 +1,277 @@
+'use client';
+
+import {
+  IonAccordion,
+  IonAccordionGroup,
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonItem,
+  IonLabel,
+  IonPage,
+  IonSelect,
+  IonSelectOption,
+  IonTextarea,
+  IonToolbar,
+  IonAlert,
+} from '@ionic/react';
+import { chevronBackOutline } from 'ionicons/icons';
+import { useMemo, useState } from 'react';
+import { useHistory, useLocation } from 'react-router-dom';
+
+import Store from '../../store';
+import { t, type Language } from '../../data/flows';
+import { FLOW_CATEGORIES } from './flowsCatalog';
+import Logo from '../ui/Logo';
+
+export default function SuggestRecording() {
+  const history = useHistory();
+  const location = useLocation<{ from?: string; categoryId?: string } | undefined>();
+  const lang = Store.useState(s => s.settings.language) as Language;
+  const isRo = lang === 'ro';
+
+  const returnTo =
+    typeof (location as any)?.state?.from === 'string' && String((location as any).state.from).startsWith('/')
+      ? String((location as any).state.from)
+      : '/home';
+
+  const prefillCategoryId = useMemo(() => {
+    const fromState = typeof (location as any)?.state?.categoryId === 'string' ? String((location as any).state.categoryId) : '';
+    const fromQuery = (() => {
+      try {
+        const sp = new URLSearchParams((location as any)?.search ?? '');
+        return String(sp.get('categoryId') ?? '');
+      } catch {
+        return '';
+      }
+    })();
+    const candidate = (fromState || fromQuery).trim();
+    if (!candidate) return '';
+    // Only allow known categories (and exclude "stories").
+    const ok = FLOW_CATEGORIES.some(c => c.id === candidate && c.id !== 'stories');
+    return ok ? candidate : '';
+  }, [location]);
+
+  const [categoryId, setCategoryId] = useState<string>(() => prefillCategoryId);
+  const [suggestion, setSuggestion] = useState<string>('');
+  const [showThanks, setShowThanks] = useState(false);
+
+  const categories = useMemo(() => {
+    return [...FLOW_CATEGORIES]
+      .filter(c => c.id !== 'stories')
+      .sort((a, b) => t(a.title, lang).localeCompare(t(b.title, lang)));
+  }, [lang]);
+
+  const canSubmit = Boolean(categoryId && suggestion.trim().length >= 10);
+
+  const title = isRo ? 'Sugerează o înregistrare' : 'Suggest a recording';
+  const intro = isRo
+    ? 'Spune-ne ce practică ai vrea să auzi în aplicație. Ne ajută să prioritizăm următoarele înregistrări.'
+    : "Tell us what you'd like to hear in the app. This helps us prioritize upcoming recordings.";
+
+  const anonTitle = isRo ? 'Anonim' : 'Anonymous';
+  const anonBody = isRo
+    ? 'Această cerere va fi trimisă anonim. Nu vom trimite către echipa Flow Balance date despre contul tău (email, nume, userId etc.).'
+    : 'This request is sent anonymously. We will not send any account/user data to the Flow Balance team (email, name, userId, etc.).';
+
+  const testingTitle = isRo ? 'În testare (încă nu este funcțional)' : 'Testing (not functional yet)';
+  const testingBody = isRo
+    ? 'Acest ecran este încă în testare. În curând vom activa trimiterea reală a mesajelor.'
+    : 'This screen is still in testing. We will enable real message sending soon.';
+
+  const thanksHeader = isRo ? 'Mulțumim!' : 'Thank you!';
+  const thanksMessage = isRo
+    ? 'Îți citim propunerea și o luăm în considerare. Revino peste câteva zile — facem tot posibilul să o înregistrăm cât mai curând.'
+    : "We read every suggestion and will take it into consideration. Check back in a few days—we're doing our best to record it as soon as possible.";
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    // NOTE: Intentionally UI-only for now (testing). We'll wire server delivery after validation.
+    setShowThanks(true);
+    setCategoryId('');
+    setSuggestion('');
+  };
+
+  return (
+    <IonPage>
+      <IonHeader>
+        <IonToolbar style={{ position: 'relative' }}>
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
+
+          <IonButtons slot="start">
+            <IonBackButton
+              defaultHref={returnTo}
+              icon={chevronBackOutline}
+              text=""
+              style={{ '--color': '#4E5B4F' } as any}
+            />
+          </IonButtons>
+        </IonToolbar>
+      </IonHeader>
+
+      <IonContent fullscreen={true}>
+        <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto">
+          <div
+            className="text-[26px] md:text-[30px] leading-tight text-center"
+            style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+          >
+            {title}
+          </div>
+
+          <div className="mt-2 text-center text-[14px] md:text-[15px]" style={{ color: '#7A746C' }}>
+            {intro}
+          </div>
+
+          {/* Testing disclaimer (temporary) */}
+          <div
+            className="mt-4 rounded-2xl px-4 py-3"
+            style={{
+              backgroundColor: 'rgba(245, 158, 11, 0.10)',
+              border: '1px solid rgba(245, 158, 11, 0.22)',
+              boxShadow: '0 10px 24px rgba(120, 95, 70, 0.06)',
+            }}
+          >
+            <div className="text-[13px] font-semibold" style={{ color: '#7A746C' }}>
+              {testingTitle}
+            </div>
+            <div className="mt-1 text-[13px]" style={{ color: '#7A746C' }}>
+              {testingBody}
+            </div>
+          </div>
+
+          {/* Anonymous note (accordion) */}
+          <div className="mt-3">
+            <IonAccordionGroup>
+              <IonAccordion value="anon">
+                <IonItem slot="header" lines="none" style={{ '--background': '#FBF7F2', '--color': '#4E5B4F' } as any}>
+                  <IonLabel className="text-[14px] font-semibold">{anonTitle}</IonLabel>
+                </IonItem>
+                <div
+                  slot="content"
+                  className="px-4 py-3 text-[13px]"
+                  style={{ backgroundColor: '#FBF7F2', color: '#7A746C', borderBottomLeftRadius: 16, borderBottomRightRadius: 16 }}
+                >
+                  {anonBody}
+                </div>
+              </IonAccordion>
+            </IonAccordionGroup>
+          </div>
+
+          {/* Form */}
+          <div
+            className="mt-4 rounded-[16px] p-4 md:p-5"
+            style={{
+              backgroundColor: '#FBF7F2',
+              border: '1px solid rgba(232, 222, 211, 0.85)',
+              boxShadow: '0 10px 24px rgba(120, 95, 70, 0.08)',
+            }}
+          >
+            <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+              {isRo ? 'Detalii' : 'Details'}
+            </div>
+
+            <div className="mt-3">
+              <IonItem lines="none" style={{ '--background': 'transparent', '--padding-start': '0px' } as any}>
+                <IonLabel position="stacked" style={{ color: '#7A746C', fontWeight: 600 }}>
+                  {isRo ? 'Categorie' : 'Category'}
+                </IonLabel>
+                <IonSelect
+                  value={categoryId}
+                  interface="popover"
+                  placeholder={isRo ? 'Alege o categorie' : 'Select a category'}
+                  onIonChange={(e) => setCategoryId(String(e.detail.value ?? ''))}
+                  style={{
+                    '--placeholder-color': '#7A746C',
+                    '--color': '#4E5B4F',
+                    '--background': '#ffffff',
+                    borderRadius: '14px',
+                    padding: '10px 12px',
+                    border: '1px solid rgba(232, 222, 211, 0.85)',
+                  } as any}
+                >
+                  {categories.map(c => (
+                    <IonSelectOption key={c.id} value={c.id}>
+                      {t(c.title, lang)}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+              </IonItem>
+            </div>
+
+            <div className="mt-3">
+              <IonItem lines="none" style={{ '--background': 'transparent', '--padding-start': '0px' } as any}>
+                <IonLabel position="stacked" style={{ color: '#7A746C', fontWeight: 600 }}>
+                  {isRo ? 'Sugestie' : 'Suggestion'}
+                </IonLabel>
+                <IonTextarea
+                  value={suggestion}
+                  autoGrow={true}
+                  rows={4}
+                  placeholder={
+                    isRo
+                      ? 'Ex: O practică de 5 minute pentru calmare înainte de somn…'
+                      : 'Example: A 5-minute practice to calm down before sleep…'
+                  }
+                  onIonInput={(e) => setSuggestion(String((e as any)?.detail?.value ?? ''))}
+                  style={{
+                    '--placeholder-color': '#7A746C',
+                    '--color': '#4E5B4F',
+                    '--background': '#ffffff',
+                    borderRadius: '14px',
+                    padding: '10px 12px',
+                    border: '1px solid rgba(232, 222, 211, 0.85)',
+                    minHeight: '110px',
+                  } as any}
+                />
+              </IonItem>
+              <div className="mt-2 text-[12px]" style={{ color: '#7A746C' }}>
+                {isRo ? 'Minim 10 caractere.' : 'Minimum 10 characters.'}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <IonButton
+                expand="block"
+                disabled={!canSubmit}
+                onClick={handleSubmit}
+                style={{
+                  '--background': '#C57A4A',
+                  '--background-activated': '#B56B3B',
+                  '--border-radius': '16px',
+                  '--box-shadow': '0 10px 24px rgba(120, 95, 70, 0.14)',
+                } as any}
+              >
+                {isRo ? 'Trimite' : 'Send'}
+              </IonButton>
+            </div>
+          </div>
+        </div>
+
+        <IonAlert
+          isOpen={showThanks}
+          onDidDismiss={() => {
+            setShowThanks(false);
+            // Behave like an overlay: return to the previous page and remove this form from history.
+            history.replace(returnTo);
+          }}
+          header={thanksHeader}
+          message={thanksMessage}
+          buttons={[isRo ? 'OK' : 'OK']}
+        />
+      </IonContent>
+    </IonPage>
+  );
+}
+

@@ -60,7 +60,8 @@ const AppShell = () => {
               <Route path="/flows" component={Tabs} />
               <Route path="/settings" component={Tabs} />
               <Route path="/progress" component={Tabs} />
-            <Route path="/practices" component={Tabs} />
+              <Route path="/practices" component={Tabs} />
+              <Route path="/suggest-recording" component={Tabs} />
               {/* IMPORTANT: keep this exact so it does not catch `/subscribe-web/*` return URLs on iOS */}
               <Route path="/subscribe" component={Tabs} exact={true} />
 

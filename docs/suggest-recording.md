@@ -81,7 +81,7 @@ Set these in **Vercel** (and optionally in local `.env.local` for local testing)
 
 ### Optional
 - `SUGGEST_RECORDING_TO_EMAIL` — recipient email
-  - Current desired value (for testing): `alexandru.iordache@mrm.com`
+  - Default (if env var is not set): `simona.nicolaescu@dynamichr.ro`
 - `SUGGEST_RECORDING_FROM_EMAIL` — sender identity
   - Default used in code: `Flow Balance <suggestions@flowbalance.app>`
   - Required for sending to non-test recipients: the `from` address must use a verified domain (Resend requirement)

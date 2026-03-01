@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Server not configured' }, { status: 500 });
     }
 
-    const to = process.env.SUGGEST_RECORDING_TO_EMAIL || 'alexandru.iordache@mrm.com';
+    const to = process.env.SUGGEST_RECORDING_TO_EMAIL || 'simona.nicolaescu@dynamichr.ro';
     // IMPORTANT: For non-test recipients, Resend requires `from` to be on a verified domain.
     const from = process.env.SUGGEST_RECORDING_FROM_EMAIL || 'Flow Balance <suggestions@flowbalance.app>';
 

@@ -148,18 +148,13 @@ export default function AudioPlayer({
     a.addEventListener('playing', onPlayingEvt);
 
     // Ensure the element is pointed at the current src.
+    // Setting .src triggers load automatically; avoid calling a.load() as it would cause a second
+    // request and double-count in analytics.
     a.src = src;
     a.preload = 'auto';
     // iOS Safari / WKWebView: keep playback inline.
     a.setAttribute('playsinline', 'true');
     a.setAttribute('webkit-playsinline', 'true');
-
-    // Kick off metadata load
-    try {
-      a.load();
-    } catch {
-      // ignore
-    }
 
     return () => {
       // Report final position on unmount (e.g. user navigated away).

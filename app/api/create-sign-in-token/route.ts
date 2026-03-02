@@ -5,6 +5,10 @@ import { NextResponse } from 'next/server';
  * API route to create a transferable sign-in token
  * This allows users to authenticate in external browsers
  */
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+export const fetchCache = 'force-no-store';
+
 export async function GET() {
   try {
     const { userId } = await auth();

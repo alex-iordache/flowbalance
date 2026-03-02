@@ -2,6 +2,8 @@ import { auth, clerkClient } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
 
 import { fetchR2Object } from '../../../lib/r2';
+import { defaultFlows, t, type Flow } from '../../../data/flows';
+import { getCategoryForFlowId } from '../../../components/pages/flowsCatalog';
 
 export const runtime = 'nodejs';
 
@@ -58,6 +60,19 @@ async function computeTrialActive(userId: string): Promise<boolean> {
   return now < trialUntilMs;
 }
 
+function parseRangeStart(rangeHeader: string | null): number | null {
+  if (!rangeHeader) return null;
+  const m = /^bytes=(\d+)-/i.exec(rangeHeader.trim());
+  if (!m) return null;
+  const n = Number(m[1]);
+  return Number.isFinite(n) ? n : null;
+}
+
+function safeFlowById(flowId: string | null): Flow | null {
+  if (!flowId) return null;
+  return defaultFlows.find(f => f.id === flowId) ?? null;
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   // Use `||` (not `??`) so empty strings don't "win" over a valid fallback.
@@ -101,6 +116,42 @@ export async function GET(request: Request) {
 
   const range = request.headers.get('range');
   const r2Res = await fetchR2Object({ key, rangeHeader: range });
+
+  // Stats logging (structured JSON) for Axiom.
+  // We log only "initial" requests (rangeStart=0 or no range header) and only if R2 returned audio.
+  try {
+    const rangeStart = parseRangeStart(range);
+    const shouldLog = r2Res.status === 200 || r2Res.status === 206;
+    const isInitial = rangeStart == null || rangeStart === 0;
+    if (shouldLog && isInitial) {
+      const flow = safeFlowById(typeof flowId === 'string' ? flowId : null);
+      const practice =
+        flow && typeof practiceId === 'string'
+          ? (flow.practices ?? []).find(p => p.id === practiceId) ?? null
+          : null;
+      const category = flow ? getCategoryForFlowId(flow.id) : null;
+      const event = {
+        event: 'audio_access',
+        ts: new Date().toISOString(),
+        audioKey: key,
+        flowId: typeof flowId === 'string' ? flowId : null,
+        practiceId: typeof practiceId === 'string' ? practiceId : null,
+        categoryId: category?.id ?? null,
+        categoryNameRo: category ? t(category.title, 'ro') : null,
+        categoryNameEn: category ? t(category.title, 'en') : null,
+        flowNameRo: flow ? t(flow.name, 'ro') : null,
+        flowNameEn: flow ? t(flow.name, 'en') : null,
+        practiceNameRo: practice ? t(practice.name, 'ro') : null,
+        practiceNameEn: practice ? t(practice.name, 'en') : null,
+        rangeStart,
+        r2Status: r2Res.status,
+      };
+      // eslint-disable-next-line no-console
+      console.log(JSON.stringify(event));
+    }
+  } catch {
+    // ignore logging failures
+  }
 
   // Pass through status codes (e.g., 206 Partial Content, 404 Not Found)
   const outHeaders = new Headers();

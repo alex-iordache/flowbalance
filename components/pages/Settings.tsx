@@ -24,7 +24,7 @@ import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import { isDesktopWeb } from '../admin/adminEnv';
 import { Preferences } from '@capacitor/preferences';
 import Logo from '../ui/Logo';
-import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, refreshOutline, trashOutline } from 'ionicons/icons';
+import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, refreshOutline, statsChartOutline, trashOutline } from 'ionicons/icons';
 
 const PREF_LAST_APP_REFRESH = 'last_app_refresh_at';
 
@@ -113,6 +113,8 @@ const Settings = () => {
   const [ticket, setTicket] = useState<string | null>(null);
   const [ticketLoading, setTicketLoading] = useState(false);
   const [lastAppRefreshAt, setLastAppRefreshAt] = useState<string | null>(null);
+  const [statsAllowed, setStatsAllowed] = useState<boolean>(false);
+  const [statsAllowLoaded, setStatsAllowLoaded] = useState(false);
 
   const cardStyle: React.CSSProperties = {
     backgroundColor: '#FBF7F2',
@@ -171,6 +173,43 @@ const Settings = () => {
       if (value) setLastAppRefreshAt(value);
     });
   }, []);
+
+  // Stats allowlist (web-only)
+  useEffect(() => {
+    if (!isLoaded) return;
+    if (!userId) {
+      setStatsAllowed(false);
+      setStatsAllowLoaded(true);
+      return;
+    }
+    if (!isDesktopWeb()) {
+      setStatsAllowed(false);
+      setStatsAllowLoaded(true);
+      return;
+    }
+
+    let cancelled = false;
+    const ctrl = new AbortController();
+    setStatsAllowLoaded(false);
+    window
+      .fetch('/api/stats/allow', { signal: ctrl.signal })
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return;
+        setStatsAllowed(Boolean(data?.allowed));
+        setStatsAllowLoaded(true);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setStatsAllowed(false);
+        setStatsAllowLoaded(true);
+      });
+
+    return () => {
+      cancelled = true;
+      ctrl.abort();
+    };
+  }, [isLoaded, userId]);
 
   const handleRefreshApp = async () => {
     const now = new Date().toISOString();
@@ -305,6 +344,13 @@ const Settings = () => {
                   onClick={() => void handleRefreshApp()}
                   leftIcon={refreshOutline}
                 />
+                {statsAllowLoaded && statsAllowed ? (
+                  <ActionRow
+                    label={isRo ? 'Statistici audio (web)' : 'Audio stats (web)'}
+                    onClick={() => history.push('/settings/stats')}
+                    leftIcon={statsChartOutline}
+                  />
+                ) : null}
                 {lastAppRefreshAt ? (
                   <div
                     className="mt-1 text-[13px]"

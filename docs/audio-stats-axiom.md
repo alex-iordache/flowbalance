@@ -76,7 +76,23 @@ Required env vars:
 In Axiom, run an APL query like:
 
 ```apl
-['YOUR_DATASET'] | where event == "audio_access" | limit 10
+['YOUR_DATASET'] | search "*audio_access*" | limit 10
+```
+
+If the dataset doesn’t have an `event` column (common with Vercel drains), use JSON parsing:
+
+```apl
+['YOUR_DATASET']
+| search "*\"event\":\"audio_access\"*"
+| extend raw = coalesce(
+    ensure_field('message', typeof(string)),
+    ensure_field('line', typeof(string)),
+    ensure_field('log', typeof(string)),
+    ensure_field('msg', typeof(string))
+  )
+| extend j = parse_json(raw)
+| where tostring(j.event) == "audio_access"
+| limit 10
 ```
 
 You should see rows containing the JSON fields logged from `app/api/audio/route.ts`.

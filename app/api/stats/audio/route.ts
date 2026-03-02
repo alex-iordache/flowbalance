@@ -76,11 +76,26 @@ export async function GET(request: Request) {
   const dataset = getEnvOrThrow('AXIOM_DATASET');
   const orgId = (process.env.AXIOM_ORG_ID ?? '').trim();
 
+  // Vercel → Axiom log drain often stores console logs as JSON strings in a field like `message`.
+  // Use `search` (schema-free), then parse JSON from whichever field exists.
   // We only count "initial" audio requests (rangeStart == 0 OR no rangeStart).
   const apl = `['${dataset}']
-| where event == "audio_access"
+| search "*\\"event\\":\\"audio_access\\"*"
+| extend __raw = coalesce(
+    ensure_field('message', typeof(string)),
+    ensure_field('line', typeof(string)),
+    ensure_field('log', typeof(string)),
+    ensure_field('msg', typeof(string))
+  )
+| extend __j = parse_json(__raw)
+| where tostring(__j.event) == "audio_access"
+| extend rangeStart = toint(__j.rangeStart)
 | where isnull(rangeStart) or rangeStart == 0
-| summarize accesses=count() by categoryId, flowId, practiceId, audioKey
+| summarize accesses=count()
+    by categoryId=tostring(__j.categoryId),
+       flowId=tostring(__j.flowId),
+       practiceId=tostring(__j.practiceId),
+       audioKey=tostring(__j.audioKey)
 | order by accesses desc
 | limit 2000`;
 

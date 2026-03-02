@@ -2,17 +2,20 @@
 
 import {
   IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonPage,
-  IonTitle,
   IonToolbar,
 } from '@ionic/react';
+import { settingsOutline } from 'ionicons/icons';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
 import Store from '../../store';
+import Logo from '../ui/Logo';
 import * as selectors from '../../store/selectors';
 
 type RangeKey = '24h' | '7d' | '30d' | '365d';
@@ -178,15 +181,37 @@ export default function AudioStats() {
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
+        <IonToolbar style={{ position: 'relative' }}>
           <IonButtons slot="start">
             <IonBackButton defaultHref="/settings" />
           </IonButtons>
-          <IonTitle>{isRo ? 'Statistici audio' : 'Audio stats'}</IonTitle>
+          <div
+            className="pointer-events-none"
+            style={{
+              position: 'absolute',
+              left: '50%',
+              top: '50%',
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            <Logo />
+          </div>
+          <IonButtons slot="end">
+            <IonButton routerLink="/settings" routerDirection="none" style={{ '--color': '#4E5B4F' } as React.CSSProperties}>
+              <IonIcon icon={settingsOutline} style={{ color: '#4E5B4F' }} className="text-2xl" />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>
         <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-4">
+          <div
+            className="text-[26px] md:text-[30px] leading-tight text-center"
+            style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+          >
+            {isRo ? 'Statistici audio' : 'Audio stats'}
+          </div>
+          <div className="mt-1" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
           <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>
             <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
               {isRo ? 'Perioadă' : 'Range'}

@@ -4,6 +4,7 @@ import {
   IonToolbar,
   IonContent,
   IonToggle,
+  IonBackButton,
   IonButton,
   IonLabel,
   IonSelect,
@@ -24,7 +25,7 @@ import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import { isDesktopWeb } from '../admin/adminEnv';
 import { Preferences } from '@capacitor/preferences';
 import Logo from '../ui/Logo';
-import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, peopleOutline, refreshOutline, statsChartOutline, trashOutline } from 'ionicons/icons';
+import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, peopleOutline, refreshOutline, settingsOutline, statsChartOutline, trashOutline } from 'ionicons/icons';
 
 const PREF_LAST_APP_REFRESH = 'last_app_refresh_at';
 
@@ -235,6 +236,9 @@ const Settings = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar style={{ position: 'relative' }}>
+          <IonButtons slot="start">
+            <IonBackButton defaultHref="/" />
+          </IonButtons>
           {/* Dead-center logo (independent of left/right icons) */}
           <div
             className="pointer-events-none"
@@ -247,6 +251,11 @@ const Settings = () => {
           >
             <Logo />
           </div>
+          <IonButtons slot="end">
+            <IonButton routerLink="/settings" routerDirection="none" style={{ '--color': '#4E5B4F' } as React.CSSProperties}>
+              <IonIcon icon={settingsOutline} style={{ color: '#4E5B4F' }} className="text-2xl" />
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen={true}>

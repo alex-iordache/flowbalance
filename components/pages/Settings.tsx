@@ -24,7 +24,7 @@ import { getWebBaseUrl } from '../../helpers/webBaseUrl';
 import { isDesktopWeb } from '../admin/adminEnv';
 import { Preferences } from '@capacitor/preferences';
 import Logo from '../ui/Logo';
-import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, refreshOutline, statsChartOutline, trashOutline } from 'ionicons/icons';
+import { cardOutline, chevronForwardOutline, logInOutline, logOutOutline, peopleOutline, refreshOutline, statsChartOutline, trashOutline } from 'ionicons/icons';
 
 const PREF_LAST_APP_REFRESH = 'last_app_refresh_at';
 
@@ -346,11 +346,18 @@ const Settings = () => {
                   leftIcon={refreshOutline}
                 />
                 {statsAllowLoaded && statsAllowed ? (
-                  <ActionRow
-                    label={isRo ? 'Statistici audio (web)' : 'Audio stats (web)'}
-                    onClick={() => history.push('/settings/stats')}
-                    leftIcon={statsChartOutline}
-                  />
+                  <>
+                    <ActionRow
+                      label={isRo ? 'Statistici audio (web)' : 'Audio stats (web)'}
+                      onClick={() => history.push('/settings/stats')}
+                      leftIcon={statsChartOutline}
+                    />
+                    <ActionRow
+                      label={isRo ? 'Statistici organizații (web)' : 'Organisation stats (web)'}
+                      onClick={() => history.push('/settings/org-stats')}
+                      leftIcon={peopleOutline}
+                    />
+                  </>
                 ) : null}
                 {lastAppRefreshAt ? (
                   <div

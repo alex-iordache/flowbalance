@@ -183,12 +183,6 @@ const Settings = () => {
       setStatsAllowLoaded(true);
       return;
     }
-    if (!isDesktopWeb()) {
-      setStatsAllowed(false);
-      setStatsAllowLoaded(true);
-      return;
-    }
-
     let cancelled = false;
     const ctrl = new AbortController();
     setStatsAllowLoaded(false);
@@ -348,12 +342,12 @@ const Settings = () => {
                 {statsAllowLoaded && statsAllowed ? (
                   <>
                     <ActionRow
-                      label={isRo ? 'Statistici audio (web)' : 'Audio stats (web)'}
+                      label={isRo ? 'Statistici audio' : 'Audio stats'}
                       onClick={() => history.push('/settings/stats')}
                       leftIcon={statsChartOutline}
                     />
                     <ActionRow
-                      label={isRo ? 'Statistici organizații (web)' : 'Organisation stats (web)'}
+                      label={isRo ? 'Statistici organizații' : 'Organisation stats'}
                       onClick={() => history.push('/settings/org-stats')}
                       leftIcon={peopleOutline}
                     />

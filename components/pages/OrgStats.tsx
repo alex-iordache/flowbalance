@@ -16,7 +16,6 @@ import { useHistory } from 'react-router-dom';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
-import { isDesktopWeb } from '../admin/adminEnv';
 
 type RangeKey = '24h' | '7d' | '30d' | '365d';
 
@@ -75,11 +74,6 @@ export default function OrgStats() {
   const [orgUsageError, setOrgUsageError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isDesktopWeb()) {
-      history.replace('/settings');
-      return;
-    }
-
     let cancelled = false;
     const ctrl = new AbortController();
 

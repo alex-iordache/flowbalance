@@ -13,6 +13,7 @@ import {
 } from '@ionic/react';
 import { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useAuth, useOrganization } from '@clerk/nextjs';
 
 import Store from '../../store';
 import * as selectors from '../../store/selectors';
@@ -62,6 +63,9 @@ export default function OrgStats() {
   const history = useHistory();
   const settings = Store.useState(selectors.selectSettings);
   const isRo = settings.language === 'ro';
+  const { orgId: authOrgId, has } = useAuth();
+  const { organization } = useOrganization();
+  const isOrgAdmin = (authOrgId != null && (has?.({ role: 'org:admin' }) ?? false)) as boolean;
 
   const [allowed, setAllowed] = useState<boolean | null>(null);
   const [orgs, setOrgs] = useState<Org[]>([]);
@@ -73,6 +77,9 @@ export default function OrgStats() {
   const [orgsError, setOrgsError] = useState<string | null>(null);
   const [orgUsageError, setOrgUsageError] = useState<string | null>(null);
 
+  const isSuperAdmin = allowed === true;
+  const canAccessPage = allowed === true || (authOrgId != null && isOrgAdmin);
+
   useEffect(() => {
     let cancelled = false;
     const ctrl = new AbortController();
@@ -82,23 +89,32 @@ export default function OrgStats() {
       .then(r => r.json())
       .then(data => {
         if (cancelled) return;
-        const ok = Boolean(data?.allowed);
-        setAllowed(ok);
-        if (!ok) history.replace('/settings');
+        setAllowed(Boolean(data?.allowed));
       })
       .catch(() => {
         if (cancelled) return;
         setAllowed(false);
-        history.replace('/settings');
       });
 
     return () => {
       cancelled = true;
       ctrl.abort();
     };
-  }, [history]);
+  }, []);
 
   useEffect(() => {
+    if (allowed === null) return;
+    if (canAccessPage) return;
+    history.replace('/settings');
+  }, [allowed, canAccessPage, history]);
+
+  useEffect(() => {
+    if (allowed === false && authOrgId && isOrgAdmin) {
+      const name = organization?.name ?? (isRo ? 'Organizația ta' : 'Your organization');
+      setOrgs([{ id: authOrgId, name, slug: null }]);
+      setSelectedOrgId(authOrgId);
+      return;
+    }
     if (allowed !== true) return;
 
     let cancelled = false;
@@ -138,11 +154,10 @@ export default function OrgStats() {
       cancelled = true;
       ctrl.abort();
     };
-  }, [allowed, isRo]);
+  }, [allowed, authOrgId, isOrgAdmin, organization?.name, isRo]);
 
   useEffect(() => {
-    if (allowed !== true) return;
-    if (!selectedOrgId) return;
+    if (!canAccessPage || !selectedOrgId) return;
 
     let cancelled = false;
     const ctrl = new AbortController();
@@ -184,7 +199,7 @@ export default function OrgStats() {
       cancelled = true;
       ctrl.abort();
     };
-  }, [allowed, selectedOrgId, isRo]);
+  }, [canAccessPage, selectedOrgId, isRo]);
 
   const selectedOrg = useMemo(
     () => orgs.find(o => o.id === selectedOrgId) ?? null,

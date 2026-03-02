@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { auth } from '@clerk/nextjs/server';
 
 import { isStatsAllowed } from '../../../../lib/statsAllow';
 
@@ -81,11 +82,15 @@ async function queryAxiom(params: { dataset: string; token: string; orgIdHeader:
 
 export async function GET(request: Request) {
   const { allowed } = await isStatsAllowed();
-  if (!allowed) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
+  const { orgId: sessionOrgId, orgRole } = await auth();
 
   const url = new URL(request.url);
   const targetOrgId = sanitizeOrgId(url.searchParams.get('orgId'));
   if (!targetOrgId) return NextResponse.json({ error: 'invalid_orgId' }, { status: 400 });
+
+  const isOrgAdminOwnOrg =
+    sessionOrgId != null && orgRole === 'org:admin' && sessionOrgId === targetOrgId;
+  if (!allowed && !isOrgAdminOwnOrg) return NextResponse.json({ error: 'forbidden' }, { status: 403 });
 
   const token = getEnvOrThrow('AXIOM_TOKEN');
   const dataset = getEnvOrThrow('AXIOM_DATASET');

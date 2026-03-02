@@ -110,6 +110,7 @@ const Settings = () => {
   const { signOut } = useClerk();
   const { userId, orgId, has, isLoaded } = useAuth();
   const { user } = useUser();
+  const isOrgAdmin = (orgId != null && (has?.({ role: 'org:admin' }) ?? false)) as boolean;
   const isRo = settings.language === 'ro';
   const [ticket, setTicket] = useState<string | null>(null);
   const [ticketLoading, setTicketLoading] = useState(false);
@@ -339,13 +340,15 @@ const Settings = () => {
                   onClick={() => void handleRefreshApp()}
                   leftIcon={refreshOutline}
                 />
-                {statsAllowLoaded && statsAllowed ? (
+                {statsAllowLoaded && (statsAllowed || isOrgAdmin) ? (
                   <>
-                    <ActionRow
-                      label={isRo ? 'Statistici audio' : 'Audio stats'}
-                      onClick={() => history.push('/settings/stats')}
-                      leftIcon={statsChartOutline}
-                    />
+                    {statsAllowed ? (
+                      <ActionRow
+                        label={isRo ? 'Statistici audio' : 'Audio stats'}
+                        onClick={() => history.push('/settings/stats')}
+                        leftIcon={statsChartOutline}
+                      />
+                    ) : null}
                     <ActionRow
                       label={isRo ? 'Statistici organizații' : 'Organisation stats'}
                       onClick={() => history.push('/settings/org-stats')}

@@ -12,7 +12,7 @@ import {
   IonSpinner,
   IonButtons,
 } from '@ionic/react';
-import { SignedIn, SignedOut, useAuth, useClerk } from '@clerk/nextjs';
+import { SignedIn, SignedOut, useAuth, useClerk, useUser } from '@clerk/nextjs';
 import { useMemo, useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -109,6 +109,7 @@ const Settings = () => {
   const isEditor = Store.useState(s => s.isEditor);
   const { signOut } = useClerk();
   const { userId, orgId, has, isLoaded } = useAuth();
+  const { user } = useUser();
   const isRo = settings.language === 'ro';
   const [ticket, setTicket] = useState<string | null>(null);
   const [ticketLoading, setTicketLoading] = useState(false);
@@ -371,6 +372,15 @@ const Settings = () => {
             </div>
 
             <SignedIn>
+              <div
+                className="mt-2 text-[13px]"
+                style={{ color: '#7A746C', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}
+              >
+                {isRo ? 'Ești autentificat ca ' : 'You are logged in as '}
+                <span style={{ color: '#4E5B4F', fontWeight: 700 }}>
+                  {user?.primaryEmailAddress?.emailAddress ?? '—'}
+                </span>
+              </div>
               <div className="mt-3 flex flex-col gap-2">
                 {showManageSubscription ? (
                   <ActionRow

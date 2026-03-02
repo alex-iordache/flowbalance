@@ -93,8 +93,8 @@ const flow: Flow = {
   id: 'Emotional-Balance',
   position: 36,
 
-  title: { ro: 'Gestionarea Emoțiilor Puternice', en: 'Emotional Balance' },
-  name: { ro: 'Gestionarea Emoțiilor Puternice', en: 'Emotional Balance' },
+  title: { ro: 'Emotional Balance', en: 'Emotional Balance' },
+  name: { ro: 'Emotional Balance', en: 'Emotional Balance' },
   intro: {
     ro: 'Sprijină copilul să înțeleagă și să regleze emoțiile intense.',
     en: 'Support your child in understanding and regulating intense emotions.',

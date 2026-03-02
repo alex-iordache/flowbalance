@@ -84,8 +84,8 @@ const flow: Flow = {
   id: 'Growth-Mindset-Stories',
   position: 38,
 
-  title: { ro: 'Povești pentru Mentalitate de Creștere', en: 'Growth Mindset Stories' },
-  name: { ro: 'Povești pentru Mentalitate de Creștere', en: 'Growth Mindset Stories' },
+  title: { ro: 'Growth Mindset Stories', en: 'Growth Mindset Stories' },
+  name: { ro: 'Growth Mindset Stories', en: 'Growth Mindset Stories' },
   intro: {
     ro: 'Transformă greșelile în oportunități de învățare.',
     en: 'Turn mistakes into learning opportunities.',

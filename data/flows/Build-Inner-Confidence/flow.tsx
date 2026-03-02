@@ -100,8 +100,8 @@ const flow: Flow = {
   id: 'Build-Inner-Confidence',
   position: 35,
 
-  title: { ro: 'Construirea Încrederii Interioare', en: 'Build Inner Confidence' },
-  name: { ro: 'Construirea Încrederii Interioare', en: 'Build Inner Confidence' },
+  title: { ro: 'Build Inner Confidence', en: 'Build Inner Confidence' },
+  name: { ro: 'Build Inner Confidence', en: 'Build Inner Confidence' },
   intro: {
     ro: 'Cultivă încrederea sănătoasă și siguranța interioară a copilului tău.',
     en: 'Nurture your child’s healthy confidence and inner safety.',

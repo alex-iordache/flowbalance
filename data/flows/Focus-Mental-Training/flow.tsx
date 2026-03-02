@@ -84,8 +84,8 @@ const flow: Flow = {
   id: 'Focus-Mental-Training',
   position: 37,
 
-  title: { ro: 'Pregătire Mentală pentru Situații Importante', en: 'Focus & Mental Training' },
-  name: { ro: 'Pregătire Mentală pentru Situații Importante', en: 'Focus & Mental Training' },
+  title: { ro: 'Focus & Mental Training', en: 'Focus & Mental Training' },
+  name: { ro: 'Focus & Mental Training', en: 'Focus & Mental Training' },
   intro: {
     ro: 'Construiește o stare mentală stabilă pentru teze, examene și competiții.',
     en: 'Build a stable mental state for tests, exams, and competitions.',

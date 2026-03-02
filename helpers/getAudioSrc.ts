@@ -1,6 +1,7 @@
 'use client';
 
 import { getWebBaseUrl } from './webBaseUrl';
+import { getInstallIdSync } from './installId';
 
 /**
  * Build a same-origin (or web base) URL that streams audio via the app backend.
@@ -17,6 +18,8 @@ export function getAudioSrc(params: {
   u.searchParams.set('path', audioUrlOrPath);
   if (flowId) u.searchParams.set('flowId', flowId);
   if (practiceId) u.searchParams.set('practiceId', practiceId);
+  const installId = getInstallIdSync();
+  if (installId) u.searchParams.set('installId', installId);
   return u.toString();
 }
 

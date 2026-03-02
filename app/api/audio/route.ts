@@ -86,6 +86,11 @@ export async function GET(request: Request) {
   // Keep these params for compatibility (analytics/debug), but access is now trial-based for normal users.
   const flowId = url.searchParams.get('flowId');
   const practiceId = url.searchParams.get('practiceId');
+  const installIdParam = url.searchParams.get('installId');
+  const installId =
+    typeof installIdParam === 'string' && installIdParam.length > 0 && installIdParam.length <= 120
+      ? installIdParam
+      : null;
 
   const authResult = await auth();
   const userId = authResult.userId ?? null;
@@ -134,6 +139,8 @@ export async function GET(request: Request) {
         event: 'audio_access',
         ts: new Date().toISOString(),
         audioKey: key,
+        orgId,
+        installId,
         flowId: typeof flowId === 'string' ? flowId : null,
         practiceId: typeof practiceId === 'string' ? practiceId : null,
         categoryId: category?.id ?? null,

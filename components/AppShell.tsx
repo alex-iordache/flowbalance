@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import Tabs from './pages/Tabs';
 import AuthGuard from './AuthGuard';
 import { loadAllPersistedState } from '../store/persistence';
+import { initInstallId } from '../helpers/installId';
 import DeepLinkReturnHandler from './DeepLinkReturnHandler';
 import HardwareBackHandler from './HardwareBackHandler';
 import CategoryThemeSync from './CategoryThemeSync';
@@ -33,6 +34,8 @@ const AppShell = () => {
   useEffect(() => {
     // Load persisted state when app initializes
     loadAllPersistedState();
+    // Initialize a privacy-friendly per-install identifier (used for aggregated B2B stats).
+    initInstallId().catch(() => {});
   }, []);
 
   useEffect(() => {

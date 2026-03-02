@@ -96,7 +96,7 @@ export async function GET(request: Request) {
   // Query format: search for our console JSON payload, parse it, filter by orgId,
   // then compute activeDevices as distinct installId and total plays as count().
   const makeApl = (orgId: string) => `['${dataset}']
-| search "*\\\\\"event\\\\\":\\\\\"audio_access\\\\\"*"
+| search "*\\\"event\\\":\\\"audio_access\\\"*"
 | extend __raw = coalesce(
     ensure_field('message', typeof(string)),
     ensure_field('line', typeof(string)),

@@ -66,6 +66,9 @@ export default function StandalonePractices() {
   }, [flows, onboarding.options]);
 
   const list = useMemo(() => {
+    const kidsCategory = FLOW_CATEGORIES.find(c => c.id === 'kids-emotional-growth');
+    const kidsFlowIds = new Set(kidsCategory?.flowIds ?? []);
+
     const audioIndex = buildAudioUsageIndex(flows);
     const scored = scoreStandaloneAudios({
       flows,
@@ -76,11 +79,16 @@ export default function StandalonePractices() {
     });
     const sorted = sortStandaloneAudios(scored, lang);
 
+    // Exclude practices that belong to Kids Emotional Growth (any flow in that category).
+    const notKids = sorted.filter(
+      item => !item.flowIds.some(fid => kidsFlowIds.has(fid)),
+    );
+
     // Some recordings can exist under different audio IDs but share the same displayed title.
     // Dedupe by localized title and keep the highest-ranked item (since `sorted` is points-first).
     const seen = new Set<string>();
     const deduped: StandaloneAudioScored[] = [];
-    for (const item of sorted) {
+    for (const item of notKids) {
       const key = `${normalizeTitle(item.title.ro)}|${normalizeTitle(item.title.en)}`;
       if (seen.has(key)) continue;
       seen.add(key);

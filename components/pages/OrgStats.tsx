@@ -258,53 +258,63 @@ export default function OrgStats() {
           >
             {isRo ? 'Statistici organizații' : 'Organisation stats'}
           </div>
+          {!isSuperAdmin && selectedOrg ? (
+            <div
+              className="text-[26px] md:text-[30px] leading-tight text-center"
+              style={{ fontFamily: 'var(--font-logo), ui-serif, Georgia, serif', fontWeight: 600, color: '#4E5B4F' }}
+            >
+              {selectedOrg.name}
+            </div>
+          ) : null}
           <div className="mt-1" style={{ borderTop: '1px solid rgba(232, 222, 211, 0.65)' }} />
-          <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>
-            <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
-              {isRo ? 'Organizație' : 'Organization'}
+          {isSuperAdmin ? (
+            <div className="rounded-[16px] p-4 md:p-5" style={cardStyle}>
+              <div className="text-[14px] md:text-[16px] font-semibold" style={{ color: '#4E5B4F' }}>
+                {isRo ? 'Organizație' : 'Organization'}
+              </div>
+              <div className="mt-3">
+                <IonSelect
+                  value={selectedOrgId}
+                  interface="popover"
+                  disabled={orgsLoading || orgs.length === 0}
+                  onIonChange={(e) => setSelectedOrgId(String(e.detail.value || ''))}
+                  style={{
+                    '--placeholder-color': '#7A746C',
+                    '--color': '#4E5B4F',
+                    '--icon-color': '#4E5B4F',
+                    '--icon-opacity': '1',
+                    width: '100%',
+                  } as any}
+                >
+                  {orgs.map(o => (
+                    <IonSelectOption key={o.id} value={o.id}>
+                      {o.name}
+                    </IonSelectOption>
+                  ))}
+                </IonSelect>
+                <div className="mt-2 text-[12px]" style={{ color: '#7A746C', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
+                  {selectedOrg ? (isRo ? 'Org ID: ' : 'Org ID: ') + selectedOrg.id : (isRo ? 'Se încarcă…' : 'Loading…')}
+                </div>
+              </div>
+              {orgsError ? (
+                <div className="mt-2 text-[13px]" style={{ color: 'rgba(255, 59, 48, 0.85)', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
+                  {orgsError}
+                </div>
+              ) : null}
+              {!orgsError && !orgUsageError && !usageLoading && selectedOrgId && usageByRange && !orgHasAnyStats ? (
+                <div className="mt-2 text-[13px]" style={{ color: '#7A746C', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
+                  {isRo
+                    ? 'Nu există încă statistici pentru această organizație.'
+                    : 'There are no stats for this organization yet.'}
+                </div>
+              ) : null}
+              {orgUsageError ? (
+                <div className="mt-2 text-[13px]" style={{ color: 'rgba(255, 59, 48, 0.85)', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
+                  {orgUsageError}
+                </div>
+              ) : null}
             </div>
-            <div className="mt-3">
-              <IonSelect
-                value={selectedOrgId}
-                interface="popover"
-                disabled={orgsLoading || orgs.length === 0}
-                onIonChange={(e) => setSelectedOrgId(String(e.detail.value || ''))}
-                style={{
-                  '--placeholder-color': '#7A746C',
-                  '--color': '#4E5B4F',
-                  '--icon-color': '#4E5B4F',
-                  '--icon-opacity': '1',
-                  width: '100%',
-                } as any}
-              >
-                {orgs.map(o => (
-                  <IonSelectOption key={o.id} value={o.id}>
-                    {o.name}
-                  </IonSelectOption>
-                ))}
-              </IonSelect>
-              <div className="mt-2 text-[12px]" style={{ color: '#7A746C', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
-                {selectedOrg ? (isRo ? 'Org ID: ' : 'Org ID: ') + selectedOrg.id : (isRo ? 'Se încarcă…' : 'Loading…')}
-              </div>
-            </div>
-            {orgsError ? (
-              <div className="mt-2 text-[13px]" style={{ color: 'rgba(255, 59, 48, 0.85)', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
-                {orgsError}
-              </div>
-            ) : null}
-            {!orgsError && !orgUsageError && !usageLoading && selectedOrgId && usageByRange && !orgHasAnyStats ? (
-              <div className="mt-2 text-[13px]" style={{ color: '#7A746C', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
-                {isRo
-                  ? 'Nu există încă statistici pentru această organizație.'
-                  : 'There are no stats for this organization yet.'}
-              </div>
-            ) : null}
-            {orgUsageError ? (
-              <div className="mt-2 text-[13px]" style={{ color: 'rgba(255, 59, 48, 0.85)', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
-                {orgUsageError}
-              </div>
-            ) : null}
-          </div>
+          ) : null}
 
           {(['24h', '7d', '30d', '365d'] as RangeKey[]).map(r => {
             const row = usageByRange?.[r] ?? null;
@@ -316,7 +326,7 @@ export default function OrgStats() {
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <div className="rounded-[14px] p-3" style={{ backgroundColor: 'rgba(78, 91, 79, 0.04)', border: '1px solid rgba(232, 222, 211, 0.85)' }}>
                     <div className="text-[12px]" style={{ color: '#7A746C', fontFamily: 'var(--font-logo), ui-serif, Georgia, serif' }}>
-                      {isRo ? 'Dispozitive active' : 'Active devices'}
+                      {isRo ? 'Utilizatori activi' : 'Active users'}
                     </div>
                     <div className="mt-1 text-[18px]" style={{ color: '#4E5B4F', fontWeight: 800 }}>
                       {fmt(row?.activeDevices ?? 0)}

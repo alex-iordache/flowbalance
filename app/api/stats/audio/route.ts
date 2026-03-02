@@ -99,7 +99,9 @@ export async function GET(request: Request) {
 | order by accesses desc
 | limit 2000`;
 
-  const resp = await fetch('https://api.axiom.co/v1/query/_apl?format=tabular', {
+  // APL query endpoint (standard): https://api.axiom.co/v1/datasets/_apl?format=tabular
+  // (Edge deployments use a different base domain + /v1/query/_apl, but api.axiom.co works for typical setups.)
+  const resp = await fetch('https://api.axiom.co/v1/datasets/_apl?format=tabular', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,

@@ -53,8 +53,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Self-Compassion-Day-01",
   position: 1,
-  title: { ro: "Ziua 1 – Blândețe", en: "Day 1 – Kindness" },
-  name: { ro: "Blândețe", en: "Kindness" },
+  title: { ro: "Ziua 1 – Compasiune pentru mine", en: "Day 1 – Self-Compassion" },
+  name: { ro: "Compasiune pentru mine", en: "Self-Compassion" },
   intro: { ro: "Observă vocea interioară și oferă-ți exact ce ți-a lipsit: prezență și siguranță.", en: "Notice your inner voice and offer what was missing: presence and safety." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/self-compassion.mp3", en: "audioFilesEnAi/self-compassion-en.mp3" },

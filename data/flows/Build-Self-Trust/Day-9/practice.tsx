@@ -62,7 +62,7 @@ const practice: Practice = {
   id: "Build-Self-Trust-Day-09",
   position: 9,
   title: { ro: "Ziua 9 – Identitatea încrederii", en: "Day 9 – The Identity of Confidence" },
-  name: { ro: "Identitatea încrederii", en: "The Identity of Confidence" },
+  name: { ro: "Autovalidare", en: "Self-Validation & Inner Stability" },
   intro: { ro: "Definește cine ești când ai încredere și exersează un gând alternativ realist.", en: "Define who you are when you trust yourself and practice a realistic alternative thought." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/autovalidare-si-punct-de-stabilitate-interioara.mp3", en: "audioFiles/autovalidare-si-punct-de-stabilitate-interioara.mp3" },

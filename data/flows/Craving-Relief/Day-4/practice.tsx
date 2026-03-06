@@ -43,8 +43,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Craving-Relief-Day-04",
   position: 4,
-  title: { ro: "Ziua 4 – Repetiție și siguranță", en: "Day 4 – Repetition and Safety" },
-  name: { ro: "Repetiție și siguranță", en: "Repetition and Safety" },
+  title: { ro: "Ziua 4 – Calmare sistem nervos", en: "Day 4 – Safe Body – Nervous System Calm" },
+  name: { ro: "Calmare sistem nervos", en: "Safe Body – Nervous System Calm" },
   intro: { ro: "Consolidează pauza și întreabă-te de ce ai cu adevărat nevoie.", en: "Strengthen the pause and ask what you truly need." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/corp-sigur-calmarea-sistemului-nervos.mp3", en: "audioFilesEnAi/corp-sigur-calmarea-sistemului-nervos-en.mp3" },

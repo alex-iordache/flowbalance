@@ -50,8 +50,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Heartful-Gratitude-Day-01",
   position: 1,
-  title: { ro: "Ziua 1 – Recunoștință", en: "Day 1 – Gratitude" },
-  name: { ro: "Recunoștință", en: "Gratitude" },
+  title: { ro: "Ziua 1 – Recunoștință din inimă", en: "Day 1 – Heartful Gratitude" },
+  name: { ro: "Recunoștință din inimă", en: "Heartful Gratitude" },
   intro: {
     ro: "Alege un reper concret și lasă recunoștința să se așeze în corp.",
     en: "Choose a concrete anchor and let gratitude land in the body.",

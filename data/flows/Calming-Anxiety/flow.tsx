@@ -48,8 +48,8 @@ const flow: Flow = {
   id: 'Calming-Anxiety',
   position: 31,
 
-  title: { ro: 'Calmarea anxietății', en: 'Calming Anxiety' },
-  name: { ro: 'Calmarea anxietății', en: 'Calming Anxiety' },
+  title: { ro: 'Calmarea anxietății', en: 'Calming Anxiety – Transforming Sensations' },
+  name: { ro: 'Calmarea anxietății', en: 'Calming Anxiety – Transforming Sensations' },
   intro: {
     ro: 'Conștientizează. Reglează. Recapătă-ți calmul interior.',
     en: 'Become aware. Regulate. Regain your inner calm.',

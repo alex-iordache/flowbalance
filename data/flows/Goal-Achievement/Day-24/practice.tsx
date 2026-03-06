@@ -28,8 +28,8 @@ const enDescription = (
 const practice: Practice = {
   id: 'Goal-Achievement-Day-24',
   position: 24,
-  title: { ro: 'Ziua 24', en: 'Day 24' },
-  name: { ro: 'Ziua 24', en: 'Day 24' },
+  title: { ro: 'Ziua 24 – Ghidul meu interior', en: 'Day 24 – Connecting With Inner Wisdom' },
+  name: { ro: 'Ghidul meu interior', en: 'Connecting With Inner Wisdom' },
   intro: {
     ro: 'În viață, oriunde te vei afla, în orice capitol al vieții tale, este important să îți stabilești mai întâi…',
     en: 'Set your goals first: commit to three key goals today.',

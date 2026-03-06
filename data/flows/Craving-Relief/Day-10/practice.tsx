@@ -39,8 +39,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Craving-Relief-Day-10",
   position: 10,
-  title: { ro: "Ziua 10 – Integrare", en: "Day 10 – Integration" },
-  name: { ro: "Integrare", en: "Integration" },
+  title: { ro: "Ziua 10 – Valurile trec", en: "Day 10 – Waves Pass, You Remain" },
+  name: { ro: "Valurile trec", en: "Waves Pass, You Remain" },
   intro: { ro: "Integrează ce ai învățat și continuă să folosești exercițiile când ai nevoie.", en: "Integrate what you learned and keep using the exercises whenever you need them." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/integrare-valurile-trec-tu-ramai.mp3", en: "audioFilesEnAi/integrare-valurile-trec-tu-ramai-en.mp3" },

@@ -35,8 +35,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Craving-Relief-Day-09",
   position: 9,
-  title: { ro: "Ziua 9 – Identitatea calmă", en: "Day 9 – Calm Identity" },
-  name: { ro: "Identitatea calmă", en: "Calm Identity" },
+  title: { ro: "Ziua 9 – Eu dincolo de impuls", en: "Day 9 – Calm Identity Beyond Craving" },
+  name: { ro: "Eu dincolo de impuls", en: "Calm Identity Beyond Craving" },
   intro: { ro: "Privește progresul și reamintește-ți cine ești dincolo de poftă.", en: "Review your progress and remember who you are beyond cravings." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/identitatea-calma-eu-dincolo-de-pofta.mp3", en: "audioFilesEnAi/identitatea-calma-eu-dincolo-de-pofta-en.mp3" },

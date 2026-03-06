@@ -55,8 +55,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Boost-Motivation-Day-01",
   position: 1,
-  title: { ro: "Ziua 1 – Motivație din sens", en: "Day 1 – Motivation from Meaning" },
-  name: { ro: "Motivație din sens", en: "Motivation from Meaning" },
+  title: { ro: "Ziua 1 – Aprinde motivația", en: "Day 1 – Boost Motivation" },
+  name: { ro: "Aprinde motivația", en: "Boost Motivation" },
   intro: { ro: "Alege un motiv real și lasă corpul să se reconecteze cu energia lui.", en: "Choose a real reason and let your body reconnect with its energy." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/boost-motivation.mp3", en: "audioFilesEnAi/boost-motivation-en.mp3" },

@@ -39,8 +39,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Daily-Heart-Lift-Day-01",
   position: 1,
-  title: { ro: "Ziua 1 – Întregire", en: "Day 1 – Wholeness" },
-  name: { ro: "Întregire", en: "Wholeness" },
+  title: { ro: "Ziua 1 – Pentru optimism", en: "Day 1 – Daily Heart Lift" },
+  name: { ro: "Pentru optimism", en: "Daily Heart Lift" },
   intro: {
     ro: "Repetă o frază simplă și lasă corpul să integreze acceptarea.",
     en: "Repeat a simple phrase and let your body integrate acceptance.",

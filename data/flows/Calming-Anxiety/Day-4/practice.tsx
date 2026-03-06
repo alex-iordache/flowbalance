@@ -33,8 +33,8 @@ const enDescription = (
 const practice: Practice = {
   id: 'Calming-Anxiety-Day-04',
   position: 4,
-  title: { ro: 'Ziua 4', en: 'Day 4' },
-  name: { ro: 'Ziua 4', en: 'Day 4' },
+  title: { ro: 'Ziua 4 – Calmarea anxietății', en: 'Day 4 – Calming Anxiety – Transforming Sensations' },
+  name: { ro: 'Calmarea anxietății', en: 'Calming Anxiety – Transforming Sensations' },
   intro: {
     ro: '3 minute la respirație, la fiecare 3 ore; audio seara.',
     en: '3 minutes with your breath, every 3 hours; audio in the evening.',

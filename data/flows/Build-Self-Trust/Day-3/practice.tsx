@@ -69,8 +69,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Build-Self-Trust-Day-03",
   position: 3,
-  title: { ro: "Ziua 3 – Deciziile care te-au salvat", en: "Day 3 – The Decisions That Saved You" },
-  name: { ro: "Deciziile care te-au salvat", en: "The Decisions That Saved You" },
+  title: { ro: "Ziua 3 – Deciziile care te-au salvat", en: "Day 3 – The Decisions That Saved Me" },
+  name: { ro: "Încredere în mine", en: "The Decisions That Saved Me" },
   intro: { ro: "Adu-ți aminte de deciziile grele pe care le-ai dus — și înlocuiește absoluturile cu gânduri credibile.", en: "Remember the hard decisions you carried through—and replace absolutes with believable thoughts." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/deciziile-care-m-au-salvat.mp3", en: "audioFiles/deciziile-care-m-au-salvat.mp3" },

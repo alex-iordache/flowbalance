@@ -49,8 +49,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Build-Self-Trust-Day-05",
   position: 5,
-  title: { ro: "Ziua 5 – Cine ai devenit", en: "Day 5 – Who You’ve Become" },
-  name: { ro: "Cine ai devenit", en: "Who You’ve Become" },
+  title: { ro: "Ziua 5 – Putere interioară 2", en: "Day 5 – A Stronger Version of Me" },
+  name: { ro: "Putere interioară 2", en: "A Stronger Version of Me" },
   intro: { ro: "Observă schimbările reale din tine și continuă cu o promisiune mică.", en: "Notice real change in yourself and continue with one small promise." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/sunt-o-versiune-mai-solida-a-mea.mp3", en: "audioFiles/sunt-o-versiune-mai-solida-a-mea.mp3" },

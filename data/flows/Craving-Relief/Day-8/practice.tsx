@@ -35,8 +35,8 @@ const enDescription = (
 const practice: Practice = {
   id: "Craving-Relief-Day-08",
   position: 8,
-  title: { ro: "Ziua 8 – Alegerea conștientă", en: "Day 8 – Conscious Choice" },
-  name: { ro: "Alegerea conștientă", en: "Conscious Choice" },
+  title: { ro: "Ziua 8 – Butonul de pauză", en: "Day 8 – The Pause Button" },
+  name: { ro: "Butonul de pauză", en: "The Pause Button" },
   intro: { ro: "După pauză, alege conștient și observă efectul în corp.", en: "After the pause, choose consciously and notice the effect in your body." },
   description: { ro: roDescription, en: enDescription },
   audioUrl: { ro: "audioFiles/butonul-de-pauza-alegerea-constienta.mp3", en: "audioFilesEnAi/butonul-de-pauza-alegerea-constienta-en.mp3" },

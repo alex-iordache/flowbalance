@@ -62,8 +62,8 @@ const enDescription = (
 const practice: Practice = {
   id: 'Calming-Anxiety-Day-06',
   position: 6,
-  title: { ro: 'Ziua 6', en: 'Day 6' },
-  name: { ro: 'Ziua 6', en: 'Day 6' },
+  title: { ro: 'Ziua 6 – Ghidul meu interior', en: 'Day 6 – Connecting With Inner Wisdom' },
+  name: { ro: 'Ghidul meu interior', en: 'Connecting With Inner Wisdom' },
   intro: {
     ro: 'Jurnal dezamăgiri/eșecuri; examinează așteptările; ce faci diferit data viitoare.',
     en: 'Disappointments and failures journal; examine expectations; what you’ll do differently next time.',

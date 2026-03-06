@@ -483,8 +483,8 @@ const Home = () => {
 
   const isRo = lang === 'ro';
 
-  const forYouTitle = isRo ? 'Pentru tine azi' : 'For you today';
-  const forYouSubtitle = isRo ? 'Alege o sesiune care să îți regleze mintea.' : 'Choose a session to help regulate your mind.';
+  const forYouTitle = isRo ? 'Programe recomandate pentru tine' : 'Recommended programs for you';
+  const forYouSubtitle = isRo ? 'Alege un flow' : 'Choose a flow';
   const categoriesTitle = isRo ? 'Explorează direcțiile' : 'Explore pathways';
 
   const recommendedCarouselFlows = useMemo(() => {
@@ -526,9 +526,19 @@ const Home = () => {
     });
   }, [recommendedCarouselKey]);
 
-  const minutesLabelForFlow = (flow: Flow) => {
-    const minutes = estimateTotalMinutes(flow);
-    return isRo ? `${minutes} minute` : `${minutes} minutes`;
+  // Flows that show "Day N" in practice titles get "X Zile/Days"; others get "X Exerciții/Exercises".
+  const flowUsesDayTitles = (f: Flow): boolean => {
+    const practices = f.practices ?? [];
+    if (practices.length === 0) return false;
+    const dayCount = practices.filter(p => /^(Ziua|Day)\s+\d+/i.test((t(p.title, lang) ?? '').trim())).length;
+    return dayCount / practices.length >= 0.6;
+  };
+  const countLabelForFlow = (flow: Flow) => {
+    const count = flow.totalPractices ?? flow.practices?.length ?? 0;
+    if (flowUsesDayTitles(flow)) {
+      return isRo ? `${count} zile` : `${count} days`;
+    }
+    return isRo ? `${count} exerciții` : `${count} exercises`;
   };
 
   const warmShadow = '0 10px 24px rgba(120, 95, 70, 0.08)';
@@ -643,7 +653,7 @@ const Home = () => {
                       imageSrc={t(flow.image, lang)}
                       title={t(flow.title, lang)}
                       subtitle={t(flow.intro, lang)}
-                      minutesLabel={minutesLabelForFlow(flow)}
+                      minutesLabel={countLabelForFlow(flow)}
                       onClick={() => history.push(`/flows/${flow.id}`)}
                     />
                   </div>

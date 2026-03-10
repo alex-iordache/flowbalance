@@ -7,6 +7,7 @@ const roDescription = (
       Astăzi lucrăm cu <strong>starea de fond</strong> cu care începi ziua. Modul în care îți începi dimineața
       influențează nivelul de stres pe tot parcursul zilei.
     </p>
+    <p>Dimineața ascultă înregistrarea audio pentru a ancora o stare de bucurie.</p>
     <p>Dimineața, înainte de a intra în ritmul obișnuit, notează:</p>
     <ul className="list-disc pl-5 mt-2">
       <li>Cum mă simt în corp chiar acum?</li>
@@ -19,7 +20,6 @@ const roDescription = (
     <ul className="list-disc pl-5 mt-2">
       <li>Cum se modifică nivelul de stres când pornesc dintr-o stare diferită?</li>
     </ul>
-    <p>Dimineața ascultă înregistrarea audio pentru a ancora o stare de bucurie.</p>
   </>
 );
 
@@ -30,6 +30,7 @@ const enDescription = (
       Today we work with the <strong>baseline state</strong> you start the day with. How you begin your morning affects
       your stress level for the rest of the day.
     </p>
+    <p>In the morning, listen to the audio to anchor a state of ease and lightness.</p>
     <p>In the morning, before you get into your usual rhythm, note:</p>
     <ul className="list-disc pl-5 mt-2">
       <li>How do I feel in my body right now?</li>
@@ -43,7 +44,6 @@ const enDescription = (
     <ul className="list-disc pl-5 mt-2">
       <li>How does your stress level change when you start from a different state?</li>
     </ul>
-    <p>In the morning, listen to the audio to anchor a state of ease and lightness.</p>
   </>
 );
 

@@ -4,6 +4,7 @@ const roDescription = (
   <>
     <p>Bun găsit,</p>
     <p>Astăzi ne axăm pe modul în care funcționează mintea.</p>
+    <p>Dimineața ascultă înregistrarea audio.</p>
     <p>Pentru ziua aceasta renunță la rețelele sociale pentru o zi și vezi ce se întâmplă.</p>
     <p>Scrie pe un post-it și pune la vedere:</p>
     <ol className="list-decimal pl-5 mt-2 space-y-1">
@@ -14,7 +15,6 @@ const roDescription = (
       <li>Pot înlocui gândurile care nu mă ajută.</li>
     </ol>
     <p>Pe parcursul zilei, observă ce gânduri se repetă în situații stresante. Nu le schimba încă. Doar observă-le.</p>
-    <p>Dimineața ascultă înregistrarea audio.</p>
   </>
 );
 
@@ -22,6 +22,7 @@ const enDescription = (
   <>
     <p>Welcome,</p>
     <p>Today we focus on how the mind works.</p>
+    <p>In the morning, listen to the audio.</p>
     <p>For today, take a break from social media for one day and see what happens.</p>
     <p>Write on a post-it and put it where you can see it:</p>
     <ol className="list-decimal pl-5 mt-2 space-y-1">
@@ -32,7 +33,6 @@ const enDescription = (
       <li>I can replace thoughts that don’t serve me.</li>
     </ol>
     <p>Throughout the day, notice which thoughts repeat in stressful situations. Don’t change them yet. Just observe.</p>
-    <p>In the morning, listen to the audio.</p>
   </>
 );
 

@@ -6,7 +6,7 @@ const roDescription = (
       <strong>Exercițiu principal:</strong> Listează 15 situații în care ai simțit ceva „din interior” și s-a confirmat ulterior.
       Notează ce ai simțit în corp atunci.
     </p>
-    <p className="mt-2"><strong>Seara:</strong> scrii:</p>
+    <p className="mt-2"><strong>Seara – Scrii ce ai făcut azi:</strong></p>
     <ul className="list-disc pl-5 mt-2">
       <li>3 lucruri făcute bine</li>
       <li>1 act de grijă față de tine</li>
@@ -20,7 +20,7 @@ const enDescription = (
       <strong>Main exercise:</strong> List 15 situations where you felt something “from the inside” and it was later confirmed.
       Note what you felt in your body at that time.
     </p>
-    <p className="mt-2"><strong>Evening:</strong> write:</p>
+    <p className="mt-2"><strong>Evening – Write what you did today:</strong></p>
     <ul className="list-disc pl-5 mt-2">
       <li>3 things you did well</li>
       <li>1 act of care toward yourself</li>

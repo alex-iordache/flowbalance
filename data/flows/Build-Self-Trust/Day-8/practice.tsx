@@ -7,7 +7,7 @@ const roDescription = (
       <strong>Exercițiu principal:</strong> Alege 5 promisiuni mici pentru tine pe care le vei respecta zilnic timp de o săptămână.
       Exemple: pauză, apă, mișcare, somn, limită.
     </p>
-    <p className="mt-2"><strong>Seara:</strong> scrii:</p>
+    <p className="mt-2"><strong>Seara – Scrii ce ai făcut azi:</strong></p>
     <ul className="list-disc pl-5 mt-2">
       <li>3 lucruri făcute bine</li>
       <li>1 act de grijă față de tine</li>
@@ -22,7 +22,7 @@ const enDescription = (
       <strong>Main exercise:</strong> Choose 5 small promises to yourself that you will keep daily for one week.
       Examples: a pause, water, movement, sleep, a boundary.
     </p>
-    <p className="mt-2"><strong>Evening:</strong> write:</p>
+    <p className="mt-2"><strong>Evening – Write what you did today:</strong></p>
     <ul className="list-disc pl-5 mt-2">
       <li>3 things you did well</li>
       <li>1 act of care toward yourself</li>

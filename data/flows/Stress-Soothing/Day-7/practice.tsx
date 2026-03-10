@@ -6,6 +6,7 @@ const roDescription = (
     <p>
       Astăzi lucrăm cu <strong>sprijinul extern</strong>, un element esențial în reducerea stresului.
     </p>
+    <p>Dimineața ascultă înregistrarea audio și permite corpului să se relaxeze.</p>
     <p>Identifică o persoană din viața ta căreia îi poți comunica:</p>
     <ul className="list-disc pl-5 mt-2">
       <li>ce schimbări vrei să faci</li>
@@ -13,7 +14,6 @@ const roDescription = (
     </ul>
     <p>Scrie ce ai vrea să îi spui și, dacă este posibil, comunică-i acest lucru.</p>
     <p>Observă ce emoții apar când ceri sprijin.</p>
-    <p>Dimineața ascultă înregistrarea audio și permite corpului să se relaxeze.</p>
   </>
 );
 
@@ -23,6 +23,7 @@ const enDescription = (
     <p>
       Today we work with <strong>external support</strong>, an essential element in reducing stress.
     </p>
+    <p>In the morning, listen to the audio and allow your body to relax.</p>
     <p>Identify someone in your life you can tell:</p>
     <ul className="list-disc pl-5 mt-2">
       <li>what changes you want to make</li>
@@ -30,7 +31,6 @@ const enDescription = (
     </ul>
     <p>Write down what you’d like to say and, if possible, share it with them.</p>
     <p>Notice what emotions come up when you ask for support.</p>
-    <p>In the morning, listen to the audio and allow your body to relax.</p>
   </>
 );
 

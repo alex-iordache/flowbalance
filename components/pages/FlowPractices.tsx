@@ -32,7 +32,7 @@ function getDayLabelAndRest(value: string): { dayLabel: string; rest: string } |
   return { dayLabel: (m[1] ?? '').trim(), rest: (m[2] ?? '').trim() };
 }
 
-type PracticeListTitleMode = 'normalTitleOnly' | 'dayLabelOnly';
+type PracticeListTitleMode = 'normalTitleOnly' | 'dayLabelOnly' | 'fullDayTitle';
 
 function PracticeRow({
   flowId,
@@ -59,6 +59,7 @@ function PracticeRow({
 
   const primary = (() => {
     if (titleMode === 'normalTitleOnly') return normalName;
+    if (titleMode === 'fullDayTitle') return dayTitle ?? normalName;
     // dayLabelOnly
     const parsed = getDayLabelAndRest(dayTitle);
     return parsed?.dayLabel ?? dayTitle ?? normalName;
@@ -144,11 +145,11 @@ export default function FlowPractices() {
   const titleMode = useMemo<PracticeListTitleMode>(() => {
     const id = flow?.id ?? flowId;
     const practicesCount = flow?.practices?.length ?? 0;
-    const alwaysNormal = new Set(['Build-Self-Trust', 'Craving-Relief', 'Healthy-Money-Mindset']);
+    const fullDayTitleFlows = new Set(['Build-Self-Trust', 'Craving-Relief', 'Healthy-Money-Mindset']);
     // "Heart Balance" in app maps to the single-practice daily flow, and user asked:
     // flows with only 1 practice should show only normal titles.
     if (practicesCount <= 1) return 'normalTitleOnly';
-    if (alwaysNormal.has(id)) return 'normalTitleOnly';
+    if (fullDayTitleFlows.has(id)) return 'fullDayTitle';
     if (isDayBasedFlow) return 'dayLabelOnly';
     return 'normalTitleOnly';
   }, [flow?.id, flow?.practices?.length, flowId, isDayBasedFlow]);

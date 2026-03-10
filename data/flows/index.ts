@@ -19,6 +19,7 @@ import flow_35_Build_Inner_Confidence from "./Build-Inner-Confidence/flow";
 import flow_36_Emotional_Balance from "./Emotional-Balance/flow";
 import flow_37_Focus_Mental_Training from "./Focus-Mental-Training/flow";
 import flow_38_Growth_Mindset_Stories from "./Growth-Mindset-Stories/flow";
+import flow_39_Breathing_Exercises from "./Breathing-Exercises/flow";
 
 export { t };
 export type { Flow, Practice, Localized, LocalizedText, LocalizedUrl, LocalizedRichText, Language };
@@ -42,4 +43,5 @@ export const defaultFlows: Flow[] = [
   flow_36_Emotional_Balance,
   flow_37_Focus_Mental_Training,
   flow_38_Growth_Mindset_Stories,
+  flow_39_Breathing_Exercises,
 ];

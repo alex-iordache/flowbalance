@@ -283,5 +283,20 @@ export const FLOW_LANDING_DATA_BY_ID: Record<string, FlowLandingData> = {
       { ro: 'Progres pas cu pas', en: 'Step-by-step progress' },
     ],
   },
+
+  'Breathing-Exercises': {
+    pills: [
+      { ro: '3 exerciții audio', en: '3 audio exercises' },
+      { ro: 'Practici simple', en: 'Simple practices' },
+      { ro: 'Reglare emoțională', en: 'Emotional regulation' },
+    ],
+    programLines: [
+      { ro: 'Respirația inimii', en: 'Heart breathing' },
+      { ro: 'Respirație abdominală', en: 'Abdominal breathing' },
+      { ro: 'Respirație coerentă', en: 'Coherent breathing' },
+      { ro: 'Reducere stres', en: 'Stress reduction' },
+      { ro: 'Claritate mentală', en: 'Mental clarity' },
+    ],
+  },
 };
 

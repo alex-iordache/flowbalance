@@ -20,6 +20,7 @@ export const FLOW_CATEGORIES: FlowCategoryDef[] = [
       'Craving-Relief',
       'Improve-Sleep',
       'Calming-Anxiety',
+      'Breathing-Exercises',
     ],
     theme: 1,
     bgClass: 'bg-gradient-to-br from-sky-500 to-indigo-600',

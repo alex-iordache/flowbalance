@@ -1,5 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import {
+  attachMediaSessionActionHandlers,
+  clearMediaSessionPositionState,
+  mediaSessionSupported,
+  resetMediaSessionForUnload,
+  setMediaSessionMetadata,
+  setMediaSessionPlaybackState,
+  setMediaSessionPositionFromAudio,
+} from '../../helpers/mediaSessionAudio';
+
 type Props = {
   src: string;
   title?: string;
@@ -42,6 +52,9 @@ export default function AudioPlayer({
   const onPositionChangeRef = useRef<Props['onPositionChange']>(onPositionChange);
   const lastReportedSecRef = useRef<number>(-1); // floor(sec) last reported
   const initialPositionSecRef = useRef(initialPositionSec);
+  const titleRef = useRef(title);
+  const subtitleRef = useRef(subtitle);
+  const lastPositionStateAtMsRef = useRef(0);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
@@ -72,6 +85,11 @@ export default function AudioPlayer({
   initialPositionSecRef.current = initialPositionSec;
 
   useEffect(() => {
+    titleRef.current = title;
+    subtitleRef.current = subtitle;
+  }, [title, subtitle]);
+
+  useEffect(() => {
     const a = audioRef.current;
     if (!a) return;
 
@@ -95,6 +113,14 @@ export default function AudioPlayer({
         lastReportedSecRef.current = sec;
         onPositionChangeRef.current(sec);
       }
+      // Throttle Media Session position (lock screen / OS): ~1 Hz
+      if (mediaSessionSupported() && !a.paused) {
+        const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+        if (now - lastPositionStateAtMsRef.current >= 1000) {
+          lastPositionStateAtMsRef.current = now;
+          setMediaSessionPositionFromAudio(a);
+        }
+      }
       rafRef.current = requestAnimationFrame(tick);
     };
 
@@ -107,12 +133,19 @@ export default function AudioPlayer({
         setCurrent(initPos);
         lastReportedSecRef.current = initPos;
       }
+      setMediaSessionMetadata(titleRef.current, subtitleRef.current);
+      setMediaSessionPositionFromAudio(a);
     };
     const onCanPlay = () => setStatus('ready');
     const onPlayEvt = () => {
       setIsPlaying(true);
       setHasStarted(true);
       setStatus('playing');
+      setMediaSessionMetadata(titleRef.current, subtitleRef.current);
+      setMediaSessionPlaybackState('playing');
+      setMediaSessionPositionFromAudio(a);
+      lastPositionStateAtMsRef.current =
+        typeof performance !== 'undefined' ? performance.now() : Date.now();
       onPlayRef.current?.();
       stopRaf();
       rafRef.current = requestAnimationFrame(tick);
@@ -120,6 +153,8 @@ export default function AudioPlayer({
     const onPauseEvt = () => {
       setIsPlaying(false);
       setStatus('paused');
+      setMediaSessionPlaybackState('paused');
+      setMediaSessionPositionFromAudio(a);
       const sec = a.currentTime || 0;
       if (onPositionChangeRef.current) onPositionChangeRef.current(sec);
       stopRaf();
@@ -127,12 +162,16 @@ export default function AudioPlayer({
     const onEndedEvt = () => {
       setIsPlaying(false);
       setStatus('ended');
+      setMediaSessionPlaybackState('none');
+      clearMediaSessionPositionState();
       stopRaf();
       onEndedRef.current?.();
     };
     const onErrorEvt = () => {
       setIsPlaying(false);
       setStatus('error');
+      setMediaSessionPlaybackState('none');
+      clearMediaSessionPositionState();
       stopRaf();
     };
     const onWaitingEvt = () => setStatus('loading');
@@ -147,6 +186,17 @@ export default function AudioPlayer({
     a.addEventListener('waiting', onWaitingEvt);
     a.addEventListener('playing', onPlayingEvt);
 
+    const detachMediaActions = attachMediaSessionActionHandlers(a);
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible' && !a.paused) {
+        setMediaSessionMetadata(titleRef.current, subtitleRef.current);
+        setMediaSessionPlaybackState('playing');
+        setMediaSessionPositionFromAudio(a);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     // Ensure the element is pointed at the current src.
     // Setting .src triggers load automatically; avoid calling a.load() as it would cause a second
     // request and double-count in analytics.
@@ -157,6 +207,9 @@ export default function AudioPlayer({
     a.setAttribute('webkit-playsinline', 'true');
 
     return () => {
+      document.removeEventListener('visibilitychange', onVisibility);
+      detachMediaActions();
+      resetMediaSessionForUnload();
       // Report final position on unmount (e.g. user navigated away).
       const sec = a.currentTime || 0;
       if (onPositionChangeRef.current) onPositionChangeRef.current(sec);

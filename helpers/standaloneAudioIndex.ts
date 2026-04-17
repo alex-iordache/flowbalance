@@ -57,6 +57,10 @@ export function buildAudioUsageIndex(flows: Flow[]): AudioUsageIndex {
     // Story flows have English-only audio uploads and are intentionally excluded from stand-alone Exercises.
     'Calm-Stories',
     'Reflection-Stories',
+    // Kid story flows: audio is meant to be played only inside the flow, not in the global Exercises list.
+    'Build-Inner-Confidence',
+    'Emotional-Balance',
+    'Growth-Mindset-Stories',
   ]);
 
   const upsert = (params: {

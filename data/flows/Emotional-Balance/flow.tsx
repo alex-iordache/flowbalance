@@ -4,6 +4,18 @@ import practice_2 from './Story-2/practice';
 import practice_3 from './Story-3/practice';
 import practice_4 from './Story-4/practice';
 import practice_5 from './Story-5/practice';
+import practice_6 from './Story-6/practice';
+import practice_7 from './Story-7/practice';
+import practice_8 from './Story-8/practice';
+import practice_9 from './Story-9/practice';
+import practice_10 from './Story-10/practice';
+import practice_11 from './Story-11/practice';
+import practice_12 from './Story-12/practice';
+import practice_13 from './Story-13/practice';
+import practice_14 from './Story-14/practice';
+import practice_15 from './Story-15/practice';
+import practice_16 from './Story-16/practice';
+import practice_17 from './Story-17/practice';
 
 const roDescription = (
   <>
@@ -108,8 +120,26 @@ const flow: Flow = {
   lastPracticeFinishedId: null,
   lastPracticePositionSec: 0,
 
-  totalPractices: 5,
-  practices: [practice_1, practice_2, practice_3, practice_4, practice_5],
+  totalPractices: 17,
+  practices: [
+    practice_1,
+    practice_2,
+    practice_3,
+    practice_4,
+    practice_5,
+    practice_6,
+    practice_7,
+    practice_8,
+    practice_9,
+    practice_10,
+    practice_11,
+    practice_12,
+    practice_13,
+    practice_14,
+    practice_15,
+    practice_16,
+    practice_17,
+  ],
 };
 
 export default flow;

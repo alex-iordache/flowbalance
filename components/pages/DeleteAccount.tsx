@@ -8,7 +8,7 @@ import {
   IonTitle,
   IonToolbar,
 } from '@ionic/react';
-import { SignedIn, SignedOut, useUser } from '@clerk/nextjs';
+import { SignedIn, SignedOut, useAuth, useUser } from '@clerk/nextjs';
 import { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -22,6 +22,8 @@ export default function DeleteAccount() {
   const isRo = settings.language === 'ro';
 
   const { isLoaded, user } = useUser();
+  const { userId, orgId } = useAuth();
+  const isOrganizationUser = Boolean(userId && orgId);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -104,6 +106,14 @@ export default function DeleteAccount() {
                 )}
               </div>
 
+              {isOrganizationUser ? (
+                <div className="mt-3 text-[13px] md:text-[15px]" style={{ color: '#7A746C' }}>
+                  {isRo
+                    ? 'Ștergerea contului nu este disponibilă pentru utilizatorii din organizații.'
+                    : 'Account deletion is not available for organization users.'}
+                </div>
+              ) : null}
+
               {error ? (
                 <div className="mt-3 text-[13px] md:text-[15px]" style={{ color: '#B91C1C' }}>
                   {error}
@@ -132,7 +142,7 @@ export default function DeleteAccount() {
                     } as any
                   }
                   onClick={() => void onConfirmDelete()}
-                  disabled={loading}
+                  disabled={loading || isOrganizationUser}
                 >
                   {loading ? (isRo ? 'Se șterge…' : 'Deleting…') : isRo ? 'Șterge contul' : 'Delete my account'}
                 </IonButton>

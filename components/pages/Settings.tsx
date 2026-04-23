@@ -111,6 +111,7 @@ const Settings = () => {
   const { signOut } = useClerk();
   const { userId, orgId, has, isLoaded } = useAuth();
   const { user } = useUser();
+  const isOrganizationUser = Boolean(userId && orgId);
   const isOrgAdmin = (orgId != null && (has?.({ role: 'org:admin' }) ?? false)) as boolean;
   const isRo = settings.language === 'ro';
   const [ticket, setTicket] = useState<string | null>(null);
@@ -404,12 +405,14 @@ const Settings = () => {
                     right={ticketLoading ? <IonSpinner name="crescent" style={{ width: 18, height: 18, color: '#7A746C' }} /> : null}
                   />
                 ) : null}
-                <ActionRow
-                  label={isRo ? 'Șterge contul' : 'Delete my account'}
-                  onClick={() => history.push('/settings/delete-account')}
-                  leftIcon={trashOutline}
-                  variant="danger"
-                />
+                {!isOrganizationUser ? (
+                  <ActionRow
+                    label={isRo ? 'Șterge contul' : 'Delete my account'}
+                    onClick={() => history.push('/settings/delete-account')}
+                    leftIcon={trashOutline}
+                    variant="danger"
+                  />
+                ) : null}
                 <ActionRow
                   label={isRo ? 'Deconectare' : 'Sign out'}
                   onClick={handleSignOut}

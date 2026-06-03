@@ -56,10 +56,10 @@ export function useAccessControl(): AccessControlResult {
       };
     }
 
-    // 3-day trial for normal users (non-org, non-pro) based on Clerk account creation date.
+    // 7-day trial for normal users (non-org, non-pro) based on Clerk account creation date.
     // NOTE: `user.createdAt` is a Date in Clerk's frontend User resource.
     const createdAtMs = user?.createdAt ? user.createdAt.getTime() : null;
-    const trialMs = 72 * 60 * 60 * 1000;
+    const trialMs = 7 * 24 * 60 * 60 * 1000;
     const trialActive = typeof createdAtMs === 'number' && Date.now() < createdAtMs + trialMs;
     if (trialActive) {
       return {

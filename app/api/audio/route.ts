@@ -7,7 +7,7 @@ import { getCategoryForFlowId } from '../../../components/pages/flowsCatalog';
 
 export const runtime = 'nodejs';
 
-const TRIAL_MS = 72 * 60 * 60 * 1000;
+const TRIAL_MS = 7 * 24 * 60 * 60 * 1000;
 const TRIAL_CACHE_TTL_MS = 5 * 60 * 1000;
 const trialCache = new Map<string, { trialUntilMs: number; checkedAtMs: number }>();
 
@@ -104,7 +104,7 @@ export async function GET(request: Request) {
 
   // Org users and Pro users: full access.
   let hasAccess = Boolean(userId && (orgId || hasPro));
-  // Normal users: 3-day full access trial from Clerk account creation date.
+  // Normal users: 7-day full access trial from Clerk account creation date.
   if (!hasAccess && userId) {
     try {
       hasAccess = await computeTrialActive(userId);

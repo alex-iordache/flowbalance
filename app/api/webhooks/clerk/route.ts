@@ -1,8 +1,8 @@
 import { verifyWebhook } from '@clerk/nextjs/webhooks';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { handleClerkWebhookEvent } from '../../../../lib/clerk/webhook-handlers';
 import { hasDatabaseUrl } from '../../../../lib/db/client';
-import { createUserIdentityFromClerkUser } from '../../../../lib/db/identity';
 
 export const runtime = 'nodejs';
 
@@ -27,19 +27,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid webhook signature' }, { status: 400 });
   }
 
-  if (event.type !== 'user.created') {
-    return NextResponse.json({ ok: true, ignored: event.type });
-  }
-
   try {
-    const identity = await createUserIdentityFromClerkUser(event.data);
-    return NextResponse.json({
-      ok: true,
-      user_key: identity.user_key,
-      clerk_user_id: identity.clerk_user_id,
-    });
+    const result = await handleClerkWebhookEvent(event);
+    return NextResponse.json(result);
   } catch (err) {
-    console.error('Clerk user.created handler failed:', err);
-    return NextResponse.json({ error: 'Failed to create user identity' }, { status: 500 });
+    console.error(`Clerk webhook handler failed for ${event.type}:`, err);
+    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
   }
 }

@@ -30,7 +30,8 @@
     "make-android-staging": "npm run android:staging",
     "make-android-prod": "npm run android:prod",
     "vercel": "node scripts/vercel.js",
-    "db:migrate": "node scripts/db-migrate.js"
+    "db:migrate": "node scripts/db-migrate.js",
+    "db:backfill-users": "node scripts/backfill-clerk-users.js"
   },
   "dependencies": {
     "@capacitor/android": "7.4.4",

@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint app and lib
+        run: npx eslint app lib middleware.ts --ext .ts,.tsx
+
+      - name: Typecheck
+        run: npm run compile
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: pk_test_ci_placeholder
+          CLERK_SECRET_KEY: sk_test_ci_placeholder
+
+      - name: Run database migrations
+        run: |
+          if [ -z "${DATABASE_URL}" ]; then
+            echo "DATABASE_URL not set; skipping db:migrate (add GitHub secret to enable)."
+            exit 0
+          fi
+          npm run db:migrate
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}

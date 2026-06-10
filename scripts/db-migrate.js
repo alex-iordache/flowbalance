@@ -9,7 +9,38 @@ const fs = require('fs');
 const path = require('path');
 const { Pool } = require('@neondatabase/serverless');
 
-const migrationsDir = path.join(__dirname, '..', 'db', 'migrations');
+const projectRoot = path.join(__dirname, '..');
+const migrationsDir = path.join(projectRoot, 'db', 'migrations');
+
+function loadEnvFile(filename) {
+  const fullPath = path.join(projectRoot, filename);
+  if (!fs.existsSync(fullPath)) return;
+
+  for (const line of fs.readFileSync(fullPath, 'utf8').split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+
+    const eq = trimmed.indexOf('=');
+    if (eq === -1) continue;
+
+    const key = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    if (!(key in process.env)) {
+      process.env[key] = value;
+    }
+  }
+}
+
+// Next.js loads these automatically; plain Node scripts do not.
+loadEnvFile('.env');
+loadEnvFile('.env.local');
 
 function mustEnv(name) {
   const value = (process.env[name] || '').trim();

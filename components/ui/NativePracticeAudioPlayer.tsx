@@ -54,6 +54,7 @@ export default function NativePracticeAudioPlayer({
   const titleRef = useRef(title);
   const subtitleRef = useRef(subtitle);
   const permissionCheckedRef = useRef(false);
+  const toggleBusyRef = useRef(false);
 
   const [playback, setPlayback] = useState<PracticePlaybackSnapshot>(() => getPracticePlaybackSnapshot());
   const [notificationsBlocked, setNotificationsBlocked] = useState(false);
@@ -135,6 +136,8 @@ export default function NativePracticeAudioPlayer({
   }, [playback.current, playback.duration]);
 
   const toggle = async () => {
+    if (toggleBusyRef.current) return;
+    toggleBusyRef.current = true;
     try {
       practiceAudioDebug('player', 'toggle', {
         ready: playback.ready,
@@ -166,6 +169,8 @@ export default function NativePracticeAudioPlayer({
       }
     } catch (err) {
       practiceAudioDebug('player', 'toggle failed', err, 'error');
+    } finally {
+      toggleBusyRef.current = false;
     }
   };
 

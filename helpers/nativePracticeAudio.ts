@@ -20,18 +20,23 @@ export type PracticePlaybackSnapshot = {
 };
 
 type CompleteHandler = () => void;
+type NativeSeekOptions = { assetId: string; time: number; resume?: boolean };
 
 let configured = false;
 let listenersAttached = false;
 let completeHandle: PluginListenerHandle | null = null;
 let timeHandle: PluginListenerHandle | null = null;
 let stateHandle: PluginListenerHandle | null = null;
+let stateReconcileTimer: ReturnType<typeof setTimeout> | null = null;
 
 let loadedSrc: string | null = null;
 let sessionStarted = false;
 let commandChain: Promise<void> = Promise.resolve();
 let releaseTimer: ReturnType<typeof setTimeout> | null = null;
 let syncTimer: ReturnType<typeof setInterval> | null = null;
+let seekDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingSeekSec: number | null = null;
+let pendingSeekDone: (() => void) | null = null;
 
 const snapshot: PracticePlaybackSnapshot = {
   src: null,
@@ -54,6 +59,15 @@ function emit(): void {
 function patchSnapshot(patch: Partial<PracticePlaybackSnapshot>): void {
   Object.assign(snapshot, patch);
   emit();
+}
+
+async function nativeSetCurrentTime(time: number, resume = false): Promise<void> {
+  const opts: NativeSeekOptions = {
+    assetId: PRACTICE_ASSET_ID,
+    time: Math.max(0, time),
+    resume,
+  };
+  await NativeAudio.setCurrentTime(opts as Parameters<typeof NativeAudio.setCurrentTime>[0]);
 }
 
 export function isNativePracticeAudioAvailable(): boolean {
@@ -100,11 +114,19 @@ async function refreshSnapshotFromNative(): Promise<void> {
   }
 }
 
+function scheduleStateReconcile(): void {
+  if (stateReconcileTimer) clearTimeout(stateReconcileTimer);
+  stateReconcileTimer = setTimeout(() => {
+    stateReconcileTimer = null;
+    void refreshSnapshotFromNative();
+  }, 180);
+}
+
 function startSyncTimer(): void {
   if (syncTimer) return;
   syncTimer = setInterval(() => {
     void refreshSnapshotFromNative();
-  }, 1000);
+  }, 1500);
 }
 
 function stopSyncTimer(): void {
@@ -159,10 +181,7 @@ async function ensurePlaybackListeners(): Promise<void> {
       ended: false,
       error: null,
     });
-    practiceAudioDebug('native', 'playbackState event', {
-      isPlaying: event.isPlaying,
-      currentTime: sec,
-    });
+    scheduleStateReconcile();
   });
 }
 
@@ -205,7 +224,7 @@ export function scheduleReleasePracticeSession(): void {
   releaseTimer = setTimeout(() => {
     releaseTimer = null;
     void stopPracticeAudio();
-  }, 400);
+  }, 800);
 }
 
 export async function preparePracticeSession(params: {
@@ -222,7 +241,7 @@ export async function preparePracticeSession(params: {
     if (loadedSrc === params.src && snapshot.ready && snapshot.duration > 0) {
       practiceAudioDebug('session', 'prepare skipped - already ready', { src: params.src });
       if (initPos > 0 && initPos < snapshot.duration && Math.abs(snapshot.current - initPos) > 1) {
-        await seekPracticeAudioInternal(initPos);
+        await seekPracticeAudioInternal(initPos, false);
       }
       return;
     }
@@ -279,7 +298,7 @@ export async function preparePracticeSession(params: {
       }
 
       if (initPos > 0 && initPos < dur) {
-        await NativeAudio.setCurrentTime({ assetId: PRACTICE_ASSET_ID, time: initPos });
+        await nativeSetCurrentTime(initPos, false);
         patchSnapshot({ current: initPos, duration: dur, ready: true, error: null });
       } else {
         patchSnapshot({ duration: dur, ready: true, error: null });
@@ -308,7 +327,7 @@ export async function startPracticeForeground(
   return { notificationGranted };
 }
 
-async function waitForNativePlaying(timeoutMs = 1200): Promise<boolean> {
+async function waitForNativePlaying(timeoutMs = 1000): Promise<boolean> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     if (await isPracticeAudioPlaying()) return true;
@@ -335,9 +354,8 @@ async function resumePracticeAudioInternal(): Promise<void> {
 async function resumeAtPositionInternal(sec: number): Promise<boolean> {
   const target = Math.max(0, sec);
   practiceAudioDebug('native', 'resumeAtPosition', { sec: target });
-  await NativeAudio.setCurrentTime({ assetId: PRACTICE_ASSET_ID, time: target });
-  await NativeAudio.resume({ assetId: PRACTICE_ASSET_ID });
-  const playing = await waitForNativePlaying(1500);
+  await nativeSetCurrentTime(target, true);
+  const playing = await waitForNativePlaying(1200);
   await refreshSnapshotFromNative();
   return playing;
 }
@@ -363,25 +381,20 @@ async function playPracticeAudioInternal(startSec = 0): Promise<void> {
   practiceAudioDebug('native', 'play done', { isPlaying: playing, current: snapshot.current });
 }
 
-async function seekPracticeAudioInternal(sec: number): Promise<void> {
-  const wasPlaying = snapshot.isPlaying;
+async function seekPracticeAudioInternal(sec: number, resumeAfter?: boolean): Promise<void> {
+  const wasPlaying = resumeAfter ?? snapshot.isPlaying;
   const targetSec = Math.max(0, sec);
   practiceAudioDebug('native', 'seek', { sec: targetSec, whilePlaying: wasPlaying });
-  await NativeAudio.setCurrentTime({
-    assetId: PRACTICE_ASSET_ID,
-    time: targetSec,
-  });
-  await new Promise((resolve) => setTimeout(resolve, 120));
+  await nativeSetCurrentTime(targetSec, wasPlaying);
+  await new Promise((resolve) => setTimeout(resolve, 150));
   await refreshSnapshotFromNative();
-  if (wasPlaying && !snapshot.isPlaying) {
-    practiceAudioDebug('native', 'seek recovery', { sec: targetSec });
-    await resumeAtPositionInternal(targetSec);
-  }
   practiceAudioDebug('native', 'seek done', { current: snapshot.current, isPlaying: snapshot.isPlaying });
 }
 
 export async function togglePracticeAudio(startSec = 0): Promise<void> {
   await enqueue(async () => {
+    await refreshSnapshotFromNative();
+
     if (snapshot.isPlaying) {
       await pausePracticeAudioInternal();
       return;
@@ -389,18 +402,18 @@ export async function togglePracticeAudio(startSec = 0): Promise<void> {
     if (!snapshot.ready) {
       throw new Error('Practice audio is not ready');
     }
-    if (snapshot.ended || !sessionStarted) {
-      await playPracticeAudioInternal(startSec);
+
+    const resumePos = Math.max(0, snapshot.current > 0 ? snapshot.current : startSec);
+
+    if (!sessionStarted || snapshot.ended) {
+      await playPracticeAudioInternal(resumePos > 0.5 ? resumePos : 0);
       return;
     }
 
-    const resumePos = snapshot.current > 0 ? snapshot.current : startSec;
-    await resumePracticeAudioInternal();
-    if (!snapshot.isPlaying && resumePos > 0) {
+    if (resumePos > 0.5) {
       await resumeAtPositionInternal(resumePos);
-    }
-    if (!snapshot.isPlaying) {
-      await playPracticeAudioInternal(startSec);
+    } else {
+      await resumePracticeAudioInternal();
     }
   });
 }
@@ -418,7 +431,19 @@ export async function resumePracticeAudio(): Promise<void> {
 }
 
 export async function seekPracticeAudio(sec: number): Promise<void> {
-  await enqueue(() => seekPracticeAudioInternal(sec));
+  pendingSeekSec = sec;
+  return new Promise((resolve) => {
+    pendingSeekDone = resolve;
+    if (seekDebounceTimer) clearTimeout(seekDebounceTimer);
+    seekDebounceTimer = setTimeout(() => {
+      seekDebounceTimer = null;
+      const target = pendingSeekSec ?? sec;
+      pendingSeekSec = null;
+      const done = pendingSeekDone;
+      pendingSeekDone = null;
+      void enqueue(() => seekPracticeAudioInternal(target)).finally(() => done?.());
+    }, 120);
+  });
 }
 
 export async function getPracticeCurrentTimeSec(): Promise<number> {
@@ -435,6 +460,13 @@ export async function stopPracticeAudio(): Promise<void> {
   await enqueue(async () => {
     practiceAudioDebug('native', 'stopPracticeAudio');
     stopSyncTimer();
+    if (seekDebounceTimer) {
+      clearTimeout(seekDebounceTimer);
+      seekDebounceTimer = null;
+    }
+    pendingSeekSec = null;
+    pendingSeekDone?.();
+    pendingSeekDone = null;
     await NativeAudio.stop({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
     await NativeAudio.unload({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
     await PracticeForeground.stop().catch(() => undefined);

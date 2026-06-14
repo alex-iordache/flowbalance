@@ -17,6 +17,7 @@ import { chevronBackOutline, settingsOutline } from 'ionicons/icons';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { t, type Language } from '../../data/flows';
 import AudioPlayer from '../ui/AudioPlayer';
+import PracticeAudioDebugPanel from '../ui/PracticeAudioDebugPanel';
 import { getAudioSrc } from '../../helpers/getAudioSrc';
 import Logo from '../ui/Logo';
 
@@ -304,28 +305,33 @@ const Practice = () => {
 
               {/* Player area */}
               {practice && t(practice.audioUrl, lang) ? (
-                <div
-                  className="flex items-center justify-center"
-                  style={{
-                    flex: hasDescription ? 5 : 10,
-                    minHeight: 0,
-                  }}
-                >
-                  <AudioPlayer
-                    src={getAudioSrc({
-                      audioUrlOrPath: t(practice.audioUrl, lang),
-                      flowId,
-                      practiceId,
-                    })}
-                    title={displayTitle}
-                    subtitle={flow ? t(flow.name, lang) : undefined}
-                    variant="floatingCircle"
-                    onPlay={handleAudioPlay}
-                    onEnded={handleAudioEnded}
-                    initialPositionSec={practice.lastPositionSec ?? 0}
-                    onPositionChange={handlePositionChange}
-                  />
-                </div>
+                <>
+                  <div
+                    className="flex items-center justify-center"
+                    style={{
+                      flex: hasDescription ? 5 : 10,
+                      minHeight: 0,
+                    }}
+                  >
+                    <AudioPlayer
+                      src={getAudioSrc({
+                        audioUrlOrPath: t(practice.audioUrl, lang),
+                        flowId,
+                        practiceId,
+                      })}
+                      title={displayTitle}
+                      subtitle={flow ? t(flow.name, lang) : undefined}
+                      variant="floatingCircle"
+                      onPlay={handleAudioPlay}
+                      onEnded={handleAudioEnded}
+                      initialPositionSec={practice.lastPositionSec ?? 0}
+                      onPositionChange={handlePositionChange}
+                    />
+                  </div>
+                  <div className="px-4 pb-4 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto shrink-0">
+                    <PracticeAudioDebugPanel />
+                  </div>
+                </>
               ) : null}
             </div>
           ) : null}

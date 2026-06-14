@@ -17,6 +17,7 @@ import { useHistory, useParams } from 'react-router-dom';
 import Store from '../../store';
 import { t, type Language } from '../../data/flows';
 import AudioPlayer from '../ui/AudioPlayer';
+import PracticeAudioDebugPanel from '../ui/PracticeAudioDebugPanel';
 import { getAudioSrc } from '../../helpers/getAudioSrc';
 import { usePracticeAccess } from '../../hooks/useAccessControl';
 import { buildAudioUsageIndex, getAudioKeyForLanguage, pickContextFlowId } from '../../helpers/standaloneAudioIndex';
@@ -317,6 +318,7 @@ export default function StandalonePractice() {
           <div className="flex items-center justify-center" style={{ minHeight: '42vh' }}>
             <AudioPlayer src={src} title={title} subtitle={flowName || undefined} variant="floatingCircle" />
           </div>
+          <PracticeAudioDebugPanel />
           {message ? <MessageBox>{message}</MessageBox> : null}
         </div>
       </IonContent>

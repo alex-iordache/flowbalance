@@ -3,11 +3,10 @@ import type { PluginListenerHandle } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 
+import { practiceAudioDebug, resolvePracticeAudioDebugEnabled } from '../../helpers/practiceAudioDebug';
 import {
   getPracticeCurrentTimeSec,
   getPracticeDurationSec,
-  isNativeAudioPluginError,
-  shouldFallbackToWebAudio,
   isPracticeAudioPlaying,
   openPracticeNotificationSettings,
   pausePracticeAudio,
@@ -32,7 +31,6 @@ type Props = {
   initialPositionSec?: number;
   onPositionChange?: (sec: number) => void;
   variant?: 'card' | 'floatingCircle';
-  onNativeUnavailable?: () => void;
 };
 
 function formatTime(sec: number): string {
@@ -51,9 +49,7 @@ export default function NativePracticeAudioPlayer({
   initialPositionSec = 0,
   onPositionChange,
   variant = 'card',
-  onNativeUnavailable,
 }: Props) {
-  const onNativeUnavailableRef = useRef(onNativeUnavailable);
   const onPlayRef = useRef(onPlay);
   const onEndedRef = useRef(onEnded);
   const onPositionChangeRef = useRef(onPositionChange);
@@ -64,10 +60,6 @@ export default function NativePracticeAudioPlayer({
   const readyRef = useRef(false);
   const hasStartedRef = useRef(false);
 
-  useEffect(() => {
-    onNativeUnavailableRef.current = onNativeUnavailable;
-  }, [onNativeUnavailable]);
-
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasStarted, setHasStarted] = useState(false);
   const [notificationsBlocked, setNotificationsBlocked] = useState(false);
@@ -76,6 +68,7 @@ export default function NativePracticeAudioPlayer({
   );
   const [current, setCurrent] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [errorDetail, setErrorDetail] = useState('');
 
   const progressPct = useMemo(() => {
     if (!duration) return 0;
@@ -140,8 +133,11 @@ export default function NativePracticeAudioPlayer({
       setStatus('loading');
       setCurrent(0);
       setDuration(0);
+      setErrorDetail('');
+      practiceAudioDebug('player', 'setup starting', { src });
 
       try {
+        await resolvePracticeAudioDebugEnabled();
         await stopPracticeAudio();
         if (cancelled) return;
 
@@ -155,7 +151,7 @@ export default function NativePracticeAudioPlayer({
         const dur = await getPracticeDurationSec();
         if (cancelled) return;
         if (!Number.isFinite(dur) || dur <= 0) {
-          throw new Error('Native audio preload returned zero duration');
+          throw new Error(`Native audio preload returned zero duration (got ${dur})`);
         }
 
         const initPos = initialPositionSecRef.current;
@@ -167,6 +163,7 @@ export default function NativePracticeAudioPlayer({
         }
         readyRef.current = true;
         setStatus('ready');
+        practiceAudioDebug('player', 'setup ready', { duration: dur });
 
         completeHandle = await NativeAudio.addListener('complete', (event) => {
           if (event.assetId !== PRACTICE_ASSET_ID) return;
@@ -187,11 +184,10 @@ export default function NativePracticeAudioPlayer({
         });
       } catch (err) {
         if (!cancelled) {
-          if (shouldFallbackToWebAudio(err) || isNativeAudioPluginError(err)) {
-            onNativeUnavailableRef.current?.();
-          } else {
-            setStatus('error');
-          }
+          const message = err instanceof Error ? err.message : String(err);
+          practiceAudioDebug('player', 'setup failed', err, 'error');
+          setErrorDetail(message);
+          setStatus('error');
         }
       }
     };
@@ -220,6 +216,7 @@ export default function NativePracticeAudioPlayer({
     }
 
     try {
+      practiceAudioDebug('player', 'toggle', { ready: readyRef.current, status, hasStarted });
       const playing = await isPracticeAudioPlaying();
       if (playing) {
         await pausePracticeAudio();
@@ -248,11 +245,11 @@ export default function NativePracticeAudioPlayer({
       setHasStarted(true);
       setStatus('playing');
       onPlayRef.current?.();
+      practiceAudioDebug('player', 'toggle -> playing');
     } catch (err) {
-      if (shouldFallbackToWebAudio(err) || isNativeAudioPluginError(err)) {
-        onNativeUnavailableRef.current?.();
-        return;
-      }
+      const message = err instanceof Error ? err.message : String(err);
+      practiceAudioDebug('player', 'toggle failed', err, 'error');
+      setErrorDetail(message);
       await stopPracticeForeground();
       setIsPlaying(false);
       setStatus('error');
@@ -283,7 +280,8 @@ export default function NativePracticeAudioPlayer({
     </svg>
   );
 
-  const statusLabel = status === 'error' ? 'Audio failed to play' : '';
+  const statusLabel =
+    status === 'error' ? (errorDetail ? `Native audio failed: ${errorDetail}` : 'Native audio failed') : '';
   const notificationHint = notificationsBlocked
     ? 'Allow notifications for lock-screen controls.'
     : '';

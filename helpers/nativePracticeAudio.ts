@@ -2,8 +2,9 @@ import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { NativeAudio } from '@capgo/native-audio';
 
-import { PracticeForeground } from './practiceForeground';
 import { getNativeAudioRequestHeaders } from './nativeAudioAuth';
+import { practiceAudioDebug } from './practiceAudioDebug';
+import { PracticeForeground } from './practiceForeground';
 
 export const PRACTICE_ASSET_ID = 'practice';
 
@@ -14,27 +15,23 @@ export function isNativePracticeAudioAvailable(): boolean {
   return Capacitor.isPluginAvailable('NativeAudio');
 }
 
-export function isNativeAudioPluginError(err: unknown): boolean {
-  const code = (err as { code?: string })?.code;
-  if (code === 'UNIMPLEMENTED' || code === 'UNAVAILABLE') return true;
-  const message = (err as { message?: string })?.message ?? '';
-  return /not implemented/i.test(message);
-}
-
-export function shouldFallbackToWebAudio(_err?: unknown): boolean {
-  // Native playback can fail for auth, preload, or device-specific issues — keep HTML5 as backup.
-  return true;
-}
-
 async function ensureConfigured(): Promise<void> {
-  if (configured) return;
+  if (configured) {
+    practiceAudioDebug('native', 'NativeAudio already configured');
+    return;
+  }
+  practiceAudioDebug('native', 'NativeAudio.configure starting', {
+    background: true,
+    focus: true,
+    showNotification: true,
+  });
   await NativeAudio.configure({
     background: true,
     focus: true,
-    // Capgo owns the media session + lock-screen controls on both platforms.
     showNotification: true,
   });
   configured = true;
+  practiceAudioDebug('native', 'NativeAudio.configure done');
 }
 
 export async function ensurePracticeNotificationPermission(): Promise<boolean> {
@@ -42,24 +39,29 @@ export async function ensurePracticeNotificationPermission(): Promise<boolean> {
 
   try {
     const current = await LocalNotifications.checkPermissions();
+    practiceAudioDebug('perm', 'LocalNotifications.checkPermissions', current);
     if (current.display === 'granted') return true;
 
     const requested = await LocalNotifications.requestPermissions();
+    practiceAudioDebug('perm', 'LocalNotifications.requestPermissions', requested);
     if (requested.display === 'granted') return true;
-  } catch {
-    // Fall back to the custom foreground plugin permission flow.
+  } catch (err) {
+    practiceAudioDebug('perm', 'LocalNotifications permission flow failed', err, 'error');
   }
 
   try {
     const { granted } = await PracticeForeground.ensurePermissions();
+    practiceAudioDebug('perm', 'PracticeForeground.ensurePermissions', { granted });
     return granted;
-  } catch {
+  } catch (err) {
+    practiceAudioDebug('perm', 'PracticeForeground.ensurePermissions failed', err, 'error');
     return false;
   }
 }
 
 export async function openPracticeNotificationSettings(): Promise<void> {
   if (Capacitor.getPlatform() !== 'android') return;
+  practiceAudioDebug('perm', 'Opening notification settings');
   await PracticeForeground.openNotificationSettings();
 }
 
@@ -68,6 +70,11 @@ export async function preloadPracticeAudio(params: {
   title?: string;
   subtitle?: string;
 }): Promise<void> {
+  practiceAudioDebug('native', 'preload starting', {
+    src: params.src,
+    title: params.title,
+    subtitle: params.subtitle,
+  });
   await ensureConfigured();
   const headers = await getNativeAudioRequestHeaders();
   await NativeAudio.unload({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
@@ -83,10 +90,12 @@ export async function preloadPracticeAudio(params: {
       album: 'Flow Balance',
     },
   });
+  practiceAudioDebug('native', 'preload done');
 }
 
 export async function getPracticeDurationSec(): Promise<number> {
   const { duration } = await NativeAudio.getDuration({ assetId: PRACTICE_ASSET_ID });
+  practiceAudioDebug('native', 'getDuration', { duration });
   return Number.isFinite(duration) ? Math.max(0, duration) : 0;
 }
 
@@ -97,11 +106,13 @@ export async function startPracticeForeground(
   if (Capacitor.getPlatform() !== 'android') {
     return { notificationGranted: true };
   }
+  practiceAudioDebug('fg', 'startPracticeForeground');
   const notificationGranted = await ensurePracticeNotificationPermission();
   await PracticeForeground.start({
     title: (title || 'Flow').trim() || 'Flow',
     body: (subtitle || 'Practice').trim() || 'Practice',
   });
+  practiceAudioDebug('fg', 'PracticeForeground.start done', { notificationGranted });
   return { notificationGranted };
 }
 
@@ -111,6 +122,7 @@ export async function updatePracticeForeground(
   subtitle?: string,
 ): Promise<void> {
   if (Capacitor.getPlatform() !== 'android') return;
+  practiceAudioDebug('fg', 'PracticeForeground.update', { playing, title, subtitle });
   await PracticeForeground.update({
     playing,
     title: (title || 'Flow').trim() || 'Flow',
@@ -120,25 +132,34 @@ export async function updatePracticeForeground(
 
 export async function stopPracticeForeground(): Promise<void> {
   if (Capacitor.getPlatform() !== 'android') return;
-  await PracticeForeground.stop().catch(() => undefined);
+  practiceAudioDebug('fg', 'PracticeForeground.stop');
+  await PracticeForeground.stop().catch((err) => {
+    practiceAudioDebug('fg', 'PracticeForeground.stop failed', err, 'warn');
+  });
 }
 
 export async function playPracticeAudio(startSec = 0): Promise<void> {
+  practiceAudioDebug('native', 'play', { startSec });
   await NativeAudio.play({
     assetId: PRACTICE_ASSET_ID,
     time: Math.max(0, startSec) * 1000,
   });
+  const playing = await isPracticeAudioPlaying();
+  practiceAudioDebug('native', 'play done', { isPlaying: playing });
 }
 
 export async function pausePracticeAudio(): Promise<void> {
+  practiceAudioDebug('native', 'pause');
   await NativeAudio.pause({ assetId: PRACTICE_ASSET_ID });
 }
 
 export async function resumePracticeAudio(): Promise<void> {
+  practiceAudioDebug('native', 'resume');
   await NativeAudio.resume({ assetId: PRACTICE_ASSET_ID });
 }
 
 export async function seekPracticeAudio(sec: number): Promise<void> {
+  practiceAudioDebug('native', 'seek', { sec });
   await NativeAudio.setCurrentTime({
     assetId: PRACTICE_ASSET_ID,
     time: Math.max(0, sec),
@@ -156,6 +177,7 @@ export async function isPracticeAudioPlaying(): Promise<boolean> {
 }
 
 export async function stopPracticeAudio(): Promise<void> {
+  practiceAudioDebug('native', 'stopPracticeAudio');
   await NativeAudio.stop({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
   await NativeAudio.unload({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
   await stopPracticeForeground();

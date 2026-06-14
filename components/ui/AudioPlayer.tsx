@@ -38,15 +38,8 @@ function formatTime(sec: number): string {
  * - Works in browsers + mobile webviews.
  */
 export default function AudioPlayer(props: Props) {
-  const [useNative, setUseNative] = useState(isNativePracticeAudioAvailable);
-
-  if (useNative) {
-    return (
-      <NativePracticeAudioPlayer
-        {...props}
-        onNativeUnavailable={() => setUseNative(false)}
-      />
-    );
+  if (isNativePracticeAudioAvailable()) {
+    return <NativePracticeAudioPlayer {...props} />;
   }
 
   return <WebAudioPlayer {...props} />;

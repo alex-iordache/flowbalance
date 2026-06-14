@@ -22,7 +22,7 @@
     "android:build": "npm run build && node scripts/ensure-offline-html.js && npx cap sync android && cd android && ./gradlew assembleDebug",
     "android:release": "npm run build && node scripts/ensure-offline-html.js && npx cap sync android && cd android && ./gradlew assembleRelease",
     "android:staging": "npm run build && node scripts/ensure-offline-html.js && npx cap sync android && cd android && ./gradlew assembleStagingDebug",
-    "android:prod": "npm run build && node scripts/ensure-offline-html.js && npx cap sync android && cd android && ./gradlew assembleProdRelease",
+    "android:prod": "node scripts/postinstall-patches.js && npm run build && node scripts/ensure-offline-html.js && npx cap sync android && cd android && ./gradlew assembleProdRelease",
     "ios": "npx cap run ios",
     "ios:dev": "npm run build && node scripts/ensure-offline-html.js && npx cap sync ios && npx cap run ios",
     "make-android": "npm run build && npx cap sync android && cd android && ./gradlew assembleDebug",
@@ -32,7 +32,7 @@
     "vercel": "node scripts/vercel.js",
     "db:migrate": "node scripts/db-migrate.js",
     "db:backfill-users": "node scripts/backfill-clerk-users.js",
-    "postinstall": "patch-package"
+    "postinstall": "node scripts/postinstall-patches.js",
   },
   "dependencies": {
     "@capacitor/android": "7.4.4",

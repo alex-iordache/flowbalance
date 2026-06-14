@@ -1,4 +1,5 @@
 import { auth, clerkClient } from '@clerk/nextjs/server';
+import { verifyToken } from '@clerk/backend';
 import { NextResponse } from 'next/server';
 
 import { fetchR2Object } from '../../../lib/r2';
@@ -73,6 +74,53 @@ function safeFlowById(flowId: string | null): Flow | null {
   return defaultFlows.find(f => f.id === flowId) ?? null;
 }
 
+type AudioAccessContext = {
+  userId: string | null;
+  orgId: string | null;
+  hasPro: boolean;
+};
+
+async function resolveAudioAccess(request: Request): Promise<AudioAccessContext> {
+  const authResult = await auth();
+  let userId = authResult.userId ?? null;
+  let orgId =
+    ((authResult as unknown as { orgId?: string | null }).orgId ?? null) ||
+    (((authResult.sessionClaims as any)?.org_id as string | undefined) ?? null);
+  const hasFn = (authResult as unknown as { has?: (p: unknown) => boolean }).has;
+  let hasPro = typeof hasFn === 'function' ? (hasFn({ plan: 'pro_user' }) as boolean) : false;
+
+  if (userId) {
+    return { userId, orgId, hasPro };
+  }
+
+  const bearer = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '').trim();
+  if (!bearer) {
+    return { userId: null, orgId: null, hasPro: false };
+  }
+
+  const secretKey = process.env.CLERK_SECRET_KEY;
+  if (!secretKey) {
+    return { userId: null, orgId: null, hasPro: false };
+  }
+
+  try {
+    const payload = await verifyToken(bearer, { secretKey });
+    userId = payload.sub ?? null;
+    const claims = payload as Record<string, unknown>;
+    orgId =
+      (typeof claims.org_id === 'string' ? claims.org_id : null) ||
+      (typeof (claims.o as { id?: string } | undefined)?.id === 'string'
+        ? (claims.o as { id: string }).id
+        : null);
+    const plan = (claims.pla as string | undefined) ?? (claims.plan as string | undefined);
+    hasPro = plan === 'pro_user';
+  } catch {
+    return { userId: null, orgId: null, hasPro: false };
+  }
+
+  return { userId, orgId, hasPro };
+}
+
 export async function GET(request: Request) {
   const url = new URL(request.url);
   // Use `||` (not `??`) so empty strings don't "win" over a valid fallback.
@@ -92,15 +140,7 @@ export async function GET(request: Request) {
       ? installIdParam
       : null;
 
-  const authResult = await auth();
-  const userId = authResult.userId ?? null;
-  const orgId =
-    // Clerk server auth object may expose orgId directly, but keep a safe fallback.
-    ((authResult as unknown as { orgId?: string | null }).orgId ?? null) ||
-    (((authResult.sessionClaims as any)?.org_id as string | undefined) ?? null);
-
-  const hasFn = (authResult as unknown as { has?: (p: unknown) => boolean }).has;
-  const hasPro = typeof hasFn === 'function' ? (hasFn({ plan: 'pro_user' }) as boolean) : false;
+  const { userId, orgId, hasPro } = await resolveAudioAccess(request);
 
   // Org users and Pro users: full access.
   let hasAccess = Boolean(userId && (orgId || hasPro));

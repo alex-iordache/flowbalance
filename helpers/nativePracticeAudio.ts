@@ -3,6 +3,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { NativeAudio } from '@capgo/native-audio';
 
 import { PracticeForeground } from './practiceForeground';
+import { getNativeAudioRequestHeaders } from './nativeAudioAuth';
 
 export const PRACTICE_ASSET_ID = 'practice';
 
@@ -18,6 +19,11 @@ export function isNativeAudioPluginError(err: unknown): boolean {
   if (code === 'UNIMPLEMENTED' || code === 'UNAVAILABLE') return true;
   const message = (err as { message?: string })?.message ?? '';
   return /not implemented/i.test(message);
+}
+
+export function shouldFallbackToWebAudio(_err?: unknown): boolean {
+  // Native playback can fail for auth, preload, or device-specific issues — keep HTML5 as backup.
+  return true;
 }
 
 async function ensureConfigured(): Promise<void> {
@@ -63,12 +69,14 @@ export async function preloadPracticeAudio(params: {
   subtitle?: string;
 }): Promise<void> {
   await ensureConfigured();
+  const headers = await getNativeAudioRequestHeaders();
   await NativeAudio.unload({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
   await NativeAudio.preload({
     assetId: PRACTICE_ASSET_ID,
     assetPath: params.src,
     isUrl: true,
     audioChannelNum: 1,
+    headers: Object.keys(headers).length > 0 ? headers : undefined,
     notificationMetadata: {
       title: (params.title || 'Flow').trim() || 'Flow',
       artist: (params.subtitle || '').trim(),

@@ -7,6 +7,7 @@ import {
   getPracticeCurrentTimeSec,
   getPracticeDurationSec,
   isNativeAudioPluginError,
+  shouldFallbackToWebAudio,
   isPracticeAudioPlaying,
   openPracticeNotificationSettings,
   pausePracticeAudio,
@@ -153,6 +154,9 @@ export default function NativePracticeAudioPlayer({
 
         const dur = await getPracticeDurationSec();
         if (cancelled) return;
+        if (!Number.isFinite(dur) || dur <= 0) {
+          throw new Error('Native audio preload returned zero duration');
+        }
 
         const initPos = initialPositionSecRef.current;
         setDuration(dur);
@@ -183,7 +187,7 @@ export default function NativePracticeAudioPlayer({
         });
       } catch (err) {
         if (!cancelled) {
-          if (isNativeAudioPluginError(err)) {
+          if (shouldFallbackToWebAudio(err) || isNativeAudioPluginError(err)) {
             onNativeUnavailableRef.current?.();
           } else {
             setStatus('error');
@@ -245,7 +249,7 @@ export default function NativePracticeAudioPlayer({
       setStatus('playing');
       onPlayRef.current?.();
     } catch (err) {
-      if (isNativeAudioPluginError(err)) {
+      if (shouldFallbackToWebAudio(err) || isNativeAudioPluginError(err)) {
         onNativeUnavailableRef.current?.();
         return;
       }

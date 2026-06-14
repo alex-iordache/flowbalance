@@ -25,10 +25,12 @@ let configured = false;
 let listenersAttached = false;
 let completeHandle: PluginListenerHandle | null = null;
 let timeHandle: PluginListenerHandle | null = null;
+let stateHandle: PluginListenerHandle | null = null;
 
 let loadedSrc: string | null = null;
-let prepareChain: Promise<void> = Promise.resolve();
+let commandChain: Promise<void> = Promise.resolve();
 let releaseTimer: ReturnType<typeof setTimeout> | null = null;
+let syncTimer: ReturnType<typeof setInterval> | null = null;
 
 const snapshot: PracticePlaybackSnapshot = {
   src: null,
@@ -73,6 +75,43 @@ export function onPracticePlaybackComplete(handler: CompleteHandler): () => void
   return () => completeHandlers.delete(handler);
 }
 
+function enqueue<T>(task: () => Promise<T>): Promise<T> {
+  const run = commandChain.then(task, task);
+  commandChain = run.then(
+    () => undefined,
+    () => undefined,
+  );
+  return run;
+}
+
+async function refreshSnapshotFromNative(): Promise<void> {
+  if (!snapshot.ready) return;
+  try {
+    const [playing, sec] = await Promise.all([isPracticeAudioPlaying(), getPracticeCurrentTimeSec()]);
+    patchSnapshot({
+      isPlaying: playing,
+      current: sec,
+      ended: !playing && snapshot.duration > 0 && sec >= snapshot.duration - 0.5 ? true : snapshot.ended,
+      error: null,
+    });
+  } catch {
+    // ignore
+  }
+}
+
+function startSyncTimer(): void {
+  if (syncTimer) return;
+  syncTimer = setInterval(() => {
+    void refreshSnapshotFromNative();
+  }, 1000);
+}
+
+function stopSyncTimer(): void {
+  if (!syncTimer) return;
+  clearInterval(syncTimer);
+  syncTimer = null;
+}
+
 async function ensureConfigured(): Promise<void> {
   if (configured) return;
   practiceAudioDebug('native', 'NativeAudio.configure starting', {
@@ -102,17 +141,28 @@ async function ensurePlaybackListeners(): Promise<void> {
   timeHandle = await NativeAudio.addListener('currentTime', (event) => {
     if (event.assetId !== PRACTICE_ASSET_ID) return;
     const sec = Number.isFinite(event.currentTime) ? Math.max(0, event.currentTime) : 0;
-    patchSnapshot({ current: sec, ended: false, error: null });
+    patchSnapshot({ current: sec, isPlaying: true, ended: false, error: null });
   });
-}
 
-function enqueue<T>(task: () => Promise<T>): Promise<T> {
-  const run = prepareChain.then(task, task);
-  prepareChain = run.then(
-    () => undefined,
-    () => undefined,
-  );
-  return run;
+  stateHandle = await (NativeAudio as unknown as {
+    addListener: (
+      eventName: 'playbackState',
+      listenerFunc: (event: { assetId?: string; isPlaying?: boolean; currentTime?: number }) => void,
+    ) => Promise<PluginListenerHandle>;
+  }).addListener('playbackState', (event) => {
+    if (event.assetId !== PRACTICE_ASSET_ID) return;
+    const sec = Number.isFinite(event.currentTime) ? Math.max(0, event.currentTime!) : snapshot.current;
+    patchSnapshot({
+      isPlaying: !!event.isPlaying,
+      current: sec,
+      ended: false,
+      error: null,
+    });
+    practiceAudioDebug('native', 'playbackState event', {
+      isPlaying: event.isPlaying,
+      currentTime: sec,
+    });
+  });
 }
 
 export async function ensurePracticeNotificationPermission(): Promise<boolean> {
@@ -146,6 +196,7 @@ export function retainPracticeSession(): void {
     clearTimeout(releaseTimer);
     releaseTimer = null;
   }
+  startSyncTimer();
 }
 
 export function scheduleReleasePracticeSession(): void {
@@ -153,7 +204,7 @@ export function scheduleReleasePracticeSession(): void {
   releaseTimer = setTimeout(() => {
     releaseTimer = null;
     void stopPracticeAudio();
-  }, 150);
+  }, 400);
 }
 
 export async function preparePracticeSession(params: {
@@ -170,8 +221,7 @@ export async function preparePracticeSession(params: {
     if (loadedSrc === params.src && snapshot.ready && snapshot.duration > 0) {
       practiceAudioDebug('session', 'prepare skipped - already ready', { src: params.src });
       if (initPos > 0 && initPos < snapshot.duration && Math.abs(snapshot.current - initPos) > 1) {
-        await NativeAudio.setCurrentTime({ assetId: PRACTICE_ASSET_ID, time: initPos });
-        patchSnapshot({ current: initPos });
+        await seekPracticeAudioInternal(initPos);
       }
       return;
     }
@@ -256,39 +306,74 @@ export async function startPracticeForeground(
   return { notificationGranted };
 }
 
-export async function playPracticeAudio(startSec = 0): Promise<void> {
+async function pausePracticeAudioInternal(): Promise<void> {
+  practiceAudioDebug('native', 'pause');
+  await NativeAudio.pause({ assetId: PRACTICE_ASSET_ID });
+  await refreshSnapshotFromNative();
+}
+
+async function resumePracticeAudioInternal(): Promise<void> {
+  practiceAudioDebug('native', 'resume');
+  await NativeAudio.resume({ assetId: PRACTICE_ASSET_ID });
+  await refreshSnapshotFromNative();
+}
+
+async function playPracticeAudioInternal(startSec = 0): Promise<void> {
   if (!snapshot.ready) {
     throw new Error('Practice audio is not ready');
   }
   practiceAudioDebug('native', 'play', { startSec });
   await NativeAudio.play({
     assetId: PRACTICE_ASSET_ID,
-    time: Math.max(0, startSec) * 1000,
+    time: Math.max(0, startSec),
   });
-  patchSnapshot({ isPlaying: true, ended: false, error: null });
-  practiceAudioDebug('native', 'play done', { isPlaying: true });
+  await refreshSnapshotFromNative();
+  practiceAudioDebug('native', 'play done', { isPlaying: snapshot.isPlaying, current: snapshot.current });
 }
 
-export async function pausePracticeAudio(): Promise<void> {
-  practiceAudioDebug('native', 'pause');
-  await NativeAudio.pause({ assetId: PRACTICE_ASSET_ID });
-  const sec = await getPracticeCurrentTimeSec();
-  patchSnapshot({ isPlaying: false, current: sec, error: null });
-}
-
-export async function resumePracticeAudio(): Promise<void> {
-  practiceAudioDebug('native', 'resume');
-  await NativeAudio.resume({ assetId: PRACTICE_ASSET_ID });
-  patchSnapshot({ isPlaying: true, ended: false, error: null });
-}
-
-export async function seekPracticeAudio(sec: number): Promise<void> {
+async function seekPracticeAudioInternal(sec: number): Promise<void> {
   practiceAudioDebug('native', 'seek', { sec });
   await NativeAudio.setCurrentTime({
     assetId: PRACTICE_ASSET_ID,
     time: Math.max(0, sec),
   });
-  patchSnapshot({ current: sec, error: null });
+  await refreshSnapshotFromNative();
+}
+
+export async function playPracticeAudio(startSec = 0): Promise<void> {
+  await enqueue(() => playPracticeAudioInternal(startSec));
+}
+
+export async function pausePracticeAudio(): Promise<void> {
+  await enqueue(() => pausePracticeAudioInternal());
+}
+
+export async function resumePracticeAudio(): Promise<void> {
+  await enqueue(() => resumePracticeAudioInternal());
+}
+
+export async function seekPracticeAudio(sec: number): Promise<void> {
+  await enqueue(() => seekPracticeAudioInternal(sec));
+}
+
+export async function togglePracticeAudio(startSec = 0): Promise<void> {
+  await enqueue(async () => {
+    if (snapshot.isPlaying) {
+      await pausePracticeAudioInternal();
+      return;
+    }
+    if (!snapshot.ready) {
+      throw new Error('Practice audio is not ready');
+    }
+    if (snapshot.ended) {
+      await playPracticeAudioInternal(startSec);
+      return;
+    }
+    await resumePracticeAudioInternal();
+    if (!snapshot.isPlaying) {
+      await playPracticeAudioInternal(startSec);
+    }
+  });
 }
 
 export async function getPracticeCurrentTimeSec(): Promise<number> {
@@ -302,32 +387,25 @@ export async function isPracticeAudioPlaying(): Promise<boolean> {
 }
 
 export async function stopPracticeAudio(): Promise<void> {
-  practiceAudioDebug('native', 'stopPracticeAudio');
-  await NativeAudio.stop({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
-  await NativeAudio.unload({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
-  await PracticeForeground.stop().catch(() => undefined);
-  loadedSrc = null;
-  patchSnapshot({
-    src: null,
-    duration: 0,
-    current: 0,
-    isPlaying: false,
-    ready: false,
-    ended: false,
-    error: null,
+  await enqueue(async () => {
+    practiceAudioDebug('native', 'stopPracticeAudio');
+    stopSyncTimer();
+    await NativeAudio.stop({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
+    await NativeAudio.unload({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
+    await PracticeForeground.stop().catch(() => undefined);
+    loadedSrc = null;
+    patchSnapshot({
+      src: null,
+      duration: 0,
+      current: 0,
+      isPlaying: false,
+      ready: false,
+      ended: false,
+      error: null,
+    });
   });
 }
 
 export async function syncPracticePlaybackFromNative(): Promise<void> {
-  if (!snapshot.ready) return;
-  try {
-    const [playing, sec] = await Promise.all([isPracticeAudioPlaying(), getPracticeCurrentTimeSec()]);
-    patchSnapshot({
-      isPlaying: playing,
-      current: sec,
-      ended: !playing && sec >= snapshot.duration && snapshot.duration > 0 ? snapshot.ended : snapshot.ended,
-    });
-  } catch {
-    // ignore
-  }
+  await refreshSnapshotFromNative();
 }

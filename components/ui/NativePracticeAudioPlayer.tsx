@@ -7,16 +7,14 @@ import {
   getPracticePlaybackSnapshot,
   onPracticePlaybackComplete,
   openPracticeNotificationSettings,
-  pausePracticeAudio,
-  playPracticeAudio,
   preparePracticeSession,
   retainPracticeSession,
-  resumePracticeAudio,
   scheduleReleasePracticeSession,
   seekPracticeAudio,
   startPracticeForeground,
   subscribePracticePlayback,
   syncPracticePlaybackFromNative,
+  togglePracticeAudio,
   type PracticePlaybackSnapshot,
 } from '../../helpers/nativePracticeAudio';
 
@@ -52,14 +50,13 @@ export default function NativePracticeAudioPlayer({
   const onEndedRef = useRef(onEnded);
   const onPositionChangeRef = useRef(onPositionChange);
   const lastReportedSecRef = useRef(-1);
-  const hasStartedRef = useRef(false);
   const initialPositionSecRef = useRef(initialPositionSec);
   const titleRef = useRef(title);
   const subtitleRef = useRef(subtitle);
+  const permissionCheckedRef = useRef(false);
 
   const [playback, setPlayback] = useState<PracticePlaybackSnapshot>(() => getPracticePlaybackSnapshot());
   const [notificationsBlocked, setNotificationsBlocked] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
 
   useEffect(() => {
     onPlayRef.current = onPlay;
@@ -75,15 +72,12 @@ export default function NativePracticeAudioPlayer({
     subtitleRef.current = subtitle;
   }, [title, subtitle]);
   initialPositionSecRef.current = initialPositionSec;
-  useEffect(() => {
-    hasStartedRef.current = hasStarted;
-  }, [hasStarted]);
 
   useEffect(() => {
     let cancelled = false;
     retainPracticeSession();
-    setHasStarted(false);
     lastReportedSecRef.current = -1;
+    permissionCheckedRef.current = false;
 
     void (async () => {
       try {
@@ -111,7 +105,6 @@ export default function NativePracticeAudioPlayer({
 
     const unsubComplete = onPracticePlaybackComplete(() => {
       if (cancelled) return;
-      setHasStarted(false);
       onEndedRef.current?.();
     });
 
@@ -146,15 +139,9 @@ export default function NativePracticeAudioPlayer({
       practiceAudioDebug('player', 'toggle', {
         ready: playback.ready,
         isPlaying: playback.isPlaying,
-        hasStarted,
         ended: playback.ended,
+        current: playback.current,
       });
-
-      if (playback.isPlaying) {
-        await pausePracticeAudio();
-        setHasStarted(true);
-        return;
-      }
 
       if (!playback.ready) {
         await preparePracticeSession({
@@ -165,18 +152,18 @@ export default function NativePracticeAudioPlayer({
         });
       }
 
-      const { notificationGranted } = await startPracticeForeground(titleRef.current, subtitleRef.current);
-      setNotificationsBlocked(!notificationGranted);
-
-      if (hasStarted && !playback.ended) {
-        await resumePracticeAudio();
-      } else {
-        const startSec = playback.ended ? 0 : initialPositionSecRef.current;
-        await playPracticeAudio(startSec);
+      if (!permissionCheckedRef.current) {
+        const { notificationGranted } = await startPracticeForeground(titleRef.current, subtitleRef.current);
+        permissionCheckedRef.current = true;
+        setNotificationsBlocked(!notificationGranted);
       }
 
-      setHasStarted(true);
-      onPlayRef.current?.();
+      const startSec = playback.ended ? 0 : initialPositionSecRef.current;
+      const wasPlaying = playback.isPlaying;
+      await togglePracticeAudio(startSec);
+      if (!wasPlaying) {
+        onPlayRef.current?.();
+      }
     } catch (err) {
       practiceAudioDebug('player', 'toggle failed', err, 'error');
     }

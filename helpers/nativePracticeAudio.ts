@@ -220,11 +220,36 @@ export function retainPracticeSession(): void {
 }
 
 export function scheduleReleasePracticeSession(): void {
+  void pausePracticeAudioOnLeave();
   if (releaseTimer) clearTimeout(releaseTimer);
   releaseTimer = setTimeout(() => {
     releaseTimer = null;
     void stopPracticeAudio();
   }, 800);
+}
+
+async function pausePracticeAudioOnLeave(): Promise<void> {
+  if (!snapshot.ready) return;
+  practiceAudioDebug('session', 'pause on leave');
+  await NativeAudio.pause({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
+  patchSnapshot({ isPlaying: false, ended: false, error: null });
+}
+
+async function ensurePausedOnReturn(): Promise<void> {
+  if (!snapshot.ready) {
+    patchSnapshot({ isPlaying: false });
+    return;
+  }
+  const playing = await isPracticeAudioPlaying().catch(() => false);
+  if (playing || snapshot.isPlaying) {
+    practiceAudioDebug('session', 'ensure paused on return');
+    await NativeAudio.pause({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
+  }
+  patchSnapshot({ isPlaying: false, ended: false, error: null });
+  await refreshSnapshotFromNative();
+  if (snapshot.isPlaying) {
+    patchSnapshot({ isPlaying: false });
+  }
 }
 
 export async function preparePracticeSession(params: {
@@ -243,6 +268,7 @@ export async function preparePracticeSession(params: {
       if (initPos > 0 && initPos < snapshot.duration && Math.abs(snapshot.current - initPos) > 1) {
         await seekPracticeAudioInternal(initPos, false);
       }
+      await ensurePausedOnReturn();
       return;
     }
 
@@ -305,6 +331,7 @@ export async function preparePracticeSession(params: {
       }
 
       practiceAudioDebug('session', 'prepare ready', { duration: dur, initialPositionSec: initPos });
+      await ensurePausedOnReturn();
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       practiceAudioDebug('session', 'prepare failed', err, 'error');

@@ -165,6 +165,17 @@ export async function preparePracticeSession(params: {
   retainPracticeSession();
 
   await enqueue(async () => {
+    const initPos = Math.max(0, params.initialPositionSec ?? 0);
+
+    if (loadedSrc === params.src && snapshot.ready && snapshot.duration > 0) {
+      practiceAudioDebug('session', 'prepare skipped - already ready', { src: params.src });
+      if (initPos > 0 && initPos < snapshot.duration && Math.abs(snapshot.current - initPos) > 1) {
+        await NativeAudio.setCurrentTime({ assetId: PRACTICE_ASSET_ID, time: initPos });
+        patchSnapshot({ current: initPos });
+      }
+      return;
+    }
+
     practiceAudioDebug('session', 'prepare', {
       src: params.src,
       loadedSrc,
@@ -215,7 +226,6 @@ export async function preparePracticeSession(params: {
         throw new Error(`Native audio preload returned zero duration (got ${dur})`);
       }
 
-      const initPos = Math.max(0, params.initialPositionSec ?? 0);
       if (initPos > 0 && initPos < dur) {
         await NativeAudio.setCurrentTime({ assetId: PRACTICE_ASSET_ID, time: initPos });
         patchSnapshot({ current: initPos, duration: dur, ready: true, error: null });

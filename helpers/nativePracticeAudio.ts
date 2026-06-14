@@ -106,13 +106,8 @@ export async function startPracticeForeground(
   if (Capacitor.getPlatform() !== 'android') {
     return { notificationGranted: true };
   }
-  practiceAudioDebug('fg', 'startPracticeForeground');
+  practiceAudioDebug('fg', 'ensure notification permission only', { title, subtitle });
   const notificationGranted = await ensurePracticeNotificationPermission();
-  await PracticeForeground.start({
-    title: (title || 'Flow').trim() || 'Flow',
-    body: (subtitle || 'Practice').trim() || 'Practice',
-  });
-  practiceAudioDebug('fg', 'PracticeForeground.start done', { notificationGranted });
   return { notificationGranted };
 }
 
@@ -122,12 +117,7 @@ export async function updatePracticeForeground(
   subtitle?: string,
 ): Promise<void> {
   if (Capacitor.getPlatform() !== 'android') return;
-  practiceAudioDebug('fg', 'PracticeForeground.update', { playing, title, subtitle });
-  await PracticeForeground.update({
-    playing,
-    title: (title || 'Flow').trim() || 'Flow',
-    body: (subtitle || 'Practice').trim() || 'Practice',
-  });
+  practiceAudioDebug('fg', 'skip duplicate foreground notification update', { playing, title, subtitle });
 }
 
 export async function stopPracticeForeground(): Promise<void> {

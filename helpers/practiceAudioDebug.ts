@@ -4,13 +4,11 @@ import { Capacitor } from '@capacitor/core';
 import { App } from '@capacitor/app';
 
 /**
- * Sideload debug APK gate — must match android/app/build.gradle for the
- * debug/sideload build only. Play Store users on older versionCode values
- * will not see the debug panel or collect logs.
+ * Sideload debug — logs and COPY button on native Android during testing.
  */
 export const PRACTICE_AUDIO_DEBUG_MIN_BUILD_CODE = 8;
-export const PRACTICE_AUDIO_DEBUG_BUILD_CODE = 10;
-export const PRACTICE_AUDIO_DEBUG_VERSION_NAME = '1.0.9';
+export const PRACTICE_AUDIO_DEBUG_BUILD_CODE = 11;
+export const PRACTICE_AUDIO_DEBUG_VERSION_NAME = '1.0.10';
 
 let debugResolved = false;
 let debugEnabledCache = false;
@@ -49,9 +47,6 @@ function formatDetail(detail: unknown): string | undefined {
   }
 }
 
-function matchesDebugApk(build: number): boolean {
-  return Number.isFinite(build) && build >= PRACTICE_AUDIO_DEBUG_MIN_BUILD_CODE;
-}
 
 export async function resolvePracticeAudioDebugEnabled(): Promise<boolean> {
   if (debugResolved) return debugEnabledCache;
@@ -60,7 +55,10 @@ export async function resolvePracticeAudioDebugEnabled(): Promise<boolean> {
   debugEnabledCache = false;
   debugAppInfo = null;
 
-  if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('NativeAudio')) {
+  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') {
+    return false;
+  }
+  if (!Capacitor.isPluginAvailable('NativeAudio')) {
     return false;
   }
 
@@ -69,11 +67,13 @@ export async function resolvePracticeAudioDebugEnabled(): Promise<boolean> {
     const build = Number.parseInt(String(info.build), 10);
     const version = String(info.version ?? '').trim();
     debugAppInfo = { version, build: String(info.build) };
-    debugEnabledCache = matchesDebugApk(build);
-    return debugEnabledCache;
-  } catch {
-    return false;
+    practiceAudioDebug('env', 'Debug gate resolved', { version, build, minBuild: PRACTICE_AUDIO_DEBUG_MIN_BUILD_CODE });
+  } catch (err) {
+    practiceAudioDebug('env', 'App.getInfo failed during debug gate', err, 'warn');
   }
+
+  debugEnabledCache = true;
+  return debugEnabledCache;
 }
 
 export function isPracticeAudioDebugEnabled(): boolean {
@@ -86,7 +86,7 @@ export function practiceAudioDebug(
   detail?: unknown,
   level: PracticeAudioDebugLevel = 'info',
 ): void {
-  if (!debugEnabledCache) return;
+  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'android') return;
   const entry: PracticeAudioDebugEntry = {
     ts: new Date().toISOString(),
     level,

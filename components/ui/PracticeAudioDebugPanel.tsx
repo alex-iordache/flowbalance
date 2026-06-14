@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import {
   clearPracticeAudioDebug,
@@ -22,6 +23,7 @@ function lastError(entries: PracticeAudioDebugEntry[]): PracticeAudioDebugEntry 
 }
 
 export default function PracticeAudioDebugPanel() {
+  const [mounted, setMounted] = useState(false);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [showLogs, setShowLogs] = useState(false);
   const [entries, setEntries] = useState(getPracticeAudioDebugEntries());
@@ -29,6 +31,10 @@ export default function PracticeAudioDebugPanel() {
 
   const report = useMemo(() => formatPracticeAudioDebugReport(), [entries]);
   const latestError = useMemo(() => lastError(entries), [entries]);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,7 +54,7 @@ export default function PracticeAudioDebugPanel() {
     };
   }, []);
 
-  if (enabled !== true) return null;
+  if (!mounted || enabled !== true) return null;
 
   const onCopy = async () => {
     const ok = await copyPracticeAudioDebugToClipboard();
@@ -60,27 +66,29 @@ export default function PracticeAudioDebugPanel() {
   const copyLabel =
     copyStatus === 'ok' ? 'Copied!' : copyStatus === 'fail' ? 'Copy failed' : 'COPY LOGS';
 
-  return (
+  return createPortal(
     <>
       <button
         type="button"
         onClick={() => void onCopy()}
-        className="fixed right-3 z-[100000] px-4 py-3 rounded-xl text-sm font-bold shadow-lg"
+        className="fixed right-3 px-4 py-3 rounded-xl text-sm font-bold shadow-lg"
         style={{
-          top: 'calc(env(safe-area-inset-top, 0px) + 56px)',
+          top: 'max(12px, env(safe-area-inset-top))',
+          zIndex: 2147483646,
           backgroundColor: '#E8DFD2',
           color: '#1E1C18',
-          border: '1px solid rgba(59, 49, 38, 0.2)',
+          border: '2px solid rgba(59, 49, 38, 0.35)',
         }}
       >
         {copyLabel}
       </button>
 
       <div
-        className="fixed inset-x-0 z-[99999] px-2 pointer-events-none"
+        className="fixed inset-x-0 px-2 pointer-events-none"
         style={{
           maxWidth: '100vw',
           bottom: 'calc(56px + env(safe-area-inset-bottom, 0px))',
+          zIndex: 2147483645,
         }}
       >
         <div
@@ -140,6 +148,7 @@ export default function PracticeAudioDebugPanel() {
           ) : null}
         </div>
       </div>
-    </>
+    </>,
+    document.body,
   );
 }

@@ -28,6 +28,7 @@ let timeHandle: PluginListenerHandle | null = null;
 let stateHandle: PluginListenerHandle | null = null;
 
 let loadedSrc: string | null = null;
+let sessionStarted = false;
 let commandChain: Promise<void> = Promise.resolve();
 let releaseTimer: ReturnType<typeof setTimeout> | null = null;
 let syncTimer: ReturnType<typeof setInterval> | null = null;
@@ -250,6 +251,7 @@ export async function preparePracticeSession(params: {
         await NativeAudio.stop({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
         await NativeAudio.unload({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
         loadedSrc = null;
+        sessionStarted = false;
 
         const headers = await getNativeAudioRequestHeaders();
         await NativeAudio.preload({
@@ -316,6 +318,7 @@ async function resumePracticeAudioInternal(): Promise<void> {
   practiceAudioDebug('native', 'resume');
   await NativeAudio.resume({ assetId: PRACTICE_ASSET_ID });
   await refreshSnapshotFromNative();
+  sessionStarted = true;
 }
 
 async function playPracticeAudioInternal(startSec = 0): Promise<void> {
@@ -328,6 +331,7 @@ async function playPracticeAudioInternal(startSec = 0): Promise<void> {
     time: Math.max(0, startSec),
   });
   await refreshSnapshotFromNative();
+  sessionStarted = true;
   practiceAudioDebug('native', 'play done', { isPlaying: snapshot.isPlaying, current: snapshot.current });
 }
 
@@ -365,7 +369,7 @@ export async function togglePracticeAudio(startSec = 0): Promise<void> {
     if (!snapshot.ready) {
       throw new Error('Practice audio is not ready');
     }
-    if (snapshot.ended) {
+    if (snapshot.ended || !sessionStarted) {
       await playPracticeAudioInternal(startSec);
       return;
     }
@@ -394,6 +398,7 @@ export async function stopPracticeAudio(): Promise<void> {
     await NativeAudio.unload({ assetId: PRACTICE_ASSET_ID }).catch(() => undefined);
     await PracticeForeground.stop().catch(() => undefined);
     loadedSrc = null;
+    sessionStarted = false;
     patchSnapshot({
       src: null,
       duration: 0,

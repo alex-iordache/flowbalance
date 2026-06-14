@@ -7,8 +7,8 @@ import { App } from '@capacitor/app';
  * Sideload debug — logs and COPY button on native Android during testing.
  */
 export const PRACTICE_AUDIO_DEBUG_MIN_BUILD_CODE = 8;
-export const PRACTICE_AUDIO_DEBUG_BUILD_CODE = 16;
-export const PRACTICE_AUDIO_DEBUG_VERSION_NAME = '1.0.15';
+export const PRACTICE_AUDIO_DEBUG_BUILD_CODE = 17;
+export const PRACTICE_AUDIO_DEBUG_VERSION_NAME = '1.0.16';
 
 let debugResolved = false;
 let debugEnabledCache = false;

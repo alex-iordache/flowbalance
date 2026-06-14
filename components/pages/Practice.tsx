@@ -311,7 +311,7 @@ const Practice = () => {
                     style={{
                       flex: hasDescription ? 5 : 10,
                       minHeight: 0,
-                      paddingBottom: '120px',
+                      paddingBottom: '88px',
                     }}
                   >
                     <AudioPlayer

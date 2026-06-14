@@ -8,8 +8,9 @@ import { App } from '@capacitor/app';
  * debug/sideload build only. Play Store users on older versionCode values
  * will not see the debug panel or collect logs.
  */
-export const PRACTICE_AUDIO_DEBUG_BUILD_CODE = 9;
-export const PRACTICE_AUDIO_DEBUG_VERSION_NAME = '1.0.8';
+export const PRACTICE_AUDIO_DEBUG_MIN_BUILD_CODE = 8;
+export const PRACTICE_AUDIO_DEBUG_BUILD_CODE = 10;
+export const PRACTICE_AUDIO_DEBUG_VERSION_NAME = '1.0.9';
 
 let debugResolved = false;
 let debugEnabledCache = false;
@@ -48,8 +49,8 @@ function formatDetail(detail: unknown): string | undefined {
   }
 }
 
-function matchesDebugApk(build: number, version: string): boolean {
-  return build === PRACTICE_AUDIO_DEBUG_BUILD_CODE && version === PRACTICE_AUDIO_DEBUG_VERSION_NAME;
+function matchesDebugApk(build: number): boolean {
+  return Number.isFinite(build) && build >= PRACTICE_AUDIO_DEBUG_MIN_BUILD_CODE;
 }
 
 export async function resolvePracticeAudioDebugEnabled(): Promise<boolean> {
@@ -68,7 +69,7 @@ export async function resolvePracticeAudioDebugEnabled(): Promise<boolean> {
     const build = Number.parseInt(String(info.build), 10);
     const version = String(info.version ?? '').trim();
     debugAppInfo = { version, build: String(info.build) };
-    debugEnabledCache = matchesDebugApk(build, version);
+    debugEnabledCache = matchesDebugApk(build);
     return debugEnabledCache;
   } catch {
     return false;

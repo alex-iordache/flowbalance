@@ -216,9 +216,8 @@ export default function NativePracticeAudioPlayer({
     }
 
     try {
-      practiceAudioDebug('player', 'toggle', { ready: readyRef.current, status, hasStarted });
-      const playing = await isPracticeAudioPlaying();
-      if (playing) {
+      practiceAudioDebug('player', 'toggle', { ready: readyRef.current, status, hasStarted, isPlaying });
+      if (isPlaying) {
         await pausePracticeAudio();
         await updatePracticeForeground(false, titleRef.current, subtitleRef.current);
         const sec = await getPracticeCurrentTimeSec();

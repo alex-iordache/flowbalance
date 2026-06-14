@@ -8,8 +8,8 @@ import { App } from '@capacitor/app';
  * debug/sideload build only. Play Store users on older versionCode values
  * will not see the debug panel or collect logs.
  */
-export const PRACTICE_AUDIO_DEBUG_BUILD_CODE = 8;
-export const PRACTICE_AUDIO_DEBUG_VERSION_NAME = '1.0.7';
+export const PRACTICE_AUDIO_DEBUG_BUILD_CODE = 9;
+export const PRACTICE_AUDIO_DEBUG_VERSION_NAME = '1.0.8';
 
 let debugResolved = false;
 let debugEnabledCache = false;

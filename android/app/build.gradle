@@ -17,8 +17,8 @@ android {
         applicationId "com.flowbalance.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 8
-        versionName "1.0.7" // debug sideload: keep in sync with PRACTICE_AUDIO_DEBUG_* in helpers/practiceAudioDebug.ts
+        versionCode 9
+        versionName "1.0.8" // debug sideload: keep in sync with PRACTICE_AUDIO_DEBUG_* in helpers/practiceAudioDebug.ts
         manifestPlaceholders = [customUrlScheme: "com.flowbalance.app"]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

@@ -315,7 +315,7 @@ export default function StandalonePractice() {
       </IonHeader>
       <IonContent fullscreen={true} scrollY={true}>
         <div className="px-5 py-5 pb-10 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto flex flex-col gap-4">
-          <div className="flex items-center justify-center" style={{ minHeight: '42vh' }}>
+          <div className="flex items-center justify-center" style={{ minHeight: '42vh', paddingBottom: '120px' }}>
             <AudioPlayer src={src} title={title} subtitle={flowName || undefined} variant="floatingCircle" />
           </div>
           <PracticeAudioDebugPanel />

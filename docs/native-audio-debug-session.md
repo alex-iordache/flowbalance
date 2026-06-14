@@ -6,8 +6,8 @@ Track what was added to debug native practice playback, permissions, notificatio
 
 | Field | Value | Where defined |
 |-------|-------|----------------|
-| `versionName` | `1.0.7` | `android/app/build.gradle`, `helpers/practiceAudioDebug.ts` |
-| `versionCode` | `8` | `android/app/build.gradle`, `helpers/practiceAudioDebug.ts` |
+| `versionName` | `1.0.8` | `android/app/build.gradle`, `helpers/practiceAudioDebug.ts` |
+| `versionCode` | `9` | `android/app/build.gradle`, `helpers/practiceAudioDebug.ts` |
 
 The debug panel and log collection only run when `App.getInfo()` reports **both** values above **and** the `NativeAudio` plugin is present. Play Store users on older APK versions never see the panel, even after a Vercel deploy.
 
@@ -143,7 +143,7 @@ onNativeUnavailable={() => setUseNative(false)}
 ## How to test with this build
 
 1. Commit + deploy to Vercel (JS includes debug panel gate + logging).
-2. Install sideload APK **v1.0.7 (build 8)** — `android/app/build/outputs/apk/prod/release/app-prod-release.apk`
+2. Install sideload APK **v1.0.8 (build 9)** — `android/app/build/outputs/apk/prod/release/app-prod-release.apk`
 3. Open a practice → tap Play.
 4. Confirm debug panel appears at bottom (only on this APK version).
 5. Tap **Copy logs** → paste for analysis.

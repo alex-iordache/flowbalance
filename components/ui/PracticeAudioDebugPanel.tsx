@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 
 import {
   clearPracticeAudioDebug,
@@ -11,13 +11,24 @@ import {
   practiceAudioDebug,
   resolvePracticeAudioDebugEnabled,
   subscribePracticeAudioDebug,
+  type PracticeAudioDebugEntry,
 } from '../../helpers/practiceAudioDebug';
+
+function lastError(entries: PracticeAudioDebugEntry[]): PracticeAudioDebugEntry | null {
+  for (let i = entries.length - 1; i >= 0; i -= 1) {
+    if (entries[i]?.level === 'error') return entries[i];
+  }
+  return null;
+}
 
 export default function PracticeAudioDebugPanel() {
   const [enabled, setEnabled] = useState<boolean | null>(null);
-  const [open, setOpen] = useState(true);
+  const [showLogs, setShowLogs] = useState(false);
   const [entries, setEntries] = useState(getPracticeAudioDebugEntries());
   const [copyStatus, setCopyStatus] = useState<'idle' | 'ok' | 'fail'>('idle');
+
+  const report = useMemo(() => formatPracticeAudioDebugReport(), [entries]);
+  const latestError = useMemo(() => lastError(entries), [entries]);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,43 +59,74 @@ export default function PracticeAudioDebugPanel() {
 
   return (
     <div
-      className="w-full rounded-xl text-left"
-      style={{
-        backgroundColor: 'rgba(30, 28, 24, 0.92)',
-        border: '1px solid rgba(255,255,255,0.12)',
-        color: '#F5F0E8',
-        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
-        fontSize: '11px',
-      }}
+      className="fixed inset-x-0 bottom-0 z-[9999] px-2 pb-2 pointer-events-none"
+      style={{ maxWidth: '100vw' }}
     >
-      <div className="flex items-center justify-between gap-2 px-3 py-2 border-b border-white/10">
-        <button type="button" onClick={() => setOpen((v) => !v)} className="font-semibold text-xs">
-          {open ? '▼' : '▶'} Native audio debug ({entries.length})
-        </button>
-        <div className="flex items-center gap-2">
+      <div
+        className="mx-auto w-full max-w-lg rounded-t-2xl rounded-b-xl pointer-events-auto shadow-2xl"
+        style={{
+          backgroundColor: 'rgba(22, 20, 18, 0.97)',
+          border: '1px solid rgba(255,255,255,0.14)',
+          color: '#F5F0E8',
+          fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace',
+        }}
+      >
+        <div className="px-3 pt-3 pb-2 space-y-2">
           <button
             type="button"
-            onClick={() => {
-              clearPracticeAudioDebug();
-              logPracticeAudioEnvironment();
-            }}
-            className="px-2 py-1 rounded bg-white/10 text-[10px]"
+            onClick={() => void onCopy()}
+            className="w-full px-4 py-4 rounded-xl text-base font-bold"
+            style={{ backgroundColor: '#E8DFD2', color: '#1E1C18' }}
           >
-            Clear
+            {copyStatus === 'ok' ? 'Copied! Paste in chat' : copyStatus === 'fail' ? 'Copy failed — tap again' : 'COPY ALL LOGS'}
           </button>
-          <button type="button" onClick={() => void onCopy()} className="px-2 py-1 rounded bg-white/20 text-[10px] font-semibold">
-            {copyStatus === 'ok' ? 'Copied!' : copyStatus === 'fail' ? 'Copy failed' : 'Copy logs'}
-          </button>
+
+          <div className="flex items-center gap-2 text-[10px]">
+            <button
+              type="button"
+              onClick={() => setShowLogs((v) => !v)}
+              className="flex-1 px-2 py-2 rounded-lg bg-white/10 text-left"
+            >
+              {showLogs ? 'Hide logs' : `Show logs (${entries.length})`}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                clearPracticeAudioDebug();
+                logPracticeAudioEnvironment();
+              }}
+              className="px-3 py-2 rounded-lg bg-white/10"
+            >
+              Clear
+            </button>
+          </div>
+
+          {latestError ? (
+            <div
+              className="rounded-lg px-2 py-2 text-[10px] leading-snug"
+              style={{ backgroundColor: 'rgba(180, 60, 60, 0.25)', color: '#FFD8D8' }}
+            >
+              <div className="font-bold">Latest error</div>
+              <div>{latestError.message}</div>
+            </div>
+          ) : null}
         </div>
+
+        {showLogs ? (
+          <pre
+            className="px-3 pb-3 whitespace-pre-wrap break-words text-[11px]"
+            style={{
+              margin: 0,
+              maxHeight: '40vh',
+              overflowY: 'auto',
+              WebkitOverflowScrolling: 'touch',
+              touchAction: 'pan-y',
+            }}
+          >
+            {report}
+          </pre>
+        ) : null}
       </div>
-      {open ? (
-        <pre
-          className="px-3 py-2 overflow-auto whitespace-pre-wrap break-words"
-          style={{ maxHeight: '220px', margin: 0 }}
-        >
-          {formatPracticeAudioDebugReport()}
-        </pre>
-      ) : null}
     </div>
   );
 }

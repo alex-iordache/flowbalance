@@ -311,6 +311,7 @@ const Practice = () => {
                     style={{
                       flex: hasDescription ? 5 : 10,
                       minHeight: 0,
+                      paddingBottom: '120px',
                     }}
                   >
                     <AudioPlayer
@@ -328,9 +329,7 @@ const Practice = () => {
                       onPositionChange={handlePositionChange}
                     />
                   </div>
-                  <div className="px-4 pb-4 w-full max-w-md md:max-w-2xl lg:max-w-3xl mx-auto shrink-0">
-                    <PracticeAudioDebugPanel />
-                  </div>
+                  <PracticeAudioDebugPanel />
                 </>
               ) : null}
             </div>

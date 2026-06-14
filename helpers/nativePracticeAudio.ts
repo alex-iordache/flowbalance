@@ -308,6 +308,15 @@ export async function startPracticeForeground(
   return { notificationGranted };
 }
 
+async function waitForNativePlaying(timeoutMs = 2500): Promise<boolean> {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (await isPracticeAudioPlaying()) return true;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+  return isPracticeAudioPlaying();
+}
+
 async function pausePracticeAudioInternal(): Promise<void> {
   practiceAudioDebug('native', 'pause');
   await NativeAudio.pause({ assetId: PRACTICE_ASSET_ID });
@@ -317,8 +326,10 @@ async function pausePracticeAudioInternal(): Promise<void> {
 async function resumePracticeAudioInternal(): Promise<void> {
   practiceAudioDebug('native', 'resume');
   await NativeAudio.resume({ assetId: PRACTICE_ASSET_ID });
+  const playing = await waitForNativePlaying();
   await refreshSnapshotFromNative();
   sessionStarted = true;
+  practiceAudioDebug('native', 'resume done', { isPlaying: playing, current: snapshot.current });
 }
 
 async function playPracticeAudioInternal(startSec = 0): Promise<void> {
@@ -330,18 +341,21 @@ async function playPracticeAudioInternal(startSec = 0): Promise<void> {
     assetId: PRACTICE_ASSET_ID,
     time: Math.max(0, startSec),
   });
+  const playing = await waitForNativePlaying();
   await refreshSnapshotFromNative();
   sessionStarted = true;
-  practiceAudioDebug('native', 'play done', { isPlaying: snapshot.isPlaying, current: snapshot.current });
+  practiceAudioDebug('native', 'play done', { isPlaying: playing, current: snapshot.current });
 }
 
 async function seekPracticeAudioInternal(sec: number): Promise<void> {
-  practiceAudioDebug('native', 'seek', { sec });
+  practiceAudioDebug('native', 'seek', { sec, whilePlaying: snapshot.isPlaying });
   await NativeAudio.setCurrentTime({
     assetId: PRACTICE_ASSET_ID,
     time: Math.max(0, sec),
   });
+  await new Promise((resolve) => setTimeout(resolve, 80));
   await refreshSnapshotFromNative();
+  practiceAudioDebug('native', 'seek done', { current: snapshot.current, isPlaying: snapshot.isPlaying });
 }
 
 export async function playPracticeAudio(startSec = 0): Promise<void> {

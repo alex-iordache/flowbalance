@@ -21,7 +21,7 @@ index 0000000..0d259dd
 +o/classes
 diff --git a/node_modules/@capgo/native-audio/android/build/.transforms/8f16dfe1adc75b957e717739d42dac25/transformed/classes/classes_dex/classes.dex b/node_modules/@capgo/native-audio/android/build/.transforms/8f16dfe1adc75b957e717739d42dac25/transformed/classes/classes_dex/classes.dex
 new file mode 100644
-index 0000000..fc6e70d
+index 0000000..51a686f
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/.transforms/8f16dfe1adc75b957e717739d42dac25/transformed/classes/classes_dex/classes.dex differ
 diff --git a/node_modules/@capgo/native-audio/android/build/.transforms/ef991fb288580e219ff9774f4b21889e/results.bin b/node_modules/@capgo/native-audio/android/build/.transforms/ef991fb288580e219ff9774f4b21889e/results.bin
 new file mode 100644
@@ -65,7 +65,7 @@ index 0000000..86d5c2a
 +int string my_string 0x0
 diff --git a/node_modules/@capgo/native-audio/android/build/.transforms/ef991fb288580e219ff9774f4b21889e/transformed/out/jars/classes.jar b/node_modules/@capgo/native-audio/android/build/.transforms/ef991fb288580e219ff9774f4b21889e/transformed/out/jars/classes.jar
 new file mode 100644
-index 0000000..2c66ee7
+index 0000000..de2ecd3
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/.transforms/ef991fb288580e219ff9774f4b21889e/transformed/out/jars/classes.jar differ
 diff --git a/node_modules/@capgo/native-audio/android/build/.transforms/ef991fb288580e219ff9774f4b21889e/transformed/out/jars/libs/R.jar b/node_modules/@capgo/native-audio/android/build/.transforms/ef991fb288580e219ff9774f4b21889e/transformed/out/jars/libs/R.jar
 new file mode 100644
@@ -123,7 +123,7 @@ index 0000000..0170d66
 \ No newline at end of file
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/aar_main_jar/release/syncReleaseLibJars/classes.jar b/node_modules/@capgo/native-audio/android/build/intermediates/aar_main_jar/release/syncReleaseLibJars/classes.jar
 new file mode 100644
-index 0000000..2c66ee7
+index 0000000..de2ecd3
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/aar_main_jar/release/syncReleaseLibJars/classes.jar differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/aar_metadata/release/writeReleaseAarMetadata/aar-metadata.properties b/node_modules/@capgo/native-audio/android/build/intermediates/aar_metadata/release/writeReleaseAarMetadata/aar-metadata.properties
 new file mode 100644
@@ -150,7 +150,7 @@ new file mode 100644
 index 0000000..e69de29
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/compile_library_classes_jar/release/bundleLibCompileToJarRelease/classes.jar b/node_modules/@capgo/native-audio/android/build/intermediates/compile_library_classes_jar/release/bundleLibCompileToJarRelease/classes.jar
 new file mode 100644
-index 0000000..dbe32d9
+index 0000000..906b30e
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/compile_library_classes_jar/release/bundleLibCompileToJarRelease/classes.jar differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/compile_r_class_jar/release/generateReleaseRFile/R.jar b/node_modules/@capgo/native-audio/android/build/intermediates/compile_r_class_jar/release/generateReleaseRFile/R.jar
 new file mode 100644
@@ -456,7 +456,7 @@ index 0000000..7bbb228
 +-dontnote java.lang.invoke.**
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/full_jar/release/createFullJarRelease/full.jar b/node_modules/@capgo/native-audio/android/build/intermediates/full_jar/release/createFullJarRelease/full.jar
 new file mode 100644
-index 0000000..7e544e0
+index 0000000..9c96dd8
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/full_jar/release/createFullJarRelease/full.jar differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/incremental/lintVitalAnalyzeRelease/module.xml b/node_modules/@capgo/native-audio/android/build/intermediates/incremental/lintVitalAnalyzeRelease/module.xml
 new file mode 100644
@@ -1680,67 +1680,67 @@ index 0000000..1d692ee
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/HlsAvailabilityChecker.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$1.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$1.class
 new file mode 100644
-index 0000000..990ed25
+index 0000000..3fc9790
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$1.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$10.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$10.class
 new file mode 100644
-index 0000000..fa34ecd
+index 0000000..c7a83b8
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$10.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$11.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$11.class
 new file mode 100644
-index 0000000..6126a62
+index 0000000..08fb848
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$11.class differ
-diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$1.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$1.class
-new file mode 100644
-index 0000000..747b0e9
-Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$1.class differ
-diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$2.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$2.class
-new file mode 100644
-index 0000000..37bdd99
-Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$2.class differ
-diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$3.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$3.class
-new file mode 100644
-index 0000000..4185252
-Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$3.class differ
-diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$4.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$4.class
-new file mode 100644
-index 0000000..d6d2cac
-Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12$4.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12.class
 new file mode 100644
-index 0000000..19bc315
+index 0000000..0eebf9a
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$12.class differ
+diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$1.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$1.class
+new file mode 100644
+index 0000000..0f567dc
+Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$1.class differ
+diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$2.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$2.class
+new file mode 100644
+index 0000000..18acf3d
+Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$2.class differ
+diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$3.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$3.class
+new file mode 100644
+index 0000000..17a6406
+Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13$3.class differ
+diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13.class
+new file mode 100644
+index 0000000..b228ee0
+Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$13.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$2.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$2.class
 new file mode 100644
-index 0000000..5f8537d
+index 0000000..13e92d8
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$2.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$3.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$3.class
 new file mode 100644
-index 0000000..363f79a
+index 0000000..5a8e298
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$3.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$4.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$4.class
 new file mode 100644
-index 0000000..5a12f74
+index 0000000..2be56b0
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$4.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$5.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$5.class
 new file mode 100644
-index 0000000..c3d3ff6
+index 0000000..1a190a2
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$5.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$6.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$6.class
 new file mode 100644
-index 0000000..49fbd6c
+index 0000000..0a1fb95
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$6.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$7.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$7.class
 new file mode 100644
-index 0000000..1e919d1
+index 0000000..2708816
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$7.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$8.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$8.class
 new file mode 100644
-index 0000000..84e9666
+index 0000000..129126d
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$8.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$9.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$9.class
 new file mode 100644
-index 0000000..bed35e6
+index 0000000..7d358e4
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$9.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$ArtworkCallback.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$ArtworkCallback.class
 new file mode 100644
@@ -1748,7 +1748,7 @@ index 0000000..7882bb1
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio$ArtworkCallback.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio.class
 new file mode 100644
-index 0000000..9b8b950
+index 0000000..ec4f69a
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/NativeAudio.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$1.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$1.class
 new file mode 100644
@@ -1768,31 +1768,31 @@ index 0000000..b69c48d
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$12.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$13.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$13.class
 new file mode 100644
-index 0000000..60958c3
+index 0000000..18e397f
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$13.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$14.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$14.class
 new file mode 100644
-index 0000000..9cd06cd
+index 0000000..63efc31
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$14.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$15.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$15.class
 new file mode 100644
-index 0000000..397e45c
+index 0000000..5007df0
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$15.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$16.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$16.class
 new file mode 100644
-index 0000000..80e01c8
+index 0000000..35b8403
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$16.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$17.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$17.class
 new file mode 100644
-index 0000000..7795e53
+index 0000000..6bd1b3b
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$17.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$18.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$18.class
 new file mode 100644
-index 0000000..7053064
+index 0000000..2091821
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$18.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$19.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$19.class
 new file mode 100644
-index 0000000..d266432
+index 0000000..6d1f9da
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$19.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$2.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$2.class
 new file mode 100644
@@ -1800,7 +1800,7 @@ index 0000000..0a2640e
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$2.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$20.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$20.class
 new file mode 100644
-index 0000000..d60da0d
+index 0000000..fc7cea8
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$20.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$3.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$3.class
 new file mode 100644
@@ -1836,7 +1836,7 @@ index 0000000..664bde1
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset$9.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset.class b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset.class
 new file mode 100644
-index 0000000..fe6484b
+index 0000000..e13563b
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes/ee/forgr/audio/RemoteAudioAsset.class differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/lint-cache/lintVitalAnalyzeRelease/lint-cache-version.txt b/node_modules/@capgo/native-audio/android/build/intermediates/lint-cache/lintVitalAnalyzeRelease/lint-cache-version.txt
 new file mode 100644
@@ -4544,7 +4544,7 @@ index 0000000..7827244
 \ No newline at end of file
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/local_aar_for_lint/release/out.aar b/node_modules/@capgo/native-audio/android/build/intermediates/local_aar_for_lint/release/out.aar
 new file mode 100644
-index 0000000..516b30b
+index 0000000..56b4800
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/local_aar_for_lint/release/out.aar differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/local_only_symbol_list/release/parseReleaseLocalResources/R-def.txt b/node_modules/@capgo/native-audio/android/build/intermediates/local_only_symbol_list/release/parseReleaseLocalResources/R-def.txt
 new file mode 100644
@@ -4615,7 +4615,7 @@ index 0000000..e95bf66
 \ No newline at end of file
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/runtime_library_classes_jar/release/bundleLibRuntimeToJarRelease/classes.jar b/node_modules/@capgo/native-audio/android/build/intermediates/runtime_library_classes_jar/release/bundleLibRuntimeToJarRelease/classes.jar
 new file mode 100644
-index 0000000..2b7c6b5
+index 0000000..20b58e7
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/intermediates/runtime_library_classes_jar/release/bundleLibRuntimeToJarRelease/classes.jar differ
 diff --git a/node_modules/@capgo/native-audio/android/build/intermediates/symbol_list_with_package_name/release/generateReleaseRFile/package-aware-r.txt b/node_modules/@capgo/native-audio/android/build/intermediates/symbol_list_with_package_name/release/generateReleaseRFile/package-aware-r.txt
 new file mode 100644
@@ -4689,23 +4689,23 @@ index 0000000..6126a62
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$11.class.uniqueId34 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$1.class.uniqueId37 b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$1.class.uniqueId37
 new file mode 100644
-index 0000000..b511f69
+index 0000000..747b0e9
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$1.class.uniqueId37 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$2.class.uniqueId5 b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$2.class.uniqueId5
 new file mode 100644
-index 0000000..d47d4e7
+index 0000000..37bdd99
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$2.class.uniqueId5 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$3.class.uniqueId15 b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$3.class.uniqueId15
 new file mode 100644
-index 0000000..0f5920b
+index 0000000..4185252
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$3.class.uniqueId15 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$4.class.uniqueId46 b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$4.class.uniqueId46
 new file mode 100644
-index 0000000..cd5ea4c
+index 0000000..d6d2cac
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12$4.class.uniqueId46 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12.class.uniqueId16 b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12.class.uniqueId16
 new file mode 100644
-index 0000000..8130189
+index 0000000..19bc315
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$12.class.uniqueId16 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$2.class.uniqueId18 b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$2.class.uniqueId18
 new file mode 100644
@@ -4745,7 +4745,7 @@ index 0000000..7882bb1
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio$ArtworkCallback.class.uniqueId35 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio.class.uniqueId11 b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio.class.uniqueId11
 new file mode 100644
-index 0000000..c93e6f4
+index 0000000..9b8b950
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/NativeAudio.class.uniqueId11 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/RemoteAudioAsset$1.class.uniqueId29 b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/RemoteAudioAsset$1.class.uniqueId29
 new file mode 100644
@@ -4837,7 +4837,7 @@ index 0000000..fe6484b
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/compileTransaction/stash-dir/RemoteAudioAsset.class.uniqueId2 differ
 diff --git a/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/previous-compilation-data.bin b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/previous-compilation-data.bin
 new file mode 100644
-index 0000000..eb9a15e
+index 0000000..e5ffc8b
 Binary files /dev/null and b/node_modules/@capgo/native-audio/android/build/tmp/compileReleaseJavaWithJavac/previous-compilation-data.bin differ
 diff --git a/node_modules/@capgo/native-audio/android/gradle.properties b/node_modules/@capgo/native-audio/android/gradle.properties
 new file mode 100644
@@ -4851,7 +4851,7 @@ index 0000000..a7cc673
 +# Generated by NativeAudio hook script
 +nativeAudio.hls.include=false
 diff --git a/node_modules/@capgo/native-audio/android/src/main/java/ee/forgr/audio/NativeAudio.java b/node_modules/@capgo/native-audio/android/src/main/java/ee/forgr/audio/NativeAudio.java
-index d9ad01e..1d1b5df 100644
+index d9ad01e..77695c9 100644
 --- a/node_modules/@capgo/native-audio/android/src/main/java/ee/forgr/audio/NativeAudio.java
 +++ b/node_modules/@capgo/native-audio/android/src/main/java/ee/forgr/audio/NativeAudio.java
 @@ -77,12 +77,39 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
@@ -5217,7 +5217,7 @@ index d9ad01e..1d1b5df 100644
                                      call.resolve();
                                  } catch (Exception e) {
                                      call.reject("Error setting current time: " + e.getMessage());
-@@ -590,6 +643,102 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
+@@ -590,6 +643,105 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
          notifyListeners("currentTime", ret);
      }
  
@@ -5305,6 +5305,9 @@ index d9ad01e..1d1b5df 100644
 +                    asset.resume();
 +                }
 +            }
++            if (shouldResume && !asset.isPlaying()) {
++                asset.resume();
++            }
 +            if (showNotification) {
 +                int state = shouldResume ? PlaybackStateCompat.STATE_PLAYING : PlaybackStateCompat.STATE_PAUSED;
 +                long positionMs = Math.max(0, Math.round(timeSec * 1000));
@@ -5320,7 +5323,7 @@ index d9ad01e..1d1b5df 100644
      private void preloadAsset(PluginCall call) {
          float volume = 1F;
          int audioChannelNum = 1;
-@@ -770,6 +919,8 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
+@@ -770,6 +922,8 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
                          currentlyPlayingAssetId = audioId;
                          updateNotification(audioId);
                      }
@@ -5329,7 +5332,7 @@ index d9ad01e..1d1b5df 100644
  
                      call.resolve();
                  } else {
-@@ -851,6 +1002,10 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
+@@ -851,6 +1005,10 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
  
      public void notifyDurationAvailable(String assetId, double duration) {
          Log.d(TAG, "Duration available for " + assetId + ": " + duration);
@@ -5340,7 +5343,7 @@ index d9ad01e..1d1b5df 100644
          PluginCall savedCall = pendingDurationCalls.remove(assetId);
          if (savedCall != null) {
              JSObject ret = new JSObject();
-@@ -920,7 +1075,10 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
+@@ -920,7 +1078,10 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
          mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
  
          PlaybackStateCompat.Builder stateBuilder = new PlaybackStateCompat.Builder().setActions(
@@ -5352,7 +5355,7 @@ index d9ad01e..1d1b5df 100644
          );
          mediaSession.setPlaybackState(stateBuilder.build());
  
-@@ -929,45 +1087,71 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
+@@ -929,45 +1090,71 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
              new MediaSessionCompat.Callback() {
                  @Override
                  public void onPlay() {
@@ -5450,7 +5453,7 @@ index d9ad01e..1d1b5df 100644
                  }
              }
          );
-@@ -989,33 +1173,44 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
+@@ -989,33 +1176,44 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
      private void updateNotification(String audioId) {
          if (mediaSession == null) return;
  
@@ -5502,7 +5505,7 @@ index d9ad01e..1d1b5df 100644
      }
  
      private void showNotification(String title, String artist) {
-@@ -1047,12 +1242,71 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
+@@ -1047,12 +1245,71 @@ public class NativeAudio extends Plugin implements AudioManager.OnAudioFocusChan
          }
      }
  
@@ -5577,7 +5580,7 @@ index d9ad01e..1d1b5df 100644
      }
  
 diff --git a/node_modules/@capgo/native-audio/android/src/main/java/ee/forgr/audio/RemoteAudioAsset.java b/node_modules/@capgo/native-audio/android/src/main/java/ee/forgr/audio/RemoteAudioAsset.java
-index adc1951..9ab12ca 100644
+index adc1951..3ac1948 100644
 --- a/node_modules/@capgo/native-audio/android/src/main/java/ee/forgr/audio/RemoteAudioAsset.java
 +++ b/node_modules/@capgo/native-audio/android/src/main/java/ee/forgr/audio/RemoteAudioAsset.java
 @@ -19,6 +19,9 @@ import androidx.media3.exoplayer.source.ProgressiveMediaSource;
@@ -5742,7 +5745,7 @@ index adc1951..9ab12ca 100644
          }
          Log.d(TAG, "No players or not prepared for duration");
          return 0;
-@@ -414,59 +457,59 @@ public class RemoteAudioAsset extends AudioAsset {
+@@ -414,59 +457,85 @@ public class RemoteAudioAsset extends AudioAsset {
  
      @Override
      public double getCurrentPosition() {
@@ -5816,19 +5819,44 @@ index adc1951..9ab12ca 100644
 -                                    }
 -                                }
 -                            );
--                        }
 +        final double targetSec = Math.max(0, timeSec);
 +        runOnMainSync(
 +            new Callable<Void>() {
 +                @Override
 +                public Void call() {
 +                    ExoPlayer player = players.get(playIndex);
++                    int state = player.getPlaybackState();
++                    if (state == Player.STATE_IDLE || state == Player.STATE_ENDED) {
++                        Log.d(TAG, "seekPlaybackSync recovering player from state: " + getStateString(state));
++                        if (state == Player.STATE_ENDED) {
++                            player.seekTo(0);
++                        }
++                        player.prepare();
++                    }
++
++                    boolean wasPlaying = player.isPlaying();
 +                    player.seekTo(Math.round(targetSec * 1000));
++
 +                    if (resumeAfter) {
-+                        player.play();
++                        player.setPlayWhenReady(true);
++                        if (!wasPlaying || !player.isPlaying()) {
++                            player.play();
+                         }
 +                        startCurrentTimeUpdates();
                      }
++
 +                    owner.notifyCurrentTime(assetId, targetSec);
++                    Log.d(
++                        TAG,
++                        "seekPlaybackSync target=" +
++                        targetSec +
++                        " resumeAfter=" +
++                        resumeAfter +
++                        " wasPlaying=" +
++                        wasPlaying +
++                        " nowPlaying=" +
++                        player.isPlaying()
++                    );
 +                    return null;
                  }
 -            );
@@ -5843,7 +5871,7 @@ index adc1951..9ab12ca 100644
      }
  
      @UnstableApi
-@@ -600,17 +643,19 @@ public class RemoteAudioAsset extends AudioAsset {
+@@ -600,17 +669,19 @@ public class RemoteAudioAsset extends AudioAsset {
              currentTimeHandler = new Handler(Looper.getMainLooper());
          }
  
@@ -5866,7 +5894,7 @@ index adc1951..9ab12ca 100644
                              currentTimeHandler.postDelayed(this, 100);
                          }
                      }
-@@ -620,17 +665,22 @@ public class RemoteAudioAsset extends AudioAsset {
+@@ -620,17 +691,22 @@ public class RemoteAudioAsset extends AudioAsset {
          );
      }
  
@@ -5892,7 +5920,7 @@ index adc1951..9ab12ca 100644
                              currentTimeHandler.postDelayed(this, 100);
                              return;
                          }
-@@ -649,9 +699,10 @@ public class RemoteAudioAsset extends AudioAsset {
+@@ -649,9 +725,10 @@ public class RemoteAudioAsset extends AudioAsset {
      @Override
      void stopCurrentTimeUpdates() {
          Log.d(TAG, "Stopping timer updates in RemoteAudioAsset");

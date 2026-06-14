@@ -72,13 +72,17 @@ public class MainActivity extends BridgeActivity {
         Log.i(TAG, "boot config: server.url removed (bundled mode)");
       } else {
         this.config = CapConfig.loadDefault(this);
-        Log.i(TAG, "boot config: default (remote-first)");
+        String serverUrl = this.config.getServerUrl();
+        Log.i(TAG, "boot config: default serverUrl=" + (serverUrl == null ? "(bundled)" : serverUrl));
       }
     } catch (Exception ignored) {
       // If config override fails, fall back to defaults.
       this.config = CapConfig.loadDefault(this);
       Log.i(TAG, "boot config: override failed, using default");
     }
+
+    // Must register before super.onCreate() so the plugin is included when the bridge is built.
+    registerPlugin(PracticeForegroundPlugin.class);
 
     super.onCreate(savedInstanceState);
 

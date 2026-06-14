@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 
+import NativePracticeAudioPlayer from './NativePracticeAudioPlayer';
+import { isNativePracticeAudioAvailable } from '../../helpers/nativePracticeAudio';
 import {
   attachMediaSessionActionHandlers,
   clearMediaSessionPositionState,
@@ -35,7 +37,22 @@ function formatTime(sec: number): string {
  * - No WebAudio, no CORS complications.
  * - Works in browsers + mobile webviews.
  */
-export default function AudioPlayer({
+export default function AudioPlayer(props: Props) {
+  const [useNative, setUseNative] = useState(isNativePracticeAudioAvailable);
+
+  if (useNative) {
+    return (
+      <NativePracticeAudioPlayer
+        {...props}
+        onNativeUnavailable={() => setUseNative(false)}
+      />
+    );
+  }
+
+  return <WebAudioPlayer {...props} />;
+}
+
+function WebAudioPlayer({
   src,
   title,
   subtitle,

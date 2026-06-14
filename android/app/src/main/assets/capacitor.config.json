@@ -41,6 +41,9 @@
 		},
 		"CapacitorHttp": {
 			"enabled": false
+		},
+		"NativeAudio": {
+			"hls": false
 		}
 	},
 	"cordova": {}

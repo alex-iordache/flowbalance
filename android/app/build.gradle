@@ -17,8 +17,8 @@ android {
         applicationId "com.flowbalance.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 7
+        versionName "1.0.6"
         manifestPlaceholders = [customUrlScheme: "com.flowbalance.app"]
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
@@ -77,7 +77,7 @@ repositories {
     }
 }
 
-dependencies {
+    dependencies {
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation fileTree(include: ['*.jar'], dir: 'libs')

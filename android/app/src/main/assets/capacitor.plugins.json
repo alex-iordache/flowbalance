@@ -20,11 +20,19 @@
 		"classpath": "com.capacitorjs.plugins.keyboard.KeyboardPlugin"
 	},
 	{
+		"pkg": "@capacitor/local-notifications",
+		"classpath": "com.capacitorjs.plugins.localnotifications.LocalNotificationsPlugin"
+	},
+	{
 		"pkg": "@capacitor/preferences",
 		"classpath": "com.capacitorjs.plugins.preferences.PreferencesPlugin"
 	},
 	{
 		"pkg": "@capacitor/status-bar",
 		"classpath": "com.capacitorjs.plugins.statusbar.StatusBarPlugin"
+	},
+	{
+		"pkg": "@capgo/native-audio",
+		"classpath": "ee.forgr.audio.NativeAudio"
 	}
 ]

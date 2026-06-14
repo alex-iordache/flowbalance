@@ -41,6 +41,9 @@
 		},
 		"CapacitorHttp": {
 			"enabled": false
+		},
+		"NativeAudio": {
+			"hls": false
 		}
 	},
 	"cordova": {},
@@ -51,6 +54,7 @@
 		"HapticsPlugin",
 		"KeyboardPlugin",
 		"PreferencesPlugin",
-		"StatusBarPlugin"
+		"StatusBarPlugin",
+		"NativeAudio"
 	]
 }

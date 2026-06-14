@@ -11,11 +11,15 @@
     "url": "https://www.flowbalance.app",
     "cleartext": false,
     "androidScheme": "https",
+    "errorPath": "offline.html",
     "allowNavigation": [
       "www.flowbalance.app",
       "flowbalance.app",
       "flowbalance.vercel.app",
       "*.vercel.app",
+      "clerk.flowbalance.app",
+      "accounts.flowbalance.app",
+      "clkmail.flowbalance.app",
       "clerk.com",
       "*.clerk.com",
       "accounts.clerk.dev",
@@ -25,10 +29,7 @@
       "*.accounts.dev",
       "clerk.accounts.dev",
       "clerk.shared.lcl.dev",
-      "*.lcl.dev",
-      "clerk.flowbalance.app",
-      "accounts.flowbalance.app",
-      "clkmail.flowbalance.app"
+      "*.lcl.dev"
     ]
   },
   "plugins": {
@@ -40,8 +41,10 @@
     },
     "CapacitorHttp": {
       "enabled": false
+    },
+    "NativeAudio": {
+      "hls": false
     }
   },
   "cordova": {}
 }
-

@@ -1,26 +1,24 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import type { PluginListenerHandle } from '@capacitor/core';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 
-import { practiceAudioDebug, resolvePracticeAudioDebugEnabled } from '../../helpers/practiceAudioDebug';
+import { practiceAudioDebug } from '../../helpers/practiceAudioDebug';
 import {
-  getPracticeCurrentTimeSec,
-  getPracticeDurationSec,
-  isPracticeAudioPlaying,
+  getPracticePlaybackSnapshot,
+  onPracticePlaybackComplete,
   openPracticeNotificationSettings,
   pausePracticeAudio,
   playPracticeAudio,
-  preloadPracticeAudio,
-  PRACTICE_ASSET_ID,
+  preparePracticeSession,
+  retainPracticeSession,
   resumePracticeAudio,
+  scheduleReleasePracticeSession,
   seekPracticeAudio,
   startPracticeForeground,
-  stopPracticeAudio,
-  stopPracticeForeground,
-  updatePracticeForeground,
+  subscribePracticePlayback,
+  syncPracticePlaybackFromNative,
+  type PracticePlaybackSnapshot,
 } from '../../helpers/nativePracticeAudio';
-import { NativeAudio } from '@capgo/native-audio';
 
 type Props = {
   src: string;
@@ -54,26 +52,14 @@ export default function NativePracticeAudioPlayer({
   const onEndedRef = useRef(onEnded);
   const onPositionChangeRef = useRef(onPositionChange);
   const lastReportedSecRef = useRef(-1);
+  const hasStartedRef = useRef(false);
   const initialPositionSecRef = useRef(initialPositionSec);
   const titleRef = useRef(title);
   const subtitleRef = useRef(subtitle);
-  const readyRef = useRef(false);
-  const hasStartedRef = useRef(false);
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [hasStarted, setHasStarted] = useState(false);
+  const [playback, setPlayback] = useState<PracticePlaybackSnapshot>(() => getPracticePlaybackSnapshot());
   const [notificationsBlocked, setNotificationsBlocked] = useState(false);
-  const [status, setStatus] = useState<'idle' | 'loading' | 'ready' | 'playing' | 'paused' | 'ended' | 'error'>(
-    'idle',
-  );
-  const [current, setCurrent] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [errorDetail, setErrorDetail] = useState('');
-
-  const progressPct = useMemo(() => {
-    if (!duration) return 0;
-    return Math.max(0, Math.min(100, (current / duration) * 100));
-  }, [current, duration]);
+  const [hasStarted, setHasStarted] = useState(false);
 
   useEffect(() => {
     onPlayRef.current = onPlay;
@@ -88,32 +74,61 @@ export default function NativePracticeAudioPlayer({
     titleRef.current = title;
     subtitleRef.current = subtitle;
   }, [title, subtitle]);
-
   initialPositionSecRef.current = initialPositionSec;
-
   useEffect(() => {
     hasStartedRef.current = hasStarted;
   }, [hasStarted]);
 
-  const syncPlaybackState = async () => {
-    try {
-      const playing = await isPracticeAudioPlaying();
-      const sec = await getPracticeCurrentTimeSec();
-      setCurrent(sec);
-      setIsPlaying(playing);
-      setStatus(playing ? 'playing' : hasStartedRef.current ? 'paused' : 'ready');
-      if (onPositionChangeRef.current) onPositionChangeRef.current(sec);
-    } catch {
-      // ignore sync errors
-    }
-  };
+  useEffect(() => {
+    let cancelled = false;
+    retainPracticeSession();
+    setHasStarted(false);
+    lastReportedSecRef.current = -1;
+
+    void (async () => {
+      try {
+        await preparePracticeSession({
+          src,
+          title: titleRef.current,
+          subtitle: subtitleRef.current,
+          initialPositionSec: initialPositionSecRef.current,
+        });
+      } catch (err) {
+        if (!cancelled) {
+          practiceAudioDebug('player', 'prepare failed in component', err, 'error');
+        }
+      }
+    })();
+
+    const unsubPlayback = subscribePracticePlayback((state) => {
+      if (cancelled) return;
+      setPlayback(state);
+      if (onPositionChangeRef.current && Math.floor(state.current) !== Math.floor(lastReportedSecRef.current)) {
+        lastReportedSecRef.current = state.current;
+        onPositionChangeRef.current(state.current);
+      }
+    });
+
+    const unsubComplete = onPracticePlaybackComplete(() => {
+      if (cancelled) return;
+      setHasStarted(false);
+      onEndedRef.current?.();
+    });
+
+    return () => {
+      cancelled = true;
+      unsubPlayback();
+      unsubComplete();
+      scheduleReleasePracticeSession();
+    };
+  }, [src]);
 
   useEffect(() => {
     if (Capacitor.getPlatform() !== 'android') return;
-    let handle: PluginListenerHandle | null = null;
+    let handle: { remove: () => Promise<void> } | null = null;
     void (async () => {
       handle = await App.addListener('appStateChange', ({ isActive }) => {
-        if (isActive) void syncPlaybackState();
+        if (isActive) void syncPracticePlaybackFromNative();
       });
     })();
     return () => {
@@ -121,149 +136,60 @@ export default function NativePracticeAudioPlayer({
     };
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    let completeHandle: PluginListenerHandle | null = null;
-    let timeHandle: PluginListenerHandle | null = null;
-
-    const setup = async () => {
-      readyRef.current = false;
-      setIsPlaying(false);
-      setHasStarted(false);
-      setStatus('loading');
-      setCurrent(0);
-      setDuration(0);
-      setErrorDetail('');
-      practiceAudioDebug('player', 'setup starting', { src });
-
-      try {
-        await resolvePracticeAudioDebugEnabled();
-        await stopPracticeAudio();
-        if (cancelled) return;
-
-        await preloadPracticeAudio({
-          src,
-          title: titleRef.current,
-          subtitle: subtitleRef.current,
-        });
-        if (cancelled) return;
-
-        const dur = await getPracticeDurationSec();
-        if (cancelled) return;
-        if (!Number.isFinite(dur) || dur <= 0) {
-          throw new Error(`Native audio preload returned zero duration (got ${dur})`);
-        }
-
-        const initPos = initialPositionSecRef.current;
-        setDuration(dur);
-        if (initPos > 0 && initPos < dur) {
-          await seekPracticeAudio(initPos);
-          setCurrent(initPos);
-          lastReportedSecRef.current = Math.floor(initPos);
-        }
-        readyRef.current = true;
-        setStatus('ready');
-        practiceAudioDebug('player', 'setup ready', { duration: dur });
-
-        completeHandle = await NativeAudio.addListener('complete', (event) => {
-          if (event.assetId !== PRACTICE_ASSET_ID) return;
-          setIsPlaying(false);
-          setStatus('ended');
-          void stopPracticeForeground();
-          onEndedRef.current?.();
-        });
-
-        timeHandle = await NativeAudio.addListener('currentTime', (event) => {
-          if (event.assetId !== PRACTICE_ASSET_ID) return;
-          const sec = event.currentTime || 0;
-          setCurrent(sec);
-          if (onPositionChangeRef.current && Math.floor(sec) !== Math.floor(lastReportedSecRef.current)) {
-            lastReportedSecRef.current = sec;
-            onPositionChangeRef.current(sec);
-          }
-        });
-      } catch (err) {
-        if (!cancelled) {
-          const message = err instanceof Error ? err.message : String(err);
-          practiceAudioDebug('player', 'setup failed', err, 'error');
-          setErrorDetail(message);
-          setStatus('error');
-        }
-      }
-    };
-
-    void setup();
-
-    return () => {
-      cancelled = true;
-      void completeHandle?.remove();
-      void timeHandle?.remove();
-      void (async () => {
-        try {
-          const sec = await getPracticeCurrentTimeSec();
-          onPositionChangeRef.current?.(sec);
-        } catch {
-          // ignore
-        }
-        await stopPracticeAudio();
-      })();
-    };
-  }, [src]);
+  const progressPct = useMemo(() => {
+    if (!playback.duration) return 0;
+    return Math.max(0, Math.min(100, (playback.current / playback.duration) * 100));
+  }, [playback.current, playback.duration]);
 
   const toggle = async () => {
-    if (!readyRef.current && status !== 'playing' && status !== 'paused') {
-      setStatus('loading');
-    }
-
     try {
-      practiceAudioDebug('player', 'toggle', { ready: readyRef.current, status, hasStarted, isPlaying });
-      if (isPlaying) {
+      practiceAudioDebug('player', 'toggle', {
+        ready: playback.ready,
+        isPlaying: playback.isPlaying,
+        hasStarted,
+        ended: playback.ended,
+      });
+
+      if (playback.isPlaying) {
         await pausePracticeAudio();
-        await updatePracticeForeground(false, titleRef.current, subtitleRef.current);
-        const sec = await getPracticeCurrentTimeSec();
-        setCurrent(sec);
-        onPositionChangeRef.current?.(sec);
-        setIsPlaying(false);
-        setStatus('paused');
+        setHasStarted(true);
         return;
       }
 
-      setStatus('loading');
-      const { notificationGranted } = await startPracticeForeground(titleRef.current, subtitleRef.current);
-      if (!notificationGranted) {
-        setNotificationsBlocked(true);
-      } else {
-        setNotificationsBlocked(false);
+      if (!playback.ready) {
+        await preparePracticeSession({
+          src,
+          title: titleRef.current,
+          subtitle: subtitleRef.current,
+          initialPositionSec: initialPositionSecRef.current,
+        });
       }
-      if (hasStarted) {
+
+      const { notificationGranted } = await startPracticeForeground(titleRef.current, subtitleRef.current);
+      setNotificationsBlocked(!notificationGranted);
+
+      if (hasStarted && !playback.ended) {
         await resumePracticeAudio();
       } else {
-        await playPracticeAudio(initialPositionSecRef.current);
+        const startSec = playback.ended ? 0 : initialPositionSecRef.current;
+        await playPracticeAudio(startSec);
       }
-      setIsPlaying(true);
+
       setHasStarted(true);
-      setStatus('playing');
       onPlayRef.current?.();
-      practiceAudioDebug('player', 'toggle -> playing');
     } catch (err) {
-      const message = err instanceof Error ? err.message : String(err);
       practiceAudioDebug('player', 'toggle failed', err, 'error');
-      setErrorDetail(message);
-      await stopPracticeForeground();
-      setIsPlaying(false);
-      setStatus('error');
     }
   };
 
   const seekToPct = async (pct: number) => {
-    if (!duration) return;
-    const next = (pct / 100) * duration;
+    if (!playback.duration) return;
+    const next = (pct / 100) * playback.duration;
     try {
       await seekPracticeAudio(next);
-      setCurrent(next);
       if (onPositionChangeRef.current) onPositionChangeRef.current(next);
-    } catch {
-      setStatus('error');
+    } catch (err) {
+      practiceAudioDebug('player', 'seek failed', err, 'error');
     }
   };
 
@@ -279,11 +205,8 @@ export default function NativePracticeAudioPlayer({
     </svg>
   );
 
-  const statusLabel =
-    status === 'error' ? (errorDetail ? `Native audio failed: ${errorDetail}` : 'Native audio failed') : '';
-  const notificationHint = notificationsBlocked
-    ? 'Allow notifications for lock-screen controls.'
-    : '';
+  const statusLabel = playback.error ? `Native audio failed: ${playback.error}` : '';
+  const notificationHint = notificationsBlocked ? 'Allow notifications for lock-screen controls.' : '';
   const ink = '#3B3126';
   const inkMuted = 'rgba(59, 49, 38, 0.72)';
   const inkSubtle = 'rgba(59, 49, 38, 0.52)';
@@ -302,42 +225,20 @@ export default function NativePracticeAudioPlayer({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          {title ? (
-            <div className="font-semibold truncate" style={{ color: ink }}>
-              {title}
-            </div>
-          ) : null}
-          {subtitle ? (
-            <div className="text-xs truncate mt-0.5" style={{ color: inkMuted }}>
-              {subtitle}
-            </div>
-          ) : null}
-          {statusLabel ? (
-            <div className="text-xs mt-1" style={{ color: inkMuted }}>
-              {statusLabel}
-            </div>
-          ) : null}
+          {title ? <div className="font-semibold truncate">{title}</div> : null}
+          {subtitle ? <div className="text-xs truncate mt-0.5" style={{ color: inkMuted }}>{subtitle}</div> : null}
+          {statusLabel ? <div className="text-xs mt-1" style={{ color: inkMuted }}>{statusLabel}</div> : null}
           {notificationHint ? (
             <div className="text-xs mt-1 flex items-center gap-2 flex-wrap" style={{ color: inkMuted }}>
               <span>{notificationHint}</span>
-              <button
-                type="button"
-                onClick={() => void openPracticeNotificationSettings()}
-                className="underline"
-                style={{ color: ink }}
-              >
+              <button type="button" onClick={() => void openPracticeNotificationSettings()} className="underline" style={{ color: ink }}>
                 Open Settings
               </button>
             </div>
           ) : null}
         </div>
-        <button
-          type="button"
-          onClick={() => void toggle()}
-          className="shrink-0 px-5 py-2 rounded-full text-sm font-semibold"
-          style={{ backgroundColor: 'rgba(59, 49, 38, 0.10)', color: ink }}
-        >
-          {isPlaying ? PauseIcon : PlayIcon}
+        <button type="button" onClick={() => void toggle()} className="shrink-0 px-5 py-2 rounded-full text-sm font-semibold" style={{ backgroundColor: 'rgba(59, 49, 38, 0.10)', color: ink }}>
+          {playback.isPlaying ? PauseIcon : PlayIcon}
         </button>
       </div>
       <div className="mt-4">
@@ -345,22 +246,17 @@ export default function NativePracticeAudioPlayer({
           className="w-full h-3 rounded-full overflow-hidden cursor-pointer"
           role="slider"
           aria-label="Seek"
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(progressPct)}
-          tabIndex={0}
           style={{ backgroundColor: trackBg }}
           onClick={(e) => {
             const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-            const pct = ((e.clientX - rect.left) / rect.width) * 100;
-            void seekToPct(pct);
+            void seekToPct(((e.clientX - rect.left) / rect.width) * 100);
           }}
         >
           <div className="h-3 rounded-full" style={{ width: `${progressPct}%`, backgroundColor: fillBg }} />
         </div>
         <div className="flex items-center justify-between text-xs mt-2" style={{ color: inkMuted }}>
-          <span>{formatTime(current)}</span>
-          <span>{formatTime(duration)}</span>
+          <span>{formatTime(playback.current)}</span>
+          <span>{formatTime(playback.duration)}</span>
         </div>
       </div>
     </div>
@@ -370,68 +266,29 @@ export default function NativePracticeAudioPlayer({
     <div className="w-full h-full flex items-center justify-center">
       <div className="w-full max-w-md md:max-w-2xl lg:max-w-3xl px-6 flex flex-col items-center text-center gap-4">
         <div className="w-full">
-          {title ? (
-            <div className="font-semibold text-base md:text-lg leading-snug line-clamp-2" style={{ color: ink }}>
-              {title}
-            </div>
-          ) : null}
-          {subtitle ? (
-            <div className="text-xs md:text-sm mt-1" style={{ color: inkMuted }}>
-              {subtitle}
-            </div>
-          ) : null}
-          {statusLabel ? (
-            <div className="text-xs mt-2" style={{ color: inkSubtle }}>
-              {statusLabel}
-            </div>
-          ) : null}
-          {notificationHint ? (
-            <div className="text-xs mt-2 flex items-center justify-center gap-2 flex-wrap" style={{ color: inkSubtle }}>
-              <span>{notificationHint}</span>
-              <button
-                type="button"
-                onClick={() => void openPracticeNotificationSettings()}
-                className="underline"
-                style={{ color: ink }}
-              >
-                Open Settings
-              </button>
-            </div>
-          ) : null}
+          {title ? <div className="font-semibold text-base md:text-lg leading-snug line-clamp-2">{title}</div> : null}
+          {subtitle ? <div className="text-xs md:text-sm mt-1" style={{ color: inkMuted }}>{subtitle}</div> : null}
+          {statusLabel ? <div className="text-xs mt-2" style={{ color: inkSubtle }}>{statusLabel}</div> : null}
         </div>
-        <button
-          type="button"
-          onClick={() => void toggle()}
-          aria-label={isPlaying ? 'Pause' : 'Play'}
-          className="flex items-center justify-center"
-          style={{ width: 76, height: 76, background: 'transparent', border: 'none', padding: 0, color: ink }}
-        >
-          {isPlaying ? PauseIcon : PlayIcon}
+        <button type="button" onClick={() => void toggle()} aria-label={playback.isPlaying ? 'Pause' : 'Play'} className="flex items-center justify-center" style={{ width: 76, height: 76, background: 'transparent', border: 'none', padding: 0, color: ink }}>
+          {playback.isPlaying ? PauseIcon : PlayIcon}
         </button>
-        <div className="w-full flex flex-col items-center" style={{ maxWidth: '100%' }}>
+        <div className="w-full flex flex-col items-center">
           <div
             className="h-2 rounded-full overflow-hidden cursor-pointer"
             role="slider"
             aria-label="Seek"
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={Math.round(progressPct)}
-            tabIndex={0}
             style={{ width: '92%', background: trackBg }}
             onClick={(e) => {
               const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
-              const pct = ((e.clientX - rect.left) / rect.width) * 100;
-              void seekToPct(pct);
+              void seekToPct(((e.clientX - rect.left) / rect.width) * 100);
             }}
           >
             <div className="h-2 rounded-full" style={{ width: `${progressPct}%`, background: fillBg }} />
           </div>
-          <div
-            className="flex items-center justify-between text-xs mt-2 select-none"
-            style={{ fontVariantNumeric: 'tabular-nums', width: '92%', color: inkMuted }}
-          >
-            <span>{formatTime(current)}</span>
-            <span>{formatTime(duration)}</span>
+          <div className="flex items-center justify-between text-xs mt-2 select-none" style={{ fontVariantNumeric: 'tabular-nums', width: '92%', color: inkMuted }}>
+            <span>{formatTime(playback.current)}</span>
+            <span>{formatTime(playback.duration)}</span>
           </div>
         </div>
       </div>
